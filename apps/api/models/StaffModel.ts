@@ -26,7 +26,11 @@ function Staffs(prismaStaff: PrismaClient["staff"]) {
     //   return prismaUser.create({ data })
     // },
     async getAll(): Promise<Omit<Staff, "password">[]> {
-      const staffs = await prismaStaff.findMany();
+      const staffs = await prismaStaff.findMany({
+        include: {
+          merchant: true,
+        },
+      });
       return staffs.map((staff) => exclude(staff, ["password"]));
     },
   });

@@ -10,8 +10,13 @@
     "eslint": "^7.32.0",
     "eslint-config-custom": "workspace:*",
     "prettier": "^2.5.1",
-    "turbo": "latest"
+    "turbo": "latest",
+    "@types/bcrypt": "^5.0.0"
   },
   "packageManager": "pnpm@7.15.0",
-  "name": "evoucher"
+  "name": "evoucher",
+  "dependencies": {
+    "axios": "^1.4.0",
+    "bcrypt": "^5.1.0"
+  }
 }

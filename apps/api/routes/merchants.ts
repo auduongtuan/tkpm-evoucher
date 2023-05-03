@@ -1,14 +1,18 @@
 import { FastifyPluginOptions, FastifyInstance, FastifyRequest } from "fastify";
-import StaffModel from "../models/StaffModel";
+// import MerchantModel from "../models/MerchantModel";
 async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
-  fastify.get("/staffs", async (request, reply) => {
-    const staffModel = StaffModel(fastify.prisma.staff);
-    const staffs = await staffModel.getAll();
-    return staffs;
+  fastify.get("/", async (request, reply) => {
+    const merchants = await fastify.prisma.merchant.findMany({
+      include: {
+        stores: true,
+        staffs: true,
+      },
+    });
+    return merchants;
   });
 
   fastify.get(
-    "/staff/:id",
+    "/:id",
     async (
       request: FastifyRequest<{
         Params: {
@@ -17,21 +21,25 @@ async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
       }>,
       reply
     ) => {
-      const staffModel = StaffModel(fastify.prisma.staff);
+      // const merchantModel = MerchantModel(fastify.prisma.merchant);
       if (Number.isNaN(request.params.id)) {
         reply.statusCode = 400;
         throw new Error("Bad request");
       }
-      const staff = await staffModel.findUnique({
+      const merchant = await fastify.prisma.merchant.findUnique({
         where: {
           id: parseInt(request.params.id),
         },
+        include: {
+          stores: true,
+          staffs: true,
+        },
       });
-      if (!staff) {
+      if (!merchant) {
         reply.statusCode = 404;
-        throw new Error("Staff not found");
+        throw new Error("Merchant not found");
       }
-      return staff;
+      return merchant;
     }
   );
 }

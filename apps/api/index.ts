@@ -1,12 +1,21 @@
 import Fastify, { FastifyInstance, RouteShorthandOptions } from "fastify";
-import { Server, IncomingMessage, ServerResponse } from "http";
+// import { Server, IncomingMessage, ServerResponse } from "http";
 import prismaPlugin from "./plugins/prisma";
-import { PrismaClient } from "@prisma/client";
 const server: FastifyInstance = Fastify({});
-import staffRoute from "./routes/staff";
+import staffRoute from "./routes/staffs";
+import merchantRoute from "./routes/merchants";
+import campainRoute from "./routes/campaigns";
+import storeRoute from "./routes/stores";
+import cors from "@fastify/cors";
 
+server.register(cors, {
+  origin: ["http://localhost:5173"],
+});
 server.register(prismaPlugin);
-server.register(staffRoute, { prefix: "staff" });
+server.register(staffRoute, { prefix: "staffs" });
+server.register(merchantRoute, { prefix: "merchants" });
+server.register(storeRoute, { prefix: "stores" });
+server.register(campainRoute, { prefix: "campaigns" });
 
 const opts: RouteShorthandOptions = {
   schema: {
