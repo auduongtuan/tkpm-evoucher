@@ -1,10 +1,10 @@
-import { getMerchants } from "../api-client";
+import { getGames } from "../api-client";
 import { useQuery } from "react-query";
 import { Table, Typography, Space } from "antd";
-import { Merchant } from "database";
+import { Game, Store } from "database";
 
-const Merchants = () => {
-  const query = useQuery("merchants", getMerchants);
+const Games = () => {
+  const query = useQuery("games", getGames);
   if (query.data) console.log(query.data);
   const columns = [
     {
@@ -18,14 +18,8 @@ const Merchants = () => {
       key: "name",
     },
     {
-      title: "Number of stores",
-      dataIndex: "stores",
-      key: "stores_length",
-      render: (stores) => (stores ? stores.length : 0),
-    },
-    {
       title: "Actions",
-      render: (record: Merchant) => (
+      render: (record: Store) => (
         <Space size="middle">
           <a href={`/${record.id}`}>Delete</a>
         </Space>
@@ -34,9 +28,9 @@ const Merchants = () => {
   ];
   return (
     <>
-      <Typography.Title level={2}>Merchants</Typography.Title>
+      <Typography.Title level={2}>Games</Typography.Title>
       {!query.isLoading && <Table dataSource={query.data} columns={columns} />}
     </>
   );
 };
-export default Merchants;
+export default Games;

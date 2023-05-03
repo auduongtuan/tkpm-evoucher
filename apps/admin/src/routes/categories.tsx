@@ -1,10 +1,10 @@
-import { getMerchants } from "../api-client";
+import { getCategories } from "../api-client";
 import { useQuery } from "react-query";
 import { Table, Typography, Space } from "antd";
 import { Merchant } from "database";
 
 const Merchants = () => {
-  const query = useQuery("merchants", getMerchants);
+  const query = useQuery("categories", getCategories);
   if (query.data) console.log(query.data);
   const columns = [
     {
@@ -34,7 +34,7 @@ const Merchants = () => {
   ];
   return (
     <>
-      <Typography.Title level={2}>Merchants</Typography.Title>
+      <Typography.Title level={2}>Categories</Typography.Title>
       {!query.isLoading && <Table dataSource={query.data} columns={columns} />}
     </>
   );

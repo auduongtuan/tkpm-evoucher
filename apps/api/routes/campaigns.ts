@@ -1,41 +1,48 @@
 import { FastifyPluginOptions, FastifyInstance, FastifyRequest } from "fastify";
 // import CampaignModel from "../models/CampaignModel";
+import {
+  deleteMiddleware,
+  viewMiddleware,
+  listMiddleware,
+} from "../middlewares/crud";
+
 async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
-  fastify.get("/", async (request, reply) => {
-    const campaigns = await fastify.prisma.campaign.findMany();
-    return campaigns;
-  });
+  fastify.get(
+    "/",
+    listMiddleware("Campaign", async () => {
+      return await fastify.prisma.campaign.findMany({
+        include: {
+          merchant: true,
+          stores: true,
+        },
+      });
+    })
+  );
 
   fastify.get(
     "/:id",
-    async (
-      request: FastifyRequest<{
-        Params: {
-          id: string;
-        };
-      }>,
-      reply
-    ) => {
-      // const campaignModel = CampaignModel(fastify.prisma.campaign);
-      if (Number.isNaN(request.params.id)) {
-        reply.statusCode = 400;
-        throw new Error("Bad request");
-      }
-      const campaign = await fastify.prisma.campaign.findUnique({
+    viewMiddleware("Campaign", async (id) => {
+      return await fastify.prisma.campaign.findUnique({
         where: {
-          id: parseInt(request.params.id),
+          id: id,
         },
         include: {
           merchant: true,
           stores: true,
         },
       });
-      if (!campaign) {
-        reply.statusCode = 404;
-        throw new Error("Campaign not found");
-      }
-      return campaign;
-    }
+    })
+  );
+
+  fastify.delete(
+    "/:id",
+    deleteMiddleware("Campaign", async (id) => {
+      await fastify.prisma.campaign.delete({
+        where: {
+          id: id,
+        },
+      });
+    })
   );
 }
 

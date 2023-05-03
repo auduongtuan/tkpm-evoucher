@@ -4,7 +4,15 @@ import type { MenuProps } from "antd";
 import { ConfigProvider, Layout, Menu, Typography, theme } from "antd";
 import { useNavigate, useLocation } from "react-router-dom";
 const { Header, Content, Footer, Sider } = Layout;
-import { RiStore2Line, RiHome2Line } from "react-icons/ri";
+import {
+  RiStoreFill,
+  RiStore2Fill,
+  RiHome2Fill,
+  RiFilter2Fill,
+  RiGamepadFill,
+  RiImageEditFill,
+} from "react-icons/ri";
+import { R } from "react-icons/hi2";
 import { SubMenuType } from "antd/es/menu/hooks/useItems";
 type MenuItem = Required<MenuProps>["items"][number];
 
@@ -16,18 +24,43 @@ type NavigationItem = {
   parent?: string;
 };
 const navigationItems: NavigationItem[] = [
-  { label: "Home", key: "_", path: "/", icon: <RiHome2Line /> },
+  { label: "Home", key: "_", path: "/", icon: <RiHome2Fill /> },
   {
     label: "Merchants",
     key: "_merchants",
-    icon: <RiStore2Line />,
+    path: "/merchants",
+    icon: <RiStore2Fill />,
   },
   {
-    label: "Merchant List",
-    key: "_merchants_list",
-    path: "/merchants",
-    parent: "_merchants",
+    label: "Stores",
+    key: "_stores",
+    path: "/stores",
+    icon: <RiStoreFill />,
   },
+  {
+    label: "Categories",
+    key: "_categories",
+    path: "/categories",
+    icon: <RiFilter2Fill />,
+  },
+  {
+    label: "Games",
+    key: "_games",
+    path: "/games",
+    icon: <RiGamepadFill />,
+  },
+  {
+    label: "Campaigns",
+    key: "_campaigns",
+    path: "/campaigns",
+    icon: <RiImageEditFill />,
+  },
+  // {
+  //   label: "Merchant List",
+  //   key: "_merchants_list",
+  //   path: "/merchants",
+  //   parent: "_merchants",
+  // },
 ];
 // function getItem(navItem: NavigationItem) {
 //   const { path, parent, ...rest } = navItem;
@@ -75,7 +108,7 @@ const MainSidebar = () => {
   };
   return (
     <Sider
-      collapsible
+      // collapsible
       collapsed={collapsed}
       onCollapse={(value) => setCollapsed(value)}
     >

@@ -1,4 +1,4 @@
-import { PrismaClient, Staff } from "@prisma/client";
+import { PrismaClient, Staff } from "database";
 
 type Signup = {
   email: string;

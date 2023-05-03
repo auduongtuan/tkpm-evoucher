@@ -1,11 +1,15 @@
 import { FastifyPluginOptions, FastifyInstance, FastifyRequest } from "fastify";
 import StaffModel from "../models/StaffModel";
+import { listMiddleware, deleteMiddleware } from "../middlewares/crud";
 async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
-  fastify.get("/", async (request, reply) => {
-    const staffModel = StaffModel(fastify.prisma.staff);
-    const staffs = await staffModel.getAll();
-    return staffs;
-  });
+  fastify.get(
+    "/",
+    listMiddleware("Staff", async () => {
+      const staffModel = StaffModel(fastify.prisma.staff);
+      const staffs = await staffModel.getAll();
+      return staffs;
+    })
+  );
 
   fastify.get(
     "/:id",
@@ -36,6 +40,17 @@ async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
       }
       return staff;
     }
+  );
+
+  fastify.delete(
+    "/:id",
+    deleteMiddleware("Staff", async (id) => {
+      await fastify.prisma.staff.delete({
+        where: {
+          id: id,
+        },
+      });
+    })
   );
 }
 

@@ -7,20 +7,17 @@ import {
 async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
   fastify.get(
     "/",
-    listMiddleware("Store", async () => {
-      const stores = await fastify.prisma.store.findMany();
-      return stores;
+    listMiddleware("Game", async () => {
+      const games = await fastify.prisma.game.findMany();
+      return games;
     })
   );
   fastify.get(
     "/:id",
-    viewMiddleware("Store", async (id) => {
-      return await fastify.prisma.store.findUnique({
+    viewMiddleware("Game", async (id) => {
+      return await fastify.prisma.game.findUnique({
         where: {
           id: id,
-        },
-        include: {
-          merchant: true,
         },
       });
     })
@@ -28,8 +25,8 @@ async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
 
   fastify.delete(
     "/:id",
-    deleteMiddleware("Store", async (id) => {
-      await fastify.prisma.store.delete({
+    deleteMiddleware("Game", async (id) => {
+      await fastify.prisma.game.delete({
         where: {
           id: id,
         },

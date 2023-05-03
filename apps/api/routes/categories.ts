@@ -1,9 +1,8 @@
 import { FastifyPluginOptions, FastifyInstance, FastifyRequest } from "fastify";
-// import MerchantModel from "../models/MerchantModel";
 import {
-  listMiddleware,
   viewMiddleware,
   deleteMiddleware,
+  listMiddleware,
 } from "../middlewares/crud";
 async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
   fastify.get(
@@ -13,24 +12,25 @@ async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
       return categories;
     })
   );
+
   fastify.get(
     "/:id",
-    viewMiddleware("Merchant", async (id) => {
-      return await fastify.prisma.merchant.findUnique({
+    viewMiddleware("Category", async (id) => {
+      return await fastify.prisma.category.findUnique({
         where: {
           id: id,
         },
         include: {
           stores: true,
-          staffs: true,
         },
       });
     })
   );
+
   fastify.delete(
     "/:id",
-    deleteMiddleware("Merchant", async (id) => {
-      await fastify.prisma.merchant.delete({
+    deleteMiddleware("Category", async (id) => {
+      await fastify.prisma.category.delete({
         where: {
           id: id,
         },

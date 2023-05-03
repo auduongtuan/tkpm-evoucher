@@ -1,10 +1,10 @@
-import { getMerchants } from "../api-client";
+import { getCampaigns } from "../api-client";
 import { useQuery } from "react-query";
 import { Table, Typography, Space } from "antd";
-import { Merchant } from "database";
+import { Campaign, Merchant } from "database";
 
-const Merchants = () => {
-  const query = useQuery("merchants", getMerchants);
+const Campaigns = () => {
+  const query = useQuery("campaigns", getCampaigns);
   if (query.data) console.log(query.data);
   const columns = [
     {
@@ -18,14 +18,20 @@ const Merchants = () => {
       key: "name",
     },
     {
-      title: "Number of stores",
+      title: "Merchant",
+      key: "merchant",
+      dataIndex: "merchant",
+      render: (merchant: Merchant) => merchant.name,
+    },
+    {
+      title: "Number of stores applied",
       dataIndex: "stores",
       key: "stores_length",
       render: (stores) => (stores ? stores.length : 0),
     },
     {
       title: "Actions",
-      render: (record: Merchant) => (
+      render: (record: Campaign) => (
         <Space size="middle">
           <a href={`/${record.id}`}>Delete</a>
         </Space>
@@ -34,9 +40,9 @@ const Merchants = () => {
   ];
   return (
     <>
-      <Typography.Title level={2}>Merchants</Typography.Title>
+      <Typography.Title level={2}>Campaigns</Typography.Title>
       {!query.isLoading && <Table dataSource={query.data} columns={columns} />}
     </>
   );
 };
-export default Merchants;
+export default Campaigns;
