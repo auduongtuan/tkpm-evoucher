@@ -1,42 +1,63 @@
-import { FastifyPluginOptions, FastifyInstance, FastifyRequest } from "fastify";
+import { FastifyInstance, FastifyPluginOptions } from "fastify";
 // import MerchantModel from "../models/MerchantModel";
-import {
-  listMiddleware,
-  viewMiddleware,
-  deleteMiddleware,
-} from "../middlewares/crud";
-async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
-  fastify.get(
+import { IdParamsSchema, IdParamsType } from "../schema/id";
+import { MerchantSchema, MerchantType } from "../schema/merchants";
+async function merchantRoutes(
+  fastify: FastifyInstance,
+  options: FastifyPluginOptions
+) {
+  fastify.get("/", async function (req, reply) {
+    return fastify.prisma.merchant.findMany();
+  });
+  fastify.get<{ Params: IdParamsType }>("/:id", async function (req, reply) {
+    return await fastify.prisma.merchant.findUnique({
+      where: {
+        id: req.params.id,
+      },
+      include: {
+        stores: true,
+        staffs: true,
+      },
+    });
+  });
+  fastify.post<{ Body: MerchantType }>(
     "/",
-    listMiddleware("Category", async () => {
-      const categories = await fastify.prisma.category.findMany();
-      return categories;
-    })
-  );
-  fastify.get(
-    "/:id",
-    viewMiddleware("Merchant", async (id) => {
-      return await fastify.prisma.merchant.findUnique({
-        where: {
-          id: id,
-        },
-        include: {
-          stores: true,
-          staffs: true,
+    { schema: { body: MerchantSchema } },
+    async function (req, reply) {
+      return fastify.prisma.merchant.create({
+        data: {
+          name: req.body.name,
+          image: req.body.image,
         },
       });
-    })
+    }
   );
-  fastify.delete(
+  fastify.put<{ Body: MerchantType; Params: IdParamsType }>(
     "/:id",
-    deleteMiddleware("Merchant", async (id) => {
+    { schema: { body: MerchantSchema, params: IdParamsSchema } },
+    async function (req, reply) {
+      return await fastify.prisma.merchant.update({
+        where: {
+          id: req.params.id,
+        },
+        data: {
+          name: req.body.name,
+          image: req.body.image,
+        },
+      });
+    }
+  );
+  fastify.delete<{ Params: IdParamsType }>(
+    "/:id",
+    { schema: { params: IdParamsSchema } },
+    async function (req, reply) {
       await fastify.prisma.merchant.delete({
         where: {
-          id: id,
+          id: req.params.id,
         },
       });
-    })
+    }
   );
 }
 
-export default routes;
+export default merchantRoutes;

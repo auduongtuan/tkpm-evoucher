@@ -29,6 +29,35 @@ export const deleteMiddleware = function (
   };
 };
 
+export const editMiddleware = function (
+  name: string,
+  editByIdFunction: (id: number) => Promise<void>,
+  errorHandler?: Function
+) {
+  return async function (
+    req: FastifyRequest<{
+      Params: {
+        id: string;
+      };
+    }>,
+    reply: FastifyReply
+  ) {
+    const updateId = parseInt(req.params.id);
+    if (!updateId || !Number.isInteger(updateId)) {
+      reply.statusCode = 400;
+      throw new Error("Bad request");
+    }
+
+    try {
+      await editByIdFunction(updateId);
+      reply.statusCode = 204;
+    } catch (err) {
+      reply.statusCode = 500;
+      throw new Error(`Cannot update ${name}`);
+    }
+  };
+};
+
 export const listMiddleware = function <T>(
   name: string,
   listFunc: () => Promise<T[]>,

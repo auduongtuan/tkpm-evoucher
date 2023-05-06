@@ -1,41 +1,66 @@
-import { FastifyPluginOptions, FastifyInstance, FastifyRequest } from "fastify";
+import { FastifyInstance, FastifyPluginOptions } from "fastify";
+import { IdParamsSchema, IdParamsType } from "../schema/id";
 import {
-  deleteMiddleware,
-  viewMiddleware,
-  listMiddleware,
-} from "../middlewares/crud";
-async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
-  fastify.get(
+  StoreSchema,
+  StoreType,
+  StoreUpdateSchema,
+  StoreUpdateType,
+} from "../schema/stores";
+async function storeRoutes(
+  fastify: FastifyInstance,
+  options: FastifyPluginOptions
+) {
+  fastify.get("/", async function (req, reply) {
+    return fastify.prisma.merchant.findMany();
+  });
+  fastify.get<{ Params: IdParamsType }>("/:id", async function (req, reply) {
+    return await fastify.prisma.merchant.findUnique({
+      where: {
+        id: req.params.id,
+      },
+      include: {
+        stores: true,
+        staffs: true,
+      },
+    });
+  });
+  fastify.post<{ Body: StoreType }>(
     "/",
-    listMiddleware("Store", async () => {
-      const stores = await fastify.prisma.store.findMany();
-      return stores;
-    })
-  );
-  fastify.get(
-    "/:id",
-    viewMiddleware("Store", async (id) => {
-      return await fastify.prisma.store.findUnique({
-        where: {
-          id: id,
-        },
-        include: {
-          merchant: true,
+    { schema: { body: StoreSchema } },
+    async function (req, reply) {
+      return fastify.prisma.store.create({
+        data: {
+          ...req.body,
         },
       });
-    })
+    }
   );
 
-  fastify.delete(
+  fastify.put<{ Body: StoreUpdateType; Params: IdParamsType }>(
     "/:id",
-    deleteMiddleware("Store", async (id) => {
-      await fastify.prisma.store.delete({
+    { schema: { body: StoreUpdateSchema, params: IdParamsSchema } },
+    async function (req, reply) {
+      return await fastify.prisma.store.update({
         where: {
-          id: id,
+          id: req.params.id,
+        },
+        data: {
+          ...req.body,
         },
       });
-    })
+    }
+  );
+  fastify.delete<{ Params: IdParamsType }>(
+    "/:id",
+    { schema: { params: IdParamsSchema } },
+    async function (req, reply) {
+      await fastify.prisma.store.delete({
+        where: {
+          id: req.params.id,
+        },
+      });
+    }
   );
 }
 
-export default routes;
+export default storeRoutes;
