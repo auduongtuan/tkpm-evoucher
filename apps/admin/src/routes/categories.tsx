@@ -1,10 +1,13 @@
 import { getCategories } from "../api-client";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Table, Typography, Space } from "antd";
 import { Merchant } from "database";
 
 const Merchants = () => {
-  const query = useQuery("categories", getCategories);
+  const query = useQuery({
+    queryKey: ["category_list"],
+    queryFn: getCategories,
+  });
   if (query.data) console.log(query.data);
   const columns = [
     {

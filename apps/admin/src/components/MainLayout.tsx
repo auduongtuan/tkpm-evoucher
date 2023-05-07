@@ -1,9 +1,8 @@
 import React from "react";
 
-import { Breadcrumb, Layout, theme } from "antd";
+import { Breadcrumb, Layout, theme, message } from "antd";
 import MainHeader from "./MainHeader";
 import MainSidebar from "./MainSidebar";
-
 const { Content } = Layout;
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {

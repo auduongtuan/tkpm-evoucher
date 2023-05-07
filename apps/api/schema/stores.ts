@@ -6,9 +6,10 @@ export const StoreSchema = Type.Object({
   lat: Type.Number(),
   lng: Type.Number(),
   merchantId: Type.Integer(),
+  categoryIds: Type.Optional(Type.Array(Type.Number())),
 });
 
 export const StoreUpdateSchema = Type.Partial(StoreSchema);
 
-export type StoreType = Static<typeof StoreSchema>;
-export type StoreUpdateType = Static<typeof StoreUpdateSchema>;
+export type StoreCreateBody = Static<typeof StoreSchema>;
+export type StoreUpdateBody = Static<typeof StoreUpdateSchema>;

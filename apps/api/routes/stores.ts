@@ -2,41 +2,66 @@ import { FastifyInstance, FastifyPluginOptions } from "fastify";
 import { IdParamsSchema, IdParamsType } from "../schema/id";
 import {
   StoreSchema,
-  StoreType,
+  StoreCreateBody,
   StoreUpdateSchema,
-  StoreUpdateType,
+  StoreUpdateBody,
 } from "../schema/stores";
 async function storeRoutes(
   fastify: FastifyInstance,
   options: FastifyPluginOptions
 ) {
   fastify.get("/", async function (req, reply) {
-    return fastify.prisma.merchant.findMany();
+    const stores = await fastify.prisma.store.findMany({
+      include: {
+        merchant: true,
+        categories: {
+          include: {
+            category: true,
+          },
+        },
+      },
+    });
+    // https://www.prisma.io/docs/guides/other/troubleshooting-orm/help-articles/working-with-many-to-many-relations
+    return stores.map((store) => ({
+      ...store,
+      categories: store.categories.map((category) => category.category),
+    }));
   });
   fastify.get<{ Params: IdParamsType }>("/:id", async function (req, reply) {
-    return await fastify.prisma.merchant.findUnique({
+    return await fastify.prisma.store.findUnique({
       where: {
         id: req.params.id,
       },
       include: {
-        stores: true,
-        staffs: true,
+        merchant: true,
       },
     });
   });
-  fastify.post<{ Body: StoreType }>(
+  fastify.post<{ Body: StoreCreateBody }>(
     "/",
     { schema: { body: StoreSchema } },
     async function (req, reply) {
+      const { categoryIds, ...rest } = req.body;
       return fastify.prisma.store.create({
         data: {
-          ...req.body,
+          ...rest,
+          categories: categoryIds
+            ? {
+                create: categoryIds.map((categoryId) => ({
+                  category: {
+                    connect: {
+                      id: categoryId,
+                    },
+                  },
+                })),
+              }
+            : undefined,
         },
       });
     }
   );
 
-  fastify.put<{ Body: StoreUpdateType; Params: IdParamsType }>(
+  fastify.put<{ Body: StoreUpdateBody; Params: IdParamsType }>(
     "/:id",
     { schema: { body: StoreUpdateSchema, params: IdParamsSchema } },
     async function (req, reply) {

@@ -1,10 +1,13 @@
 import { getGames } from "../api-client";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Table, Typography, Space } from "antd";
-import { Game, Store } from "database";
+import { Game } from "database";
 
 const Games = () => {
-  const query = useQuery("games", getGames);
+  const query = useQuery({
+    queryKey: ["game_list"],
+    queryFn: getGames,
+  });
   if (query.data) console.log(query.data);
   const columns = [
     {
@@ -19,7 +22,7 @@ const Games = () => {
     },
     {
       title: "Actions",
-      render: (record: Store) => (
+      render: (record: Game) => (
         <Space size="middle">
           <a href={`/${record.id}`}>Delete</a>
         </Space>

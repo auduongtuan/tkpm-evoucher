@@ -11,16 +11,16 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.0.1",
+    "@tanstack/react-query": "^4.29.5",
     "antd": "^5.4.6",
+    "database": "workspace:*",
+    "helpers": "workspace:*",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.8.0",
-    "react-query": "^3.39.3",
     "react-router-dom": "^6.11.0",
     "styled-components": "^5.3.10",
-    "zustand": "^4.3.7",
-    "database": "workspace:*",
-    "helpers": "workspace:*"
+    "zustand": "^4.3.7"
   },
   "devDependencies": {
     "@swc/plugin-styled-components": "^1.5.61",

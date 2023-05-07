@@ -7,5 +7,5 @@ export const MerchantSchema = Type.Object({
 
 export const MerchantUpdateSchema = Type.Partial(MerchantSchema);
 
-export type MerchantType = Static<typeof MerchantSchema>;
+export type MerchantCreateBody = Static<typeof MerchantSchema>;
 export type MerchantUpdateType = Static<typeof MerchantUpdateSchema>;

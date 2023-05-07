@@ -1,10 +1,13 @@
 import { getCampaigns } from "../api-client";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Table, Typography, Space } from "antd";
 import { Campaign, Merchant } from "database";
 
 const Campaigns = () => {
-  const query = useQuery("campaigns", getCampaigns);
+  const query = useQuery({
+    queryKey: ["campaign_list"],
+    queryFn: getCampaigns,
+  });
   if (query.data) console.log(query.data);
   const columns = [
     {
