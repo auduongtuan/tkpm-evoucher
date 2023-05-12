@@ -20,6 +20,9 @@ async function storeRoutes(
           },
         },
       },
+      orderBy: {
+        createdAt: "asc",
+      },
     });
     // https://www.prisma.io/docs/guides/other/troubleshooting-orm/help-articles/working-with-many-to-many-relations
     return stores.map((store) => ({
@@ -27,16 +30,31 @@ async function storeRoutes(
       categories: store.categories.map((category) => category.category),
     }));
   });
-  fastify.get<{ Params: IdParamsType }>("/:id", async function (req, reply) {
-    return await fastify.prisma.store.findUnique({
-      where: {
-        id: req.params.id,
-      },
-      include: {
-        merchant: true,
-      },
-    });
-  });
+  fastify.get<{ Params: IdParamsType }>(
+    "/:id",
+    { schema: { params: IdParamsSchema } },
+    async function (req, reply) {
+      const store = await fastify.prisma.store.findUnique({
+        where: {
+          id: req.params.id,
+        },
+        include: {
+          merchant: true,
+          categories: {
+            include: {
+              category: true,
+            },
+          },
+        },
+      });
+      return store
+        ? {
+            ...store,
+            categories: store.categories.map((category) => category.category),
+          }
+        : null;
+    }
+  );
   fastify.post<{ Body: StoreCreateBody }>(
     "/",
     { schema: { body: StoreSchema } },
@@ -65,12 +83,25 @@ async function storeRoutes(
     "/:id",
     { schema: { body: StoreUpdateSchema, params: IdParamsSchema } },
     async function (req, reply) {
+      const { categoryIds, ...rest } = req.body;
       return await fastify.prisma.store.update({
         where: {
           id: req.params.id,
         },
         data: {
-          ...req.body,
+          ...rest,
+          categories: categoryIds
+            ? {
+                deleteMany: {},
+                create: categoryIds.map((categoryId) => ({
+                  category: {
+                    connect: {
+                      id: categoryId,
+                    },
+                  },
+                })),
+              }
+            : undefined,
         },
       });
     }

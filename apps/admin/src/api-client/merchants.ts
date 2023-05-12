@@ -14,6 +14,11 @@ export async function getMerchants(): Promise<Merchant[]> {
   return res.data;
 }
 
+export async function getMerchant(id: string | number): Promise<Merchant> {
+  const res = await instance.get(`/${id}`);
+  return res.data;
+}
+
 export async function createMerchant(
   body: MerchantCreateBody
 ): Promise<Merchant> {

@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyPluginOptions } from "fastify";
 // import MerchantModel from "../models/MerchantModel";
 import { IdParamsSchema, IdParamsType } from "../schema/id";
-import { MerchantSchema, MerchantCreateBody } from "../schema/merchants";
+import { MerchantCreateSchema, MerchantCreateBody } from "../schema/merchants";
 async function merchantRoutes(
   fastify: FastifyInstance,
   options: FastifyPluginOptions
@@ -12,22 +12,30 @@ async function merchantRoutes(
         stores: true,
         staffs: true,
       },
-    });
-  });
-  fastify.get<{ Params: IdParamsType }>("/:id", async function (req, reply) {
-    return await fastify.prisma.merchant.findUnique({
-      where: {
-        id: req.params.id,
-      },
-      include: {
-        stores: true,
-        staffs: true,
+      orderBy: {
+        createdAt: "asc",
       },
     });
   });
+  fastify.get<{ Params: IdParamsType }>(
+    "/:id",
+    { schema: { params: IdParamsSchema } },
+    async function (req, reply) {
+      console.log(req.params.id);
+      return await fastify.prisma.merchant.findUnique({
+        where: {
+          id: req.params.id,
+        },
+        include: {
+          stores: true,
+          staffs: true,
+        },
+      });
+    }
+  );
   fastify.post<{ Body: MerchantCreateBody }>(
     "/",
-    { schema: { body: MerchantSchema } },
+    { schema: { body: MerchantCreateSchema } },
     async function (req, reply) {
       return fastify.prisma.merchant.create({
         data: {
@@ -39,7 +47,7 @@ async function merchantRoutes(
   );
   fastify.put<{ Body: MerchantCreateBody; Params: IdParamsType }>(
     "/:id",
-    { schema: { body: MerchantSchema, params: IdParamsSchema } },
+    { schema: { body: MerchantCreateSchema, params: IdParamsSchema } },
     async function (req, reply) {
       return await fastify.prisma.merchant.update({
         where: {

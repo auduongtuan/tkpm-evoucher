@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 
 import type { MenuProps } from "antd";
-import { ConfigProvider, Layout, Menu, Typography, theme } from "antd";
+import { Layout, Menu, Typography, theme } from "antd";
 import { useNavigate, useLocation } from "react-router-dom";
-const { Header, Content, Footer, Sider } = Layout;
 import {
   RiStoreFill,
   RiStore2Fill,
@@ -11,9 +10,10 @@ import {
   RiFilter2Fill,
   RiGamepadFill,
   RiImageEditFill,
+  RiCoupon2Fill,
 } from "react-icons/ri";
-import { R } from "react-icons/hi2";
 import { SubMenuType } from "antd/es/menu/hooks/useItems";
+const { Header, Content, Footer, Sider } = Layout;
 type MenuItem = Required<MenuProps>["items"][number];
 
 type NavigationItem = {
@@ -54,6 +54,12 @@ const navigationItems: NavigationItem[] = [
     key: "_campaigns",
     path: "/campaigns",
     icon: <RiImageEditFill />,
+  },
+  {
+    label: "Vouchers",
+    key: "_vouchers",
+    path: "/vouchers",
+    icon: <RiCoupon2Fill />,
   },
   // {
   //   label: "Merchant List",
@@ -112,13 +118,6 @@ const MainSidebar = () => {
       collapsed={collapsed}
       onCollapse={(value) => setCollapsed(value)}
     >
-      {/* <div
-        style={{
-          height: 32,
-          margin: 16,
-          background: "rgba(255, 255, 255, 0.2)",
-        }}
-      /> */}
       <Typography.Title
         level={4}
         color={colorTextLightSolid}

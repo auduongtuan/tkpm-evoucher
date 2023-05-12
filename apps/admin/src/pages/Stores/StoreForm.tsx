@@ -1,73 +1,54 @@
-import { Form, Input, Modal, message, Select, Row, Col } from "antd";
-import { createStore, getCategories, getMerchants } from "@/api-client";
-import useStoreStore from "./store";
-import { useQueryClient, useQuery } from "@tanstack/react-query";
-const StoreCreateForm = () => {
-  const { createModalOpen, setCreateModalOpen } = useStoreStore();
-  const queryClient = useQueryClient();
+import { Form, Input, Modal, Select, Row, Col } from "antd";
+import {
+  createStore,
+  getCategories,
+  getMerchants,
+  getStore,
+  updateStore,
+} from "@/api-client";
+import useRouteModal from "@/components/useRouteModal";
+import { useQuery } from "@tanstack/react-query";
+import useCrud from "@/components/useCrud";
+import MerchantSelect from "@/components/MerchantSelect";
+const StoreForm = () => {
+  const { modalProps, closeModal } = useRouteModal("/stores");
   const [form] = Form.useForm();
-  const merchantListQuery = useQuery({
-    queryKey: ["merchant_list"],
-    queryFn: getMerchants,
+  const { formModalProps } = useCrud({
+    name: "store",
+    form: form,
+    getFn: getStore,
+    onGetSuccess: (data) => {
+      form.setFieldsValue({
+        ...data,
+        categoryIds: data.categories.map((category) => category.id),
+      });
+    },
+    updateFn: updateStore,
+    createFn: createStore,
+    closeModal: closeModal,
   });
+  // const merchantListQuery = useQuery({
+  //   queryKey: ["merchant_list"],
+  //   queryFn: getMerchants,
+  // });
   const categoryListQuery = useQuery({
     queryKey: ["category_list"],
     queryFn: getCategories,
   });
+
   return (
     <>
-      <Modal
-        title="Add new store"
-        open={createModalOpen}
-        onCancel={() => setCreateModalOpen(false)}
-        okText="Create"
-        cancelText="Cancel"
-        onOk={() => {
-          form
-            .validateFields()
-            .then((values) => {
-              form.resetFields();
-              console.log(values);
-              createStore(values).then(async (data) => {
-                console.log(data);
-                setCreateModalOpen(false);
-                message.success({ content: "Store created" });
-                await queryClient.invalidateQueries({
-                  queryKey: ["store_list"],
-                });
-              });
-            })
-            .catch((info) => {
-              console.log("Validate Failed:", info);
-            });
-        }}
-      >
+      <Modal {...modalProps} {...formModalProps}>
         <Form layout="vertical" autoComplete="off" form={form} className="my-4">
           <Form.Item
             label="Merchant"
             name={"merchantId"}
             rules={[{ required: true, message: "Please select a merchant!" }]}
           >
-            <Select
-              showSearch
-              placeholder="Select a merchant"
-              optionFilterProp="children"
-              filterOption={(input, option) =>
-                (option?.label ?? "")
-                  .toLowerCase()
-                  .includes(input.toLowerCase())
-              }
+            <MerchantSelect
               onSelect={(value, { label }) => {
                 form.setFieldValue("name", label + " ");
               }}
-              options={
-                !merchantListQuery.isLoading && merchantListQuery.data
-                  ? merchantListQuery.data.map((merchant) => ({
-                      value: merchant.id,
-                      label: merchant.name,
-                    }))
-                  : []
-              }
             />
           </Form.Item>
           <Form.Item
@@ -85,9 +66,6 @@ const StoreCreateForm = () => {
                   .toLowerCase()
                   .includes(input.toLowerCase())
               }
-              // onSelect={(value, { label }) => {
-              //   form.setFieldValue("name", label + " ");
-              // }}
               options={
                 !categoryListQuery.isLoading && categoryListQuery.data
                   ? categoryListQuery.data.map((category) => ({
@@ -137,4 +115,4 @@ const StoreCreateForm = () => {
     </>
   );
 };
-export default StoreCreateForm;
+export default StoreForm;

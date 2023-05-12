@@ -1,0 +1,27 @@
+import { deleteGame, getGame, getGames } from "@/api-client";
+import RecordList from "@/components/RecordList";
+import { Game, Staff, Store } from "database";
+import { Outlet } from "react-router-dom";
+const Games = () => {
+  return (
+    <>
+      <RecordList<Game>
+        name="game"
+        getFn={getGames}
+        deleteFn={deleteGame}
+        columns={[
+          {
+            title: "Name",
+            dataIndex: "name",
+          },
+          {
+            title: "Slug",
+            dataIndex: "slug",
+          },
+        ]}
+      />
+      <Outlet />
+    </>
+  );
+};
+export default Games;
