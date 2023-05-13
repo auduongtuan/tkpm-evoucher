@@ -5,6 +5,7 @@ import {
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
+import { AxiosError } from "axios";
 const DeleteRecordButton = ({
   mutationFn,
   id,
@@ -23,6 +24,15 @@ const DeleteRecordButton = ({
     onSuccess: (data, variables, context) => {
       if (queryKey) queryClient.invalidateQueries({ queryKey: queryKey });
       message.info(`Record ${name} deleted`);
+    },
+    onError: (err) => {
+      if (err instanceof AxiosError) {
+        if (err.response?.data.code == "PRISMA_P2003") {
+          message.info(
+            `Cannot delete. You must unset all campaigns using ${name} first.`
+          );
+        }
+      }
     },
   });
   const handleDelete = async (id: number) => {

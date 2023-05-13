@@ -11,6 +11,8 @@ import {
   RiGamepadFill,
   RiImageEditFill,
   RiCoupon2Fill,
+  RiShieldUserFill,
+  RiUser3Fill,
 } from "react-icons/ri";
 import { SubMenuType } from "antd/es/menu/hooks/useItems";
 const { Header, Content, Footer, Sider } = Layout;
@@ -56,11 +58,24 @@ const navigationItems: NavigationItem[] = [
     icon: <RiImageEditFill />,
   },
   {
+    label: "Staffs",
+    key: "_staffs",
+    path: "/staffs",
+    icon: <RiShieldUserFill />,
+  },
+  {
+    label: "Users",
+    key: "_users",
+    path: "/users",
+    icon: <RiUser3Fill />,
+  },
+  {
     label: "Vouchers",
     key: "_vouchers",
     path: "/vouchers",
     icon: <RiCoupon2Fill />,
   },
+
   // {
   //   label: "Merchant List",
   //   key: "_merchants_list",

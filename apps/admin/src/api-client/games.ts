@@ -1,6 +1,6 @@
 import { GameCreateBody, GameUpdateBody } from "../../../api/schema/games";
 import { Game } from "database";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { END_POINT } from "./constants";
 const instance = axios.create({
   baseURL: END_POINT + "/games",

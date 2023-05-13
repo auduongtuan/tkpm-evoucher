@@ -1,56 +1,67 @@
 import { FastifyPluginOptions, FastifyInstance, FastifyRequest } from "fastify";
-import StaffModel from "../models/StaffModel";
-import { listMiddleware, deleteMiddleware } from "../middlewares/crud";
+import { IdParamsSchema, IdParamsType } from "../schema/id";
+import { StaffCreateSchema, StaffCreateBody } from "../schema/staffs";
 async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
-  fastify.get(
-    "/",
-    listMiddleware("Staff", async () => {
-      const staffModel = StaffModel(fastify.prisma.staff);
-      const staffs = await staffModel.getAll();
-      return staffs;
-    })
-  );
-
-  fastify.get(
+  fastify.get("/", async function (req, reply) {
+    return fastify.prisma.staff.findMany({
+      include: {
+        merchant: true,
+      },
+      orderBy: {
+        id: "asc",
+      },
+    });
+  });
+  fastify.get<{ Params: IdParamsType }>(
     "/:id",
-    async (
-      request: FastifyRequest<{
-        Params: {
-          id: string;
-        };
-      }>,
-      reply
-    ) => {
-      const staffModel = StaffModel(fastify.prisma.staff);
-      if (Number.isNaN(request.params.id)) {
-        reply.statusCode = 400;
-        throw new Error("Bad request");
-      }
-      const staff = await staffModel.findUnique({
+    { schema: { params: IdParamsSchema } },
+    async function (req, reply) {
+      console.log(req.params.id);
+      return await fastify.prisma.staff.findUnique({
         where: {
-          id: parseInt(request.params.id),
+          id: req.params.id,
         },
         include: {
           merchant: true,
         },
       });
-      if (!staff) {
-        reply.statusCode = 404;
-        throw new Error("Staff not found");
-      }
-      return staff;
     }
   );
-
-  fastify.delete(
-    "/:id",
-    deleteMiddleware("Staff", async (id) => {
-      await fastify.prisma.staff.delete({
-        where: {
-          id: id,
+  fastify.post<{ Body: StaffCreateBody }>(
+    "/",
+    { schema: { body: StaffCreateSchema } },
+    async function (req, reply) {
+      return fastify.prisma.staff.create({
+        data: {
+          ...req.body,
         },
       });
-    })
+    }
+  );
+  fastify.put<{ Body: StaffCreateBody; Params: IdParamsType }>(
+    "/:id",
+    { schema: { body: StaffCreateSchema, params: IdParamsSchema } },
+    async function (req, reply) {
+      return await fastify.prisma.staff.update({
+        where: {
+          id: req.params.id,
+        },
+        data: {
+          ...req.body,
+        },
+      });
+    }
+  );
+  fastify.delete<{ Params: IdParamsType }>(
+    "/:id",
+    { schema: { params: IdParamsSchema } },
+    async function (req, reply) {
+      await fastify.prisma.staff.delete({
+        where: {
+          id: req.params.id,
+        },
+      });
+    }
   );
 }
 

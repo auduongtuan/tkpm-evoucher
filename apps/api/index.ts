@@ -38,6 +38,16 @@ server.setErrorHandler(function (error, request, reply) {
       );
       reply.send(new CustomError());
       return;
+    } else {
+      if (error.code == "P2003") {
+        const CustomError = createError(
+          "Prisma_P2003",
+          "Foreign key constraint failed",
+          400
+        );
+        reply.send(new CustomError());
+        return;
+      }
     }
   }
   reply.send(error);

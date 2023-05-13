@@ -1,7 +1,7 @@
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { FormInstance, message } from "antd";
 import { useParams } from "react-router-dom";
-import { capitalize } from "lodash-es";
+import { capitalize, isObject } from "lodash-es";
 // name: singular
 export type MutationFunction<GetReturnType = unknown, TVariables = unknown> = (
   variables: TVariables
@@ -21,6 +21,7 @@ export default function useCrud<
   onGetSuccess,
   onCreateSuccess,
   onUpdateSuccess,
+  valuesFilter,
   form,
 }: {
   name: string;
@@ -31,6 +32,7 @@ export default function useCrud<
   onUpdateSuccess?: (data: UpdateReturnType) => Promise<unknown> | unknown;
   createFn: (body: RecordCreateBody) => Promise<CreateReturnType>;
   updateFn: (id: number, body: RecordUpdateBody) => Promise<UpdateReturnType>;
+  valuesFilter?: (values: any) => any;
   closeModal?: Function;
 }) {
   const queryClient = useQueryClient();
@@ -57,7 +59,11 @@ export default function useCrud<
         mutationFn: (body: RecordUpdateBody) => updateFn(id, body),
         onSuccess: async (data) => {
           await refetchList();
-          message.success(`${capitalize(name)} updated`);
+          message.success(
+            `${capitalize(name)} ${
+              isObject(data) && "name" in data ? `${data.name} ` : ""
+            }updated`
+          );
           if (onUpdateSuccess) onUpdateSuccess(data);
           if (closeModal) closeModal();
         },
@@ -76,12 +82,13 @@ export default function useCrud<
     form
       .validateFields()
       .then((values) => {
+        const submitedValues = valuesFilter ? valuesFilter(values) : values;
+        console.log("SUBMIT VALUES", submitedValues);
         if (id) {
-          console.log(values);
-          updateRecordMutation?.mutate(values);
+          updateRecordMutation?.mutate(submitedValues);
         } else {
           form.resetFields();
-          createRecordMutation.mutate(values);
+          createRecordMutation.mutate(submitedValues);
         }
       })
       .catch((info) => {

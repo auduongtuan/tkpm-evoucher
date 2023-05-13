@@ -14,6 +14,11 @@ async function campaignRoutes(
     const campaigns = await fastify.prisma.campaign.findMany({
       include: {
         merchant: true,
+        games: {
+          include: {
+            game: true,
+          },
+        },
         stores: {
           include: {
             store: true,
@@ -27,7 +32,8 @@ async function campaignRoutes(
     // https://www.prisma.io/docs/guides/other/troubleshooting-orm/help-articles/working-with-many-to-many-relations
     return campaigns.map((campaign) => ({
       ...campaign,
-      categories: campaign.stores.map((store) => store.store),
+      stores: campaign.stores.map((store) => store.store),
+      games: campaign.games.map((game) => game.game),
     }));
   });
   fastify.get<{ Params: IdParamsType }>(
@@ -40,6 +46,11 @@ async function campaignRoutes(
         },
         include: {
           merchant: true,
+          games: {
+            include: {
+              game: true,
+            },
+          },
           stores: {
             include: {
               store: true,
@@ -50,7 +61,8 @@ async function campaignRoutes(
       return campaign
         ? {
             ...campaign,
-            categories: campaign.stores.map((store) => store.store),
+            stores: campaign.stores.map((store) => store.store),
+            games: campaign.games.map((game) => game.game),
           }
         : null;
     }

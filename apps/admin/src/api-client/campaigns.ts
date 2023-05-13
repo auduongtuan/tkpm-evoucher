@@ -2,19 +2,20 @@ import {
   CampaignCreateBody,
   CampaignUpdateBody,
 } from "../../../api/schema/campaigns";
-import { Campaign } from "database";
+import { Campaign, Game, Store } from "database";
 import axios from "axios";
 import { END_POINT } from "./constants";
 const instance = axios.create({
   baseURL: END_POINT + "/campaigns",
 });
-export async function getCampaigns(): Promise<Campaign[]> {
+type CampainSelect = Campaign & { stores: Store[]; games: Game[] };
+export async function getCampaigns(): Promise<CampainSelect[]> {
   const res = await instance.get("/");
 
   return res.data;
 }
 
-export async function getCampaign(id: string | number): Promise<Campaign> {
+export async function getCampaign(id: string | number): Promise<CampainSelect> {
   const res = await instance.get(`/${id}`);
   return res.data;
 }

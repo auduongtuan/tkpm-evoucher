@@ -23,6 +23,7 @@
     "axios": "^1.4.0",
     "bcrypt": "^5.1.0",
     "clsx": "^1.2.1",
+    "dayjs": "^1.11.7",
     "lodash-es": "^4.17.21",
     "pluralize-esm": "^9.0.5"
   }
