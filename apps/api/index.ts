@@ -14,18 +14,16 @@ import multipart from "@fastify/multipart";
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import { Prisma } from "database";
 import { createError } from "@fastify/error";
-import fastifyJwt from "@fastify/jwt";
 import employeeAuthRoute from "./routes/employeesAuth";
+import authentication from "./plugins/authentication";
 const server: FastifyInstance =
   Fastify().withTypeProvider<TypeBoxTypeProvider>();
 server.register(cors, {
   origin: ["*"],
 });
-server.register(fastifyJwt, {
-  secret: "R83MDOLQ",
-});
 // server.register(multipart);
 server.register(prismaPlugin);
+server.register(authentication);
 server.register(employeeAuthRoute, { prefix: "employees/auth" });
 server.register(employeeRoute, { prefix: "employees" });
 server.register(userRoute, { prefix: "users" });

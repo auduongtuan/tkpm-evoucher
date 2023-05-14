@@ -1,11 +1,17 @@
 // Use TypeScript module augmentation to declare the type of server.prisma to be PrismaClient
 export {};
-import { FastifyInstance } from "fastify";
+import { FastifyInstance, FastifyRequest } from "fastify";
 import { Employee, PrismaClient } from "database";
+import { EmployeePayload } from "./plugins/authentication";
+
 declare module "fastify" {
   interface FastifyInstance {
     prisma: PrismaClient;
-    verifyEmployee: () => void;
+    auth: {
+      sign: (payload: EmployeePayload) => string;
+      verifyEmployee: () => void;
+      verifySystemAdmin: () => void;
+    };
   }
   interface FastifyRequest {
     employee?: Employee;

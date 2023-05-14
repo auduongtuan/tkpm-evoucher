@@ -86,7 +86,10 @@ async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
   );
   fastify.delete<{ Params: IdParamsType }>(
     "/:id",
-    { schema: { params: IdParamsSchema } },
+    {
+      schema: { params: IdParamsSchema },
+      onRequest: [fastify.auth.verifySystemAdmin],
+    },
     async function (req, reply) {
       await fastify.prisma.user.delete({
         where: {

@@ -1,10 +1,7 @@
 import { GameCreateBody, GameUpdateBody } from "../../../api/schema/games";
 import { Game } from "database";
-import axios, { AxiosError } from "axios";
-import { END_POINT } from "./constants";
-const instance = axios.create({
-  baseURL: END_POINT + "/games",
-});
+import { createInstance } from "./base";
+const instance = createInstance("games");
 export async function getGames(): Promise<Game[]> {
   const res = await instance.get("/");
 

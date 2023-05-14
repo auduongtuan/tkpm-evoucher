@@ -34,7 +34,10 @@ async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
   );
   fastify.post<{ Body: CategoryCreateBody }>(
     "/",
-    { schema: { body: CategoryCreateSchema } },
+    {
+      schema: { body: CategoryCreateSchema },
+      onRequest: [fastify.auth.verifySystemAdmin],
+    },
     async function (req, reply) {
       return fastify.prisma.category.create({
         data: {
@@ -45,7 +48,10 @@ async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
   );
   fastify.put<{ Body: CategoryUpdateBody; Params: IdParamsType }>(
     "/:id",
-    { schema: { body: CategoryUpdateSchema, params: IdParamsSchema } },
+    {
+      schema: { body: CategoryUpdateSchema, params: IdParamsSchema },
+      onRequest: [fastify.auth.verifySystemAdmin],
+    },
     async function (req, reply) {
       return await fastify.prisma.category.update({
         where: {
@@ -59,7 +65,10 @@ async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
   );
   fastify.delete<{ Params: IdParamsType }>(
     "/:id",
-    { schema: { params: IdParamsSchema } },
+    {
+      schema: { params: IdParamsSchema },
+      onRequest: [fastify.auth.verifySystemAdmin],
+    },
     async function (req, reply) {
       await fastify.prisma.category.delete({
         where: {

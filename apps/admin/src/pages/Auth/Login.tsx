@@ -5,11 +5,16 @@ import { Alert, Button, Form, Input } from "antd";
 import { EmployeeLoginBody } from "../../../../api/schema/employees";
 import { useNavigate } from "react-router-dom";
 import { AxiosError } from "axios";
+import useEmployeeAuth from "@/hooks/useEmployeeAuth";
 const Login = () => {
   // login page with antd components here
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [errorMessage, setErrorMessage] = useState("");
+  const { authenticated } = useEmployeeAuth();
+  if (authenticated) {
+    navigate("/");
+  }
   const loginMutation = useMutation({
     mutationFn: async (body: EmployeeLoginBody) =>
       await createAuthentication(body.email, body.password),

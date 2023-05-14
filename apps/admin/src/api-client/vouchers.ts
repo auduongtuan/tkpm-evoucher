@@ -3,11 +3,8 @@ import {
   VoucherUpdateBody,
 } from "../../../api/schema/vouchers";
 import { Voucher } from "database";
-import axios from "axios";
-import { END_POINT } from "./constants";
-const instance = axios.create({
-  baseURL: END_POINT + "/vouchers",
-});
+import { createInstance } from "./base";
+const instance = createInstance("vouchers");
 export async function getVouchers(): Promise<Voucher[]> {
   const res = await instance.get("/");
 

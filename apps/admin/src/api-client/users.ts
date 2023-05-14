@@ -1,10 +1,7 @@
 import { UserCreateBody, UserUpdateBody } from "../../../api/schema/users";
 import { User } from "database";
-import axios from "axios";
-import { END_POINT } from "./constants";
-const instance = axios.create({
-  baseURL: END_POINT + "/users",
-});
+import { createInstance } from "./base";
+const instance = createInstance("users");
 export async function getUsers(): Promise<User[]> {
   const res = await instance.get("/");
 

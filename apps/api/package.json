@@ -21,6 +21,7 @@
     "@hapi/boom": "^10.0.1",
     "@sinclair/typebox": "^0.28.9",
     "database": "workspace:*",
+    "fast-jwt": "^2.2.3",
     "fastify": "^4.17.0",
     "fastify-plugin": "^4.5.0",
     "helpers": "workspace:*"

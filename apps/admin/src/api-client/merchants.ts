@@ -3,7 +3,6 @@ import {
   MerchantUpdateBody,
 } from "../../../api/schema/merchants";
 import { Merchant, Store, Employee } from "database";
-import axios from "axios";
 import { createInstance } from "./base";
 const instance = createInstance("merchants");
 export async function getMerchants(): Promise<

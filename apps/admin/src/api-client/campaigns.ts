@@ -3,11 +3,8 @@ import {
   CampaignUpdateBody,
 } from "../../../api/schema/campaigns";
 import { Campaign, Game, Store } from "database";
-import axios from "axios";
-import { END_POINT } from "./constants";
-const instance = axios.create({
-  baseURL: END_POINT + "/campaigns",
-});
+import { createInstance } from "./base";
+const instance = createInstance("campaigns");
 type CampainSelect = Campaign & { stores: Store[]; games: Game[] };
 export async function getCampaigns(): Promise<CampainSelect[]> {
   const res = await instance.get("/");

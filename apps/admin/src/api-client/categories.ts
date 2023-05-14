@@ -3,11 +3,8 @@ import {
   CategoryUpdateBody,
 } from "../../../api/schema/categories";
 import { Category } from "database";
-import axios from "axios";
-import { END_POINT } from "./constants";
-const instance = axios.create({
-  baseURL: END_POINT + "/categories",
-});
+import { createInstance } from "./base";
+const instance = createInstance("categories");
 export async function getCategories(): Promise<Category[]> {
   const res = await instance.get("/");
 

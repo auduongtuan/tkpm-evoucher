@@ -16,7 +16,6 @@ async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
     "/:id",
     { schema: { params: IdParamsSchema } },
     async function (req, reply) {
-      console.log(req.params.id);
       return await fastify.prisma.game.findUnique({
         where: {
           id: req.params.id,
@@ -29,7 +28,10 @@ async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
   );
   fastify.post<{ Body: GameCreateBody }>(
     "/",
-    { schema: { body: GameCreateSchema } },
+    {
+      schema: { body: GameCreateSchema },
+      onRequest: [fastify.auth.verifySystemAdmin],
+    },
     async function (req, reply) {
       return fastify.prisma.game.create({
         data: {
@@ -40,7 +42,10 @@ async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
   );
   fastify.put<{ Body: GameCreateBody; Params: IdParamsType }>(
     "/:id",
-    { schema: { body: GameCreateSchema, params: IdParamsSchema } },
+    {
+      schema: { body: GameCreateSchema, params: IdParamsSchema },
+      onRequest: [fastify.auth.verifySystemAdmin],
+    },
     async function (req, reply) {
       return await fastify.prisma.game.update({
         where: {
@@ -54,7 +59,10 @@ async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
   );
   fastify.delete<{ Params: IdParamsType }>(
     "/:id",
-    { schema: { params: IdParamsSchema } },
+    {
+      schema: { params: IdParamsSchema },
+      onRequest: [fastify.auth.verifySystemAdmin],
+    },
     async function (req, reply) {
       await fastify.prisma.game.delete({
         where: {

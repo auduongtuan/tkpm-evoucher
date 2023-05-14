@@ -156,6 +156,9 @@ importers:
       database:
         specifier: workspace:*
         version: link:../../packages/database
+      fast-jwt:
+        specifier: ^2.2.3
+        version: 2.2.3
       fastify:
         specifier: ^4.17.0
         version: 4.17.0
