@@ -1,11 +1,17 @@
 import { FastifyPluginOptions, FastifyInstance, FastifyRequest } from "fastify";
 import { IdParamsSchema, IdParamsType } from "../schema/id";
-import { StaffCreateSchema, StaffCreateBody } from "../schema/staffs";
+import {
+  VoucherCreateSchema,
+  VoucherCreateBody,
+  VoucherUpdateBody,
+  VoucherUpdateSchema,
+} from "../schema/vouchers";
 async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
   fastify.get("/", async function (req, reply) {
-    return fastify.prisma.staff.findMany({
+    return fastify.prisma.voucher.findMany({
       include: {
-        merchant: true,
+        user: true,
+        campaign: true,
       },
       orderBy: {
         id: "asc",
@@ -17,32 +23,33 @@ async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
     { schema: { params: IdParamsSchema } },
     async function (req, reply) {
       console.log(req.params.id);
-      return await fastify.prisma.staff.findUnique({
+      return await fastify.prisma.voucher.findUnique({
         where: {
           id: req.params.id,
         },
         include: {
-          merchant: true,
+          user: true,
+          campaign: true,
         },
       });
     }
   );
-  fastify.post<{ Body: StaffCreateBody }>(
+  fastify.post<{ Body: VoucherCreateBody }>(
     "/",
-    { schema: { body: StaffCreateSchema } },
+    { schema: { body: VoucherCreateSchema } },
     async function (req, reply) {
-      return fastify.prisma.staff.create({
+      return fastify.prisma.voucher.create({
         data: {
           ...req.body,
         },
       });
     }
   );
-  fastify.put<{ Body: StaffCreateBody; Params: IdParamsType }>(
+  fastify.put<{ Body: VoucherUpdateBody; Params: IdParamsType }>(
     "/:id",
-    { schema: { body: StaffCreateSchema, params: IdParamsSchema } },
+    { schema: { body: VoucherUpdateSchema, params: IdParamsSchema } },
     async function (req, reply) {
-      return await fastify.prisma.staff.update({
+      return await fastify.prisma.voucher.update({
         where: {
           id: req.params.id,
         },
@@ -56,7 +63,7 @@ async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
     "/:id",
     { schema: { params: IdParamsSchema } },
     async function (req, reply) {
-      await fastify.prisma.staff.delete({
+      await fastify.prisma.voucher.delete({
         where: {
           id: req.params.id,
         },

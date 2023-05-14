@@ -4,6 +4,11 @@ import { Category, Store } from "database";
 import { END_POINT } from "./constants";
 const instance = axios.create({
   baseURL: END_POINT + "/stores",
+  headers: {
+    common: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  },
 });
 export async function getStores(): Promise<
   Array<Store & { categories: Category[] }>

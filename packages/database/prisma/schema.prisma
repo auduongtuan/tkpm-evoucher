@@ -22,7 +22,7 @@ model User {
   vouchers  Voucher[]
 }
 
-model Staff {
+model Employee {
   id          Int       @id @default(autoincrement())
   email       String    @unique
   phone       String    @unique
@@ -88,7 +88,7 @@ model Merchant {
   image     String?
   campaigns Campaign[]
   stores    Store[]
-  staffs    Staff[]
+  employees Employee[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 }
@@ -111,7 +111,7 @@ model Store {
   updatedAt  DateTime             @updatedAt
   merchantId Int
   merchant   Merchant             @relation(fields: [merchantId], references: [id])
-  campains   CampaignsOnStores[]
+  campaigns  CampaignsOnStores[]
   categories CategoriesOnStores[]
 }
 
@@ -134,7 +134,7 @@ enum DiscountType {
 model Voucher {
   id            Int          @id @default(autoincrement())
   couponCode    String       @unique
-  campagin      Campaign     @relation(fields: [campaignId], references: [id])
+  campaign      Campaign     @relation(fields: [campaignId], references: [id])
   discountType  DiscountType
   discountValue Float
   maxDiscount   Float?

@@ -1,6 +1,11 @@
 import { FastifyPluginOptions, FastifyInstance, FastifyRequest } from "fastify";
 import { IdParamsSchema, IdParamsType } from "../schema/id";
-import { CategoryCreateSchema, CategoryCreateBody } from "../schema/categories";
+import {
+  CategoryCreateSchema,
+  CategoryCreateBody,
+  CategoryUpdateBody,
+  CategoryUpdateSchema,
+} from "../schema/categories";
 async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
   fastify.get("/", async function (req, reply) {
     return fastify.prisma.category.findMany({
@@ -33,21 +38,21 @@ async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
     async function (req, reply) {
       return fastify.prisma.category.create({
         data: {
-          name: req.body.name,
+          ...req.body,
         },
       });
     }
   );
-  fastify.put<{ Body: CategoryCreateBody; Params: IdParamsType }>(
+  fastify.put<{ Body: CategoryUpdateBody; Params: IdParamsType }>(
     "/:id",
-    { schema: { body: CategoryCreateSchema, params: IdParamsSchema } },
+    { schema: { body: CategoryUpdateSchema, params: IdParamsSchema } },
     async function (req, reply) {
       return await fastify.prisma.category.update({
         where: {
           id: req.params.id,
         },
         data: {
-          name: req.body.name,
+          ...req.body,
         },
       });
     }

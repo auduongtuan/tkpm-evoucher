@@ -2,14 +2,12 @@ import {
   MerchantCreateBody,
   MerchantUpdateBody,
 } from "../../../api/schema/merchants";
-import { Merchant, Store, Staff } from "database";
+import { Merchant, Store, Employee } from "database";
 import axios from "axios";
-import { END_POINT } from "./constants";
-const instance = axios.create({
-  baseURL: END_POINT + "/merchants",
-});
+import { createInstance } from "./base";
+const instance = createInstance("merchants");
 export async function getMerchants(): Promise<
-  Array<Merchant & { stores: Store[]; staffs: Staff[] }>
+  Array<Merchant & { stores: Store[]; employees: Employee[] }>
 > {
   const res = await instance.get("/");
 
@@ -18,7 +16,7 @@ export async function getMerchants(): Promise<
 
 export async function getMerchant(
   id: string | number
-): Promise<Merchant & { stores: Store[]; staffs: Staff[] }> {
+): Promise<Merchant & { stores: Store[]; employees: Employee[] }> {
   const res = await instance.get(`/${id}`);
   return res.data;
 }

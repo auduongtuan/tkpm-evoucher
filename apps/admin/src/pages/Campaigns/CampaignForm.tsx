@@ -9,9 +9,9 @@ import {
   getMerchant,
   getGames,
 } from "@/api-client";
-import useRouteModal from "@/components/useRouteModal";
-import useCrud from "@/components/useCrud";
-import MerchantSelect from "@/components/MerchantSelect";
+import useRouteModal from "@/hooks/useRouteModal";
+import useCrud from "@/hooks/useCrud";
+import { MerchantSelect } from "@/components/RecordSelect";
 import { useQuery } from "@tanstack/react-query";
 const CampaignForm = () => {
   const { modalProps, closeModal } = useRouteModal("/campaigns");

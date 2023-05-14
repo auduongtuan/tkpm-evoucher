@@ -1,4 +1,4 @@
-import Root from "./routes/root";
+import Root from "./pages/root";
 import Categories from "./pages/Categories";
 import Merchants from "./pages/Merchants";
 import Stores from "./pages/Stores";
@@ -10,8 +10,13 @@ import MerchantForm from "./pages/Merchants/MerchantForm";
 import StoreForm from "./pages/Stores/StoreForm";
 import CategoryForm from "./pages/Categories/CategoryForm";
 import CampaignForm from "./pages/Campaigns/CampaignForm";
-import Staffs from "./pages/Staffs";
-import StaffForm from "./pages/Staffs/StaffForm";
+import Employees from "./pages/Employees";
+import EmployeeForm from "./pages/Employees/EmployeeForm";
+import Users from "./pages/Users";
+import UserForm from "./pages/Users/UserForm";
+import Vouchers from "./pages/Vouchers";
+import VoucherForm from "./pages/Vouchers/VoucherForm";
+import Login from "./pages/Auth/Login";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -89,20 +94,66 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: "staffs",
-        element: <Staffs />,
+        path: "employees",
+        element: <Employees />,
         children: [
           {
             path: "new",
-            element: <StaffForm />,
+            element: <EmployeeForm />,
           },
           {
             path: "edit/:id",
-            element: <StaffForm />,
+            element: <EmployeeForm />,
+          },
+        ],
+      },
+      {
+        path: "employees",
+        element: <Employees />,
+        children: [
+          {
+            path: "new",
+            element: <EmployeeForm />,
+          },
+          {
+            path: "edit/:id",
+            element: <EmployeeForm />,
+          },
+        ],
+      },
+      {
+        path: "vouchers",
+        element: <Vouchers />,
+        children: [
+          {
+            path: "new",
+            element: <VoucherForm />,
+          },
+          {
+            path: "edit/:id",
+            element: <VoucherForm />,
+          },
+        ],
+      },
+      {
+        path: "users",
+        element: <Users />,
+        children: [
+          {
+            path: "new",
+            element: <UserForm />,
+          },
+          {
+            path: "edit/:id",
+            element: <UserForm />,
           },
         ],
       },
     ],
+  },
+  {
+    path: "/login",
+    element: <Login />,
   },
 ]);
 export default router;

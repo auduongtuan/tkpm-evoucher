@@ -87,8 +87,11 @@ export default function useCrud<
         if (id) {
           updateRecordMutation?.mutate(submitedValues);
         } else {
-          form.resetFields();
-          createRecordMutation.mutate(submitedValues);
+          createRecordMutation.mutate(submitedValues, {
+            onSuccess: () => {
+              form.resetFields();
+            },
+          });
         }
       })
       .catch((info) => {

@@ -10,7 +10,7 @@ async function merchantRoutes(
     return fastify.prisma.merchant.findMany({
       include: {
         stores: true,
-        staffs: true,
+        employees: true,
       },
       orderBy: {
         createdAt: "asc",
@@ -28,7 +28,7 @@ async function merchantRoutes(
         },
         include: {
           stores: true,
-          staffs: true,
+          employees: true,
         },
       });
     }

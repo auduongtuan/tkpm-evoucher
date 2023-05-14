@@ -1,6 +1,6 @@
 import { deleteMerchant, getMerchant, getMerchants } from "@/api-client";
 import RecordList from "@/components/RecordList";
-import { Merchant, Staff, Store } from "database";
+import { Merchant, Employee, Store } from "database";
 import { Outlet } from "react-router-dom";
 const Merchants = () => {
   return (
@@ -21,10 +21,11 @@ const Merchants = () => {
             render: (stores: Store[]) => (stores ? stores.length : 0),
           },
           {
-            title: "Number of staffs",
-            dataIndex: "staffs",
+            title: "Number of employees",
+            dataIndex: "employees",
             width: "15%",
-            render: (staffs: Staff[]) => (staffs ? staffs.length : 0),
+            render: (employees: Employee[]) =>
+              employees ? employees.length : 0,
           },
         ]}
       />

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 import type { MenuProps } from "antd";
-import { Layout, Menu, Typography, theme } from "antd";
+import { Button, Layout, Menu, Typography, theme } from "antd";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   RiStoreFill,
@@ -15,6 +15,7 @@ import {
   RiUser3Fill,
 } from "react-icons/ri";
 import { SubMenuType } from "antd/es/menu/hooks/useItems";
+import useEmployeeAuth from "@/hooks/useEmployeeAuth";
 const { Header, Content, Footer, Sider } = Layout;
 type MenuItem = Required<MenuProps>["items"][number];
 
@@ -58,9 +59,9 @@ const navigationItems: NavigationItem[] = [
     icon: <RiImageEditFill />,
   },
   {
-    label: "Staffs",
-    key: "_staffs",
-    path: "/staffs",
+    label: "Employees",
+    key: "_employees",
+    path: "/employees",
     icon: <RiShieldUserFill />,
   },
   {
@@ -127,30 +128,40 @@ const MainSidebar = () => {
       navigate(path);
     }
   };
+  const { employee, logout } = useEmployeeAuth(true);
   return (
     <Sider
       // collapsible
       collapsed={collapsed}
       onCollapse={(value) => setCollapsed(value)}
     >
-      <Typography.Title
-        level={4}
-        color={colorTextLightSolid}
-        css={`
-          color: ${colorTextLightSolid} !important;
-          padding: 16px 24px;
-          margin: 0 !important;
-        `}
-      >
-        eVoucher
-      </Typography.Title>
-      <Menu
-        theme="dark"
-        defaultSelectedKeys={[location.pathname.replace("/", "_")]}
-        mode="inline"
-        items={items}
-        onClick={handleMenuClick}
-      />
+      <div className="flex flex-col h-full">
+        <Typography.Title
+          level={4}
+          color={colorTextLightSolid}
+          className="text-white m-0 py-4 px-6"
+        >
+          eVoucher
+        </Typography.Title>
+        <Menu
+          theme="dark"
+          defaultSelectedKeys={[location.pathname.replace("/", "_")]}
+          mode="inline"
+          items={items}
+          onClick={handleMenuClick}
+        />
+        <div className="flex-grow"></div>
+        <div className="flex-grow-0 text-white py-4 px-6">
+          <div>{employee && employee.fullName}</div>
+          <Button
+            type="link"
+            onClick={() => logout && logout()}
+            className="-mx-4"
+          >
+            Logout
+          </Button>
+        </div>
+      </div>
     </Sider>
   );
 };

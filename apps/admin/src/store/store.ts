@@ -1,12 +1,12 @@
 import { create } from "zustand";
-interface StoreState {
-  createModalOpen: boolean;
-  setCreateModalOpen: (open: boolean) => void;
+interface AuthenticationState {
+  token: string;
+  setToken: (token: string) => void;
 }
 
-const useStoreStore = create<StoreState>((set) => ({
-  createModalOpen: false,
-  setCreateModalOpen: (open) => set(() => ({ createModalOpen: open })),
+const useAuthenticationStore = create<AuthenticationState>((set) => ({
+  token: "",
+  setToken: (token) => set(() => ({ token: token })),
 }));
 
-export default useStoreStore;
+export default useAuthenticationStore;

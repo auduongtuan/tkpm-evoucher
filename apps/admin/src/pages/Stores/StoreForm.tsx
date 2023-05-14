@@ -6,10 +6,11 @@ import {
   getStore,
   updateStore,
 } from "@/api-client";
-import useRouteModal from "@/components/useRouteModal";
+import useRouteModal from "@/hooks/useRouteModal";
 import { useQuery } from "@tanstack/react-query";
-import useCrud from "@/components/useCrud";
-import MerchantSelect from "@/components/MerchantSelect";
+import useCrud from "@/hooks/useCrud";
+import { MerchantSelect } from "@/components/RecordSelect";
+
 const StoreForm = () => {
   const { modalProps, closeModal } = useRouteModal("/stores");
   const [form] = Form.useForm();

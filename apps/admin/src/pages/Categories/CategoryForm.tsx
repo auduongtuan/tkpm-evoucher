@@ -1,7 +1,7 @@
 import { Form, Input, Modal } from "antd";
 import { createCategory, getCategory, updateCategory } from "@/api-client";
-import useRouteModal from "@/components/useRouteModal";
-import useCrud from "@/components/useCrud";
+import useRouteModal from "@/hooks/useRouteModal";
+import useCrud from "@/hooks/useCrud";
 
 const CategoryForm = () => {
   const { modalProps, closeModal } = useRouteModal("/categories");

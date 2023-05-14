@@ -1,6 +1,6 @@
 import { deleteGame, getGame, getGames } from "@/api-client";
 import RecordList from "@/components/RecordList";
-import { Game, Staff, Store } from "database";
+import { Game, Employee, Store } from "database";
 import { Outlet } from "react-router-dom";
 const Games = () => {
   return (
