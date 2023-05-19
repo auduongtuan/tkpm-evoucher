@@ -16,21 +16,26 @@ export default fp(async (fastify, opts) => {
       const auth = req.headers.authorization;
       const token = auth ? auth.split(" ")[1] : undefined;
       if (!token) return;
-      const payload = verifySync(token) as EmployeePayload;
-      if (!payload) {
+      try {
+        const payload = verifySync(token) as EmployeePayload;
+        if (!payload) {
+          reply.statusCode = 401;
+          throw new Error("Employee not found");
+        }
+        const employee = await fastify.prisma.employee.findUnique({
+          where: {
+            id: payload.id,
+          },
+        });
+        if (!employee) {
+          reply.statusCode = 401;
+          throw new Error("Employee not found");
+        }
+        req.employee = employee;
+      } catch (error) {
         reply.statusCode = 401;
-        throw new Error("Employee not found");
+        throw new Error("Token invalid");
       }
-      const employee = await fastify.prisma.employee.findUnique({
-        where: {
-          id: payload.id,
-        },
-      });
-      if (!employee) {
-        reply.statusCode = 401;
-        throw new Error("Employee not found");
-      }
-      req.employee = employee;
     } catch (error) {
       throw error;
     }

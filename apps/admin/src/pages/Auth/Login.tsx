@@ -1,5 +1,5 @@
 import { createAuthentication } from "@/api-client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Alert, Button, Form, Input } from "antd";
 import { EmployeeLoginBody } from "../../../../api/schema/employees";
@@ -11,10 +11,13 @@ const Login = () => {
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [errorMessage, setErrorMessage] = useState("");
-  const { authenticated } = useEmployeeAuth();
-  if (authenticated) {
-    navigate("/");
-  }
+  const { authenticated, refetch } = useEmployeeAuth();
+  useEffect(() => {
+    if (authenticated) {
+      navigate("/");
+    }
+  }, [authenticated]);
+
   const loginMutation = useMutation({
     mutationFn: async (body: EmployeeLoginBody) =>
       await createAuthentication(body.email, body.password),
@@ -22,7 +25,7 @@ const Login = () => {
       const { token } = data;
       if (token) {
         localStorage.setItem("token", token);
-        navigate("/");
+        refetch();
       }
     },
     onError: (error) => {

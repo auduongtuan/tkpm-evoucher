@@ -1,4 +1,6 @@
+import { useEffect, useRef, useState, useCallback } from "react";
 import { Form, Input, Modal, Select, Row, Col } from "antd";
+import type { InputRef } from "antd";
 import {
   createStore,
   getCategories,
@@ -10,6 +12,7 @@ import useRouteModal from "@/hooks/useRouteModal";
 import { useQuery } from "@tanstack/react-query";
 import useCrud from "@/hooks/useCrud";
 import { MerchantSelect } from "@/components/RecordSelect";
+import useGoogleMapsApi from "@/hooks/useGoogleMapsApi";
 
 const StoreForm = () => {
   const { modalProps, closeModal } = useRouteModal("/stores");
@@ -28,14 +31,52 @@ const StoreForm = () => {
     createFn: createStore,
     closeModal: closeModal,
   });
-  // const merchantListQuery = useQuery({
-  //   queryKey: ["merchant_list"],
-  //   queryFn: getMerchants,
-  // });
   const categoryListQuery = useQuery({
     queryKey: ["category_list"],
     queryFn: getCategories,
   });
+  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string;
+  const google = useGoogleMapsApi(apiKey);
+  const [autocompleteRef, setAutocompleteRef] =
+    useState<HTMLInputElement | null>(null);
+
+  const refAutocompleteRef = useCallback((c: InputRef | null) => {
+    if (c !== null) {
+      setAutocompleteRef(c.input);
+    }
+  }, []);
+  useEffect(() => {
+    if (!google || !autocompleteRef) return;
+    const center = { lat: 50.064192, lng: -130.605469 };
+    // Create a bounding box with sides ~10km away from the center point
+    const defaultBounds = {
+      north: center.lat + 0.1,
+      south: center.lat - 0.1,
+      east: center.lng + 0.1,
+      west: center.lng - 0.1,
+    };
+    const options = {
+      // bounds: defaultBounds,
+      componentRestrictions: { country: "vn" },
+      fields: ["address_components", "geometry", "icon", "name"],
+      strictBounds: false,
+      types: ["establishment"],
+    };
+    if (!autocompleteRef) {
+      console.log("ko co input");
+    }
+    const autocomplete = new google.maps.places.Autocomplete(
+      autocompleteRef,
+      options
+    );
+    autocomplete.addListener("place_changed", () => {
+      const place = autocomplete.getPlace();
+      if (place.geometry && place.geometry.location) {
+        console.log(place.geometry.location.lat());
+        console.log(place.geometry.location.lng());
+      }
+    });
+  }, [google, autocompleteRef]);
 
   return (
     <>
@@ -111,6 +152,7 @@ const StoreForm = () => {
               </Form.Item>
             </Col>
           </Row>
+          <Input ref={refAutocompleteRef} />
         </Form>
       </Modal>
     </>
