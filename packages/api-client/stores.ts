@@ -1,11 +1,12 @@
+import { PaginationParamsType } from "./../../apps/api/schema/pagination";
 import { StoreCreateBody, StoreUpdateBody } from "api/schema/stores";
 import { Category, Store } from "database";
 import { createInstance } from "./base";
 const instance = createInstance("stores");
-export async function getStores(): Promise<
-  Array<Store & { categories: Category[] }>
-> {
-  const res = await instance.get("/");
+export async function getStores(
+  params?: PaginationParamsType
+): Promise<Array<Store & { categories: Category[] }>> {
+  const res = await instance.get("/", { params });
 
   return res.data;
 }

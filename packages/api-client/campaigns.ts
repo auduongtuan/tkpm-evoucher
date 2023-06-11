@@ -2,7 +2,11 @@ import { CampaignCreateBody, CampaignUpdateBody } from "api/schema/campaigns";
 import { Campaign, Game, Store } from "database";
 import { createInstance } from "./base";
 const instance = createInstance("campaigns");
-type CampainSelect = Campaign & { stores: Store[]; games: Game[] };
+type CampainSelect = Campaign & {
+  merchant: Merchant;
+  stores: Store[];
+  games: Game[];
+};
 export async function getCampaigns(): Promise<CampainSelect[]> {
   const res = await instance.get("/");
 

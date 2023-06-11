@@ -1,3 +1,4 @@
+import { PaginationParamsType } from "./../schema/pagination";
 import { FastifyInstance, FastifyPluginOptions } from "fastify";
 import { IdParamsSchema, IdParamsType } from "../schema/id";
 import {
@@ -10,26 +11,57 @@ async function storeRoutes(
   fastify: FastifyInstance,
   options: FastifyPluginOptions
 ) {
-  fastify.get("/", async function (req, reply) {
-    const stores = await fastify.prisma.store.findMany({
-      include: {
-        merchant: true,
-        categories: {
-          include: {
-            category: true,
+  fastify.get<{ Querystring: PaginationParamsType }>(
+    "/",
+    async function (req, reply) {
+      const stores = await fastify.prisma.store.findMany({
+        take: req.query.take ? Number(req.query.take) : undefined,
+        skip: req.query.skip ? Number(req.query.skip) : undefined,
+        include: {
+          merchant: true,
+          categories: {
+            include: {
+              category: true,
+            },
           },
         },
-      },
-      orderBy: {
-        createdAt: "asc",
-      },
-    });
-    // https://www.prisma.io/docs/guides/other/troubleshooting-orm/help-articles/working-with-many-to-many-relations
-    return stores.map((store) => ({
-      ...store,
-      categories: store.categories.map((category) => category.category),
-    }));
-  });
+        orderBy: {
+          createdAt: "asc",
+        },
+      });
+      // https://www.prisma.io/docs/guides/other/troubleshooting-orm/help-articles/working-with-many-to-many-relations
+      return stores.map((store) => ({
+        ...store,
+        categories: store.categories.map((category) => category.category),
+      }));
+    }
+  );
+  fastify.get<{ Querystring: PaginationParamsType }>(
+    "/nearest",
+    async function (req, reply) {
+      const stores = await fastify.prisma.store.findMany({
+        take: req.query.take ? Number(req.query.take) : undefined,
+        skip: req.query.skip ? Number(req.query.skip) : undefined,
+        include: {
+          merchant: true,
+          categories: {
+            include: {
+              category: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: "asc",
+        },
+      });
+      // https://www.prisma.io/docs/guides/other/troubleshooting-orm/help-articles/working-with-many-to-many-relations
+      return stores.map((store) => ({
+        ...store,
+        categories: store.categories.map((category) => category.category),
+      }));
+    }
+  );
+
   fastify.get<{ Params: IdParamsType }>(
     "/:id",
     { schema: { params: IdParamsSchema } },

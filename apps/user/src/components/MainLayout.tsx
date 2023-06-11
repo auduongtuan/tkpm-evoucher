@@ -9,26 +9,19 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
     token: { colorBgContainer },
   } = theme.useToken();
   return (
-    <Layout className="min-h-screen">
+    <div className="min-h-screen font-sans">
       {/* <MainSidebar /> */}
-      <Layout className="p-6">
+      <div className="flex justify-center w-full min-h-screen p-6 bg-gray-100">
         {/* <Breadcrumb style={{ margin: "16px 0" }}>
           <Breadcrumb.Item>Home</Breadcrumb.Item>
           <Breadcrumb.Item>List</Breadcrumb.Item>
           <Breadcrumb.Item>App</Breadcrumb.Item>
         </Breadcrumb> */}
-        <Content
-          style={{
-            padding: 24,
-            margin: 0,
-            minHeight: 280,
-            background: colorBgContainer,
-          }}
-        >
+        <div className="grow-0 shrink-0 w-full max-w-screen-lg p-4 m-0 min-h-[280px] ">
           {children}
-        </Content>
-      </Layout>
-    </Layout>
+        </div>
+      </div>
+    </div>
   );
 };
 
