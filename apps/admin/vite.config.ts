@@ -6,6 +6,7 @@ export default defineConfig({
   plugins: [react({ plugins: [["@swc/plugin-styled-components", {}]] })],
   resolve: {
     alias: {
+      "@ui": path.resolve(__dirname, "./../../packages/ui"),
       "@": path.resolve(__dirname, "./src"),
     },
   },

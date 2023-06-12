@@ -1,5 +1,5 @@
 import { CampaignCreateBody, CampaignUpdateBody } from "api/schema/campaigns";
-import { Campaign, Game, Store } from "database";
+import { Campaign, Game, Store, Merchant } from "database";
 import { createInstance } from "./base";
 const instance = createInstance("campaigns");
 type CampainSelect = Campaign & {

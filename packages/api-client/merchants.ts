@@ -1,9 +1,10 @@
 import { MerchantCreateBody, MerchantUpdateBody } from "api/schema/merchants";
-import { Merchant, Store, Employee } from "database";
+import { Merchant, Store, Employee, Campaign } from "database";
 import { createInstance } from "./base";
+import { StoreWithCategories } from "./types";
 const instance = createInstance("merchants");
 export async function getMerchants(): Promise<
-  Array<Merchant & { stores: Store[]; employees: Employee[] }>
+  Array<Merchant & { stores: StoreWithCategories[]; employees: Employee[] }>
 > {
   const res = await instance.get("/");
 
@@ -12,7 +13,13 @@ export async function getMerchants(): Promise<
 
 export async function getMerchant(
   id: string | number
-): Promise<Merchant & { stores: Store[]; employees: Employee[] }> {
+): Promise<
+  Merchant & {
+    stores: StoreWithCategories[];
+    employees: Employee[];
+    campaigns: Campaign[];
+  }
+> {
   const res = await instance.get(`/${id}`);
   return res.data;
 }

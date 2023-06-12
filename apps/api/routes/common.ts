@@ -9,7 +9,7 @@ import {
 import util from "util";
 import { pipeline } from "stream";
 import fs from "fs";
-import { getApiUrl } from "./../helpers";
+import { getApiUrl } from "../helpers/apiUrl";
 const pump = util.promisify(pipeline);
 async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
   fastify.post("/upload", async function (req, reply) {

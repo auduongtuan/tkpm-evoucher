@@ -19,7 +19,7 @@ import authentication from "./plugins/authentication";
 import commonRoute from "./routes/common";
 import fastifyStatic from "@fastify/static";
 import path from "path";
-import { getApiUrl } from "./helpers";
+import { getApiUrl } from "./helpers/apiUrl";
 const server: FastifyInstance =
   Fastify().withTypeProvider<TypeBoxTypeProvider>();
 server.register(cors, {

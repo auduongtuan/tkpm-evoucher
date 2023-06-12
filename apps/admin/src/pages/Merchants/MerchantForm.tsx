@@ -1,18 +1,9 @@
-import {
-  Form,
-  Input,
-  Modal,
-  Typography,
-  Upload,
-  UploadProps,
-  message,
-} from "antd";
+import { Form, Input, Modal, Typography, message } from "antd";
 import { createMerchant, getMerchant, updateMerchant } from "api-client";
 import useRouteModal from "@/hooks/useRouteModal";
 import useCrud from "@/hooks/useCrud";
-import { InboxOutlined } from "@ant-design/icons";
 import { useWatch } from "antd/es/form/Form";
-const { Dragger } = Upload;
+import { Upload } from "ui";
 
 const MerchantForm = () => {
   const { modalProps, closeModal } = useRouteModal("/merchants");
@@ -29,26 +20,7 @@ const MerchantForm = () => {
     form: form,
   });
   const image = useWatch("image", form);
-  const uploadProps: UploadProps = {
-    name: "file",
-    multiple: true,
-    action: "http://localhost:8080/upload",
-    onChange(info) {
-      const { status } = info.file;
-      if (status !== "uploading") {
-        console.log(info.file, info.fileList);
-      }
-      if (status === "done") {
-        message.success(`${info.file.name} file uploaded successfully.`);
-        form.setFieldsValue({ image: info.file.response.url });
-      } else if (status === "error") {
-        message.error(`${info.file.name} file upload failed.`);
-      }
-    },
-    onDrop(e) {
-      console.log("Dropped files", e.dataTransfer.files);
-    },
-  };
+
   return (
     <>
       <Modal {...modalProps} {...formModalProps}>
@@ -59,6 +31,9 @@ const MerchantForm = () => {
             rules={[{ required: true, message: "Please input merchant name!" }]}
           >
             <Input></Input>
+          </Form.Item>
+          <Form.Item label="Description" name={"description"}>
+            <Input.TextArea></Input.TextArea>
           </Form.Item>
           <label className="block mb-2 text-sm">Image</label>
           {image && <img src={image} className="max-w-full mb-4 rounded-md" />}
@@ -71,14 +46,11 @@ const MerchantForm = () => {
           >
             <Input type="hidden"></Input>
           </Form.Item>
-          <Dragger {...uploadProps}>
-            <p className="ant-upload-drag-icon">
-              <InboxOutlined />
-            </p>
-            <p className="ant-upload-text">
-              Click or drag file to this area to upload
-            </p>
-          </Dragger>
+          <Upload
+            onUploadDone={(response) => {
+              form.setFieldsValue({ image: response.url });
+            }}
+          ></Upload>
         </Form>
       </Modal>
     </>

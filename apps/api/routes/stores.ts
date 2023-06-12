@@ -7,6 +7,7 @@ import {
   StoreUpdateSchema,
   StoreUpdateBody,
 } from "../schema/stores";
+import { simplifyCategories } from "database";
 async function storeRoutes(
   fastify: FastifyInstance,
   options: FastifyPluginOptions
@@ -32,7 +33,7 @@ async function storeRoutes(
       // https://www.prisma.io/docs/guides/other/troubleshooting-orm/help-articles/working-with-many-to-many-relations
       return stores.map((store) => ({
         ...store,
-        categories: store.categories.map((category) => category.category),
+        categories: simplifyCategories(store.categories),
       }));
     }
   );

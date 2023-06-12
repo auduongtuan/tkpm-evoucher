@@ -19,6 +19,7 @@ import { createBrowserRouter } from "react-router-dom";
 import Login from "./pages/Auth/Login";
 import Home from "./pages/Home/Home";
 import { RouterProviderProps } from "react-router-dom";
+import MerchantDetail from "./pages/Merchants/MerchantDetail";
 const router: RouterProviderProps["router"] = createBrowserRouter([
   {
     path: "/",
@@ -28,6 +29,10 @@ const router: RouterProviderProps["router"] = createBrowserRouter([
       {
         path: "/",
         element: <Home />,
+      },
+      {
+        path: "/merchant/:id",
+        element: <MerchantDetail />,
       },
     ],
   },

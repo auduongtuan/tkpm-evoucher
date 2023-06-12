@@ -13,6 +13,15 @@ import {
 import pluralize from "pluralize-esm";
 import { RiGamepadFill } from "react-icons/ri";
 import { useEffect } from "react";
+import { Link } from "react-router-dom";
+const SectionTitle = ({ title }: { title: React.ReactNode }) => {
+  return (
+    <div className="flex items-center">
+      <div className="text-xl font-semibold grow">{title}</div>
+      <a>View more</a>
+    </div>
+  );
+};
 const Home = () => {
   // const queryFns = {
   //   merchant: getMerchants,
@@ -52,16 +61,16 @@ const Home = () => {
   return (
     <div className="flex flex-col gap-4">
       <div className="p-4 bg-white rounded-xl">
-        <Typography.Title level={3}>Merchants</Typography.Title>
-        <a>View more</a>
-        <div className="grid grid-cols-3 gap-4">
+        <SectionTitle title={"Suggested merchants"} />
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           {!merchantList.isLoading &&
             merchantList.data &&
             merchantList.data.map((merchant) => {
               return (
-                <div
+                <Link
+                  to={`/merchant/${merchant.id}`}
                   key={merchant.id + "record"}
-                  className="flex flex-col mt-3"
+                  className="flex flex-col mt-3 no-underline text-inherit"
                 >
                   {merchant.image ? (
                     <img
@@ -78,19 +87,14 @@ const Home = () => {
                   <div className="mt-1 text-gray-600">
                     {merchant.stores.length} stores
                   </div>
-                </div>
+                </Link>
               );
             })}
         </div>
       </div>
       <div className="p-4 bg-white rounded-xl">
-        <div className="flex items-center">
-          <Typography.Title level={3} className="grow">
-            Nearby Stores
-          </Typography.Title>
-          <a>View more</a>
-        </div>
-        <div className="grid grid-cols-3 gap-4">
+        <SectionTitle title="Nearby Stores" />
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {!storeList.isLoading &&
             storeList.data &&
             storeList.data.map((store) => {
@@ -106,16 +110,12 @@ const Home = () => {
                 </div>
               );
             })}
+          S
         </div>
       </div>
       <div className="p-4 bg-white rounded-xl">
-        <div className="flex items-center">
-          <Typography.Title level={3} className="grow">
-            Ongoing Campaigns
-          </Typography.Title>
-          <a>View more</a>
-        </div>
-        <div className="grid grid-cols-3 gap-4">
+        <SectionTitle title={"Ongoing Campaigns"} />
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {!campaignList.isLoading &&
             campaignList.data &&
             campaignList.data.map((campaign) => {
