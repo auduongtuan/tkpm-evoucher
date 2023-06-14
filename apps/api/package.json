@@ -25,7 +25,8 @@
     "fast-jwt": "^2.2.3",
     "fastify": "^4.18.0",
     "fastify-plugin": "^4.5.0",
-    "helpers": "workspace:*"
+    "helpers": "workspace:*",
+    "voucher-codes-generator": "^1.2.4"
   },
   "devDependencies": {
     "@faker-js/faker": "^7.6.0",

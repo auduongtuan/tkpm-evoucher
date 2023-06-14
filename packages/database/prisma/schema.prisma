@@ -56,19 +56,24 @@ model Game {
 }
 
 model Campaign {
-  id          Int                 @id @default(autoincrement())
-  name        String
-  description String?
-  image       String?
-  startedAt   DateTime
-  endedAt     DateTime
-  createdAt   DateTime            @default(now())
-  updatedAt   DateTime            @updatedAt
-  games       GamesOnCampaigns[]
-  merchantId  Int
-  merchant    Merchant            @relation(fields: [merchantId], references: [id])
-  vouchers    Voucher[]
-  stores      CampaignsOnStores[]
+  id                Int                 @id @default(autoincrement())
+  name              String
+  description       String?
+  image             String?
+  startedAt         DateTime
+  endedAt           DateTime
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  games             GamesOnCampaigns[]
+  totalBudget       Float?
+  spentBudget       Float?
+  maxVoucherPercent Float?
+  maxVoucherFixed   Float?
+  discountType      DiscountType?
+  merchantId        Int
+  merchant          Merchant            @relation(fields: [merchantId], references: [id])
+  vouchers          Voucher[]
+  stores            CampaignsOnStores[]
 }
 
 model GamesOnCampaigns {

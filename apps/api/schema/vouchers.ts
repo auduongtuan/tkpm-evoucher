@@ -15,17 +15,9 @@ export const VoucherUpdateSchema = Type.Partial(VoucherCreateSchema);
 export type VoucherCreateBody = Static<typeof VoucherCreateSchema>;
 export type VoucherUpdateBody = Static<typeof VoucherUpdateSchema>;
 
-// model Voucher {
-//   id            Int          @id @default(autoincrement())
-//   couponCode    String       @unique
-//   campaign      Campaign     @relation(fields: [campaignId], references: [id])
-//   discountType  DiscountType
-//   discountValue Float
-//   maxDiscount   Float?
-//   expiredAt     DateTime?
-//   campaignId    Int
-//   createdAt     DateTime     @default(now())
-//   updatedAt     DateTime     @updatedAt
-//   user          User         @relation(fields: [userId], references: [id])
-//   userId        Int
-// }
+export const VoucherGenerateSchema = Type.Object({
+  userId: Type.Integer(),
+  score: Type.Number(),
+});
+
+export type VoucherGenerateBody = Static<typeof VoucherGenerateSchema>;

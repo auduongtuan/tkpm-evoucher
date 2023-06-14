@@ -20,6 +20,7 @@ const VoucherForm = () => {
     closeModal: closeModal,
     form: form,
   });
+  const discountType = Form.useWatch("discountType", form);
   return (
     <>
       <Modal {...modalProps} {...formModalProps}>
@@ -82,10 +83,19 @@ const VoucherForm = () => {
               { required: true, message: "Please input voucher coupon value!" },
             ]}
           >
-            <Input type="number" min={0}></Input>
+            <Input
+              type="number"
+              min={0}
+              suffix={discountType == "PERCENT" ? "%" : "VND"}
+            ></Input>
           </Form.Item>
-          <Form.Item label="Maximum Discount Value" name={"maxDiscount"}>
-            <Input type="number" min={0}></Input>
+          <Form.Item label="Maximum Discounted Value" name={"maxDiscount"}>
+            <Input
+              type="number"
+              min={0}
+              max={discountType == "FIXED" ? 100 : undefined}
+              suffix={discountType == "FIXED" ? "%" : "VND"}
+            ></Input>
           </Form.Item>
           <Form.Item label="Expired at" name={"expiredAt"}>
             <DatePicker showTime></DatePicker>

@@ -7,6 +7,11 @@ export const CampaignCreateSchema = Type.Object({
   endedAt: Type.String({ format: "date-time" }),
   gameIds: Type.Optional(Type.Array(Type.Number())),
   storeIds: Type.Optional(Type.Array(Type.Number())),
+  discountType: Type.Union([Type.Literal("PERCENT"), Type.Literal("FIXED")]),
+  maxVoucherFixed: Type.Optional(Type.Number()),
+  maxVoucherPercent: Type.Optional(Type.Number()),
+  totalBudget: Type.Optional(Type.Number()),
+  spentBudget: Type.Optional(Type.Number()),
   merchantId: Type.Integer(),
 });
 

@@ -13,7 +13,7 @@ import {
 import pluralize from "pluralize-esm";
 import { RiGamepadFill } from "react-icons/ri";
 import { useEffect } from "react";
-import { Link } from "react-router-dom";
+import Link from "@/components/Link";
 const SectionTitle = ({ title }: { title: React.ReactNode }) => {
   return (
     <div className="flex items-center">
@@ -84,7 +84,7 @@ const Home = () => {
                   <div className="mt-4 font-medium leading-normal text-md">
                     {merchant.name}
                   </div>
-                  <div className="mt-1 text-gray-600">
+                  <div className="mt-1 text-sm text-gray-600">
                     {merchant.stores.length} stores
                   </div>
                 </Link>
@@ -103,14 +103,13 @@ const Home = () => {
                   <div className="font-medium leading-normal text-md">
                     {store.name}
                   </div>
-                  <div className="mt-2 text-gray-600 truncate">
+                  <div className="mt-2 text-sm text-gray-600 truncate">
                     {store.address &&
                       store.address.split(",").slice(0, -2).join(", ")}
                   </div>
                 </div>
               );
             })}
-          S
         </div>
       </div>
       <div className="p-4 bg-white rounded-xl">
@@ -120,22 +119,23 @@ const Home = () => {
             campaignList.data &&
             campaignList.data.map((campaign) => {
               return (
-                <div
+                <Link
+                  to={`/campaign/${campaign.id}`}
                   key={campaign.id + "record"}
                   className="flex flex-col mt-3"
                 >
                   <div className="font-medium leading-normal text-md">
                     {campaign.name}
                   </div>
-                  <div className="mt-2 text-gray-600 truncate">
+                  <div className="mt-2 text-sm text-gray-600 truncate">
                     {campaign.merchant && `by ${campaign.merchant.name}`}
                   </div>
-                  <div className="flex items-center gap-2 mt-2 text-gray-600">
+                  <div className="flex items-center gap-2 mt-2 text-sm text-gray-600">
                     <RiGamepadFill />{" "}
                     {campaign.games &&
                       campaign.games.map((game) => game.name).join(", ")}
                   </div>
-                </div>
+                </Link>
               );
             })}
         </div>

@@ -164,6 +164,48 @@ const CampaignForm = () => {
               }
             />
           </Form.Item>
+          <Form.Item
+            label="Total Budget"
+            name={"totalBudget"}
+            rules={[
+              {
+                required: true,
+                message: "Please input total budget!",
+              },
+            ]}
+          >
+            <Input type="number" min={0} step={500} suffix={"VND"}></Input>
+          </Form.Item>
+          <Form.Item
+            label="Discount type"
+            name={"discountType"}
+            rules={[
+              {
+                required: true,
+                message: "Please select voucher discount type!",
+              },
+            ]}
+          >
+            <Select
+              options={[
+                { value: "FIXED", label: "Fixed" },
+                { value: "PERCENT", label: "Percent" },
+              ]}
+            ></Select>
+          </Form.Item>
+          <Form.Item label="Max Voucher Percent" name={"maxVoucherPercent"}>
+            <Input
+              type="number"
+              min={0}
+              max={100}
+              step={0.5}
+              suffix={"%"}
+            ></Input>
+          </Form.Item>
+          <Form.Item label="Max Voucher Fixed Value" name={"maxVoucherFixed"}>
+            <Input type="number" min={0} step={500} suffix={"VND"}></Input>
+          </Form.Item>
+
           <Form.Item name="timeRange" label="Time applied" {...rangeConfig}>
             <DatePicker.RangePicker
               showTime

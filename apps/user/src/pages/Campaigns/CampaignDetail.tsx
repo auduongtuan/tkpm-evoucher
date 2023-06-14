@@ -1,179 +1,133 @@
-import { useState } from "react";
-import { DatePicker, Form, Input, Modal, Select } from "antd";
-import dayjs, { Dayjs } from "dayjs";
-
-import {
-  createCampaign,
-  getCampaign,
-  updateCampaign,
-  getMerchant,
-  getGames,
-} from "api-client";
-import useRouteModal from "@/hooks/useRouteModal";
-import useCrud from "@/hooks/useCrud";
-import { MerchantSelect } from "@/components/RecordSelect";
-import { useQuery } from "@tanstack/react-query";
-const CampaignForm = () => {
-  const { modalProps, closeModal } = useRouteModal("/campaigns");
-  const [form] = Form.useForm();
-  const { formModalProps } = useCrud({
+import Link from "@/components/Link";
+import useRecord from "@/hooks/useRecord";
+import { getCampaign } from "api-client";
+import pluralize from "pluralize-esm";
+import { RiStore2Fill } from "react-icons/ri";
+import dayjs from "dayjs";
+import { Breadcrumb, Button } from "antd";
+import Description from "@/components/Description";
+import { PlayCircleFilled } from "@ant-design/icons";
+import GameModal from "@/games/GameModal";
+import useGameStore from "@/games/useGameStore";
+const CampaignDetail = () => {
+  // const { modalProps, closeModal } = useRouteModal("/campaigns");
+  // const [form] = Form.useForm();
+  // const { formModalProps } = useCrud({
+  //   name: "campaign",
+  //   getFn: getCampaign,
+  //   onGetSuccess: (data) => {
+  //     form.setFieldsValue({ ...data });
+  //   },
+  //   updateFn: updateCampaign,
+  //   createFn: createCampaign,
+  //   closeModal: closeModal,
+  //   form: form,
+  // });
+  const { id, recordQuery } = useRecord({
     name: "campaign",
     getFn: getCampaign,
-    onGetSuccess: (data) => {
-      form.setFieldsValue({
-        ...data,
-        storeIds: data.stores.map((store) => store.id),
-        gameIds: data.games.map((game) => game.id),
-        timeRange:
-          data.startedAt && data.endedAt
-            ? [dayjs(data.startedAt), dayjs(data.endedAt)]
-            : [dayjs(), null],
-      });
-      setMerchantId(data.merchantId);
-    },
-    updateFn: updateCampaign,
-    createFn: createCampaign,
-    closeModal: closeModal,
-    valuesFilter: (values: {
-      timeRange: [Dayjs, Dayjs];
-      [key: string]: any;
-    }) => {
-      const { timeRange, ...rest } = values;
-      const filteredValues = {
-        ...rest,
-        ...(timeRange
-          ? {
-              startedAt: timeRange[0].toDate(),
-              endedAt: timeRange[1].toDate(),
-            }
-          : {}),
-      };
-      return filteredValues;
-    },
-    form: form,
   });
-  const [merchantId, setMerchantId] = useState<number>();
-  const merchantQuery = useQuery({
-    queryKey: ["merchant", merchantId],
-    queryFn: async () => await getMerchant(merchantId as number),
-    enabled: !!merchantId,
-  });
-  const gameListQuery = useQuery({
-    queryKey: ["game", "list"],
-    queryFn: getGames,
-  });
-  const onValuesChange = ({ merchantId }) => {
-    if (merchantId) setMerchantId(merchantId);
-  };
-  const rangeConfig = {
-    rules: [
-      {
-        type: "array" as const,
-        required: true,
-        message: "Please select time!",
-      },
-    ],
-  };
+  const campaign = recordQuery?.data;
+  const openGameModal = useGameStore((state) => state.openModal);
+  return !recordQuery?.isLoading && campaign ? (
+    <div className="grid grid-cols-12 gap-6 p-4 bg-white rounded-xl">
+      <GameModal />
+      <Breadcrumb
+        className="col-span-12"
+        items={[
+          {
+            title: (
+              <Link to={"/"} noStyle>
+                Home
+              </Link>
+            ),
+          },
+          {
+            title: (
+              <Link to={`/merchant/${campaign.merchant.id}`} noStyle>
+                {campaign.merchant.name}
+              </Link>
+            ),
+          },
+          {
+            title: campaign.name,
+          },
+        ]}
+      />
+      <div className="col-span-12 md:col-span-7">
+        {campaign.image && (
+          <img
+            src={campaign.image}
+            className="max-w-full aspect-[4/3] object-cover rounded-md"
+            alt={campaign.name}
+          />
+        )}
+      </div>
+      <div className="col-span-12 mt-2 md:col-span-5">
+        <div className="col-span-12 text-2xl">{campaign.name}</div>
+        <div className="mt-2 text-sm text-gray-600">
+          By{" "}
+          <Link to={`/merchant/${campaign.merchant.id}`}>
+            {campaign.merchant.name}
+          </Link>
+        </div>
+        <div className="mt-2 text-sm text-gray-600">
+          {campaign.stores.length} {pluralize("store", campaign.stores.length)}{" "}
+          applied
+        </div>
 
-  return (
-    <>
-      <Modal {...modalProps} {...formModalProps}>
-        <Form
-          layout="vertical"
-          autoComplete="off"
-          form={form}
-          onValuesChange={onValuesChange}
-          initialValues={{
-            startedAt: "",
-            endedAt: "",
-          }}
-          className="my-4"
+        <p className="mt-4 leading-normal text-md">
+          {campaign.description && campaign.description}
+        </p>
+        <div className="grid grid-cols-2 gap-4 mb-8">
+          <Description label="Games" className="col-span-2">
+            {campaign.games.map((game) => game.name).join(", ")}
+          </Description>
+          <Description label="Started at">
+            {dayjs(campaign.startedAt).format("DD/MM/YYYY")}
+          </Description>
+          <Description label="Ended at">
+            {dayjs(campaign.endedAt).format("DD/MM/YYYY")}
+          </Description>
+        </div>
+        <Button
+          type="primary"
+          size="large"
+          icon={<PlayCircleFilled />}
+          onClick={() => openGameModal()}
         >
-          <Form.Item
-            label="Name"
-            name={"name"}
-            rules={[{ required: true, message: "Please input campaign name!" }]}
-          >
-            <Input></Input>
-          </Form.Item>
-          <Form.Item
-            label="Description"
-            name={"description"}
-            rules={[{ required: true, message: "Please input campaign name!" }]}
-          >
-            <Input.TextArea />
-          </Form.Item>
-          <Form.Item
-            label="Merchant"
-            name={"merchantId"}
-            rules={[{ required: true, message: "Please select merchant!" }]}
-          >
-            <MerchantSelect />
-          </Form.Item>
-          {merchantId && (
-            <Form.Item
-              label="Stores applied"
-              name={"storeIds"}
-              rules={[
-                { required: true, message: "Please select applied stores!" },
-              ]}
-            >
-              <Select
-                mode="multiple"
-                placeholder="Select applied stores"
-                showSearch
-                optionFilterProp="children"
-                filterOption={(input, option) =>
-                  (option?.label ?? "")
-                    .toLowerCase()
-                    .includes(input.toLowerCase())
-                }
-                options={
-                  !merchantQuery.isLoading && merchantQuery.data
-                    ? merchantQuery.data.stores.map((store) => ({
-                        value: store.id,
-                        label: store.name,
-                      }))
-                    : []
-                }
-              />
-            </Form.Item>
-          )}
-          <Form.Item
-            label="Games"
-            name={"gameIds"}
-            rules={[{ required: true, message: "Please select games!" }]}
-          >
-            <Select
-              mode="multiple"
-              placeholder="Select games"
-              showSearch
-              optionFilterProp="children"
-              filterOption={(input, option) =>
-                (option?.label ?? "")
-                  .toLowerCase()
-                  .includes(input.toLowerCase())
-              }
-              options={
-                !gameListQuery.isLoading && gameListQuery.data
-                  ? gameListQuery.data.map((game) => ({
-                      value: game.id,
-                      label: game.name,
-                    }))
-                  : []
-              }
-            />
-          </Form.Item>
-          <Form.Item name="timeRange" label="Time applied" {...rangeConfig}>
-            <DatePicker.RangePicker
-              showTime
-              format="YYYY-MM-DD HH:mm:ss"
-              className="w-full"
-            />
-          </Form.Item>
-        </Form>
-      </Modal>
-    </>
+          Play now
+        </Button>
+      </div>
+      <div className="flex flex-col col-span-12 gap-8">
+        <section>
+          <h2>Store applied</h2>
+          <div className="flex flex-col gap-2">
+            {campaign.stores.map((store) => {
+              return (
+                <div
+                  key={store.id + "record"}
+                  className="flex items-center gap-4 mt-3"
+                >
+                  <RiStore2Fill className="text-xl leading-none text-gray-600" />
+
+                  <div className="flex flex-col ">
+                    <div className="font-medium leading-normal text-md">
+                      {store.name}
+                    </div>
+                    <div className="mt-1 text-sm text-gray-600 truncate">
+                      {store.address}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      </div>
+    </div>
+  ) : (
+    <></>
   );
 };
-export default CampaignForm;
+export default CampaignDetail;
