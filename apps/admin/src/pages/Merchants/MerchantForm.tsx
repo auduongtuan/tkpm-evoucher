@@ -1,7 +1,9 @@
-import { Form, Input, Modal } from "antd";
-import { createMerchant, getMerchant, updateMerchant } from "@/api-client";
+import { Form, Input, Modal, Typography, message } from "antd";
+import { createMerchant, getMerchant, updateMerchant } from "api-client";
 import useRouteModal from "@/hooks/useRouteModal";
 import useCrud from "@/hooks/useCrud";
+import { useWatch } from "antd/es/form/Form";
+import { Upload } from "ui";
 
 const MerchantForm = () => {
   const { modalProps, closeModal } = useRouteModal("/merchants");
@@ -17,6 +19,7 @@ const MerchantForm = () => {
     closeModal: closeModal,
     form: form,
   });
+  const image = useWatch("image", form);
 
   return (
     <>
@@ -29,6 +32,25 @@ const MerchantForm = () => {
           >
             <Input></Input>
           </Form.Item>
+          <Form.Item label="Description" name={"description"}>
+            <Input.TextArea></Input.TextArea>
+          </Form.Item>
+          <label className="block mb-2 text-sm">Image</label>
+          {image && <img src={image} className="max-w-full mb-4 rounded-md" />}
+          <Form.Item
+            label="Image"
+            name={"image"}
+            hidden
+            shouldUpdate
+            // rules={[{ type: "url", message: "Please input valid url" }]}
+          >
+            <Input type="hidden"></Input>
+          </Form.Item>
+          <Upload
+            onUploadDone={(response) => {
+              form.setFieldsValue({ image: response.url });
+            }}
+          ></Upload>
         </Form>
       </Modal>
     </>

@@ -6,6 +6,10 @@ async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
     "/",
     { onRequest: [fastify.auth.verifyEmployee] },
     async function (req, reply) {
+      if (!req.employee) {
+        reply.statusCode = 401;
+        throw new Error("Not logged in");
+      }
       return req.employee;
     }
   );
@@ -24,8 +28,7 @@ async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
         throw new Error("Email or password is incorrect");
       }
       const token = fastify.auth.sign({
-        id: employee.id,
-        email: employee.email,
+        employeeId: employee.id,
       });
       return { token };
     }

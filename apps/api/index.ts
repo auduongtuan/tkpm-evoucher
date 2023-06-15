@@ -15,17 +15,23 @@ import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import { Prisma } from "database";
 import { createError } from "@fastify/error";
 import employeeAuthRoute from "./routes/employeesAuth";
+import userAuthRoute from "./routes/usersAuth";
 import authentication from "./plugins/authentication";
+import commonRoute from "./routes/common";
+import fastifyStatic from "@fastify/static";
+import path from "path";
+import { getApiUrl } from "./helpers/apiUrl";
 const server: FastifyInstance =
   Fastify().withTypeProvider<TypeBoxTypeProvider>();
 server.register(cors, {
   origin: ["*"],
 });
-// server.register(multipart);
+server.register(multipart);
 server.register(prismaPlugin);
 server.register(authentication);
 server.register(employeeAuthRoute, { prefix: "employees/auth" });
 server.register(employeeRoute, { prefix: "employees" });
+server.register(userAuthRoute, { prefix: "users/auth" });
 server.register(userRoute, { prefix: "users" });
 server.register(merchantRoute, { prefix: "merchants" });
 server.register(storeRoute, { prefix: "stores" });
@@ -33,6 +39,7 @@ server.register(campainRoute, { prefix: "campaigns" });
 server.register(categoryRoute, { prefix: "categories" });
 server.register(gameRoute, { prefix: "games" });
 server.register(voucherRoute, { prefix: "vouchers" });
+server.register(commonRoute);
 server.setErrorHandler(function (error, request, reply) {
   // Log error
   server.log.error(error);
@@ -60,13 +67,19 @@ server.setErrorHandler(function (error, request, reply) {
   }
   reply.send(error);
 });
+server.register(fastifyStatic, {
+  root: path.join(__dirname, "uploads"),
+  prefix: "/uploads/", // optional: default '/'
+  // constraints: { host: 'example.com' } // optional: default {}
+});
+
 const start = async () => {
   try {
     await server.listen({ host: "localhost", port: 8080 });
-
-    const address = server.server.address();
-    const port = typeof address === "string" ? address : address?.port;
-    console.log(`Server running at http://localhost:${port}`);
+    // const address = server.server.address();
+    // const port = typeof address === "string" ? address : address?.port;
+    console.log(`Server running at ${getApiUrl(server)}`);
+    console.log();
   } catch (err) {
     server.log.error(err);
     console.log(err);

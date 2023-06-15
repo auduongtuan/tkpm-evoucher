@@ -27,6 +27,7 @@
     "clsx": "^1.2.1",
     "dayjs": "^1.11.7",
     "lodash-es": "^4.17.21",
-    "pluralize-esm": "^9.0.5"
+    "pluralize-esm": "^9.0.5",
+    "tailwind-merge": "^1.13.1"
   }
 }

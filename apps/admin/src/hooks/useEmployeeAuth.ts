@@ -1,10 +1,19 @@
-import { useQuery } from "@tanstack/react-query";
-import { getEmployeeAuth } from "@/api-client";
+import { EmployeeLoginBody } from "./../../../api/schema/employees";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { getEmployeeAuth, loginEmployee } from "api-client";
 import { Employee } from "database";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { AxiosError } from "axios";
-function useEmployeeAuth(systemAdmin: boolean = false) {
+import { AxiosError, AxiosResponse } from "axios";
+const TOKEN_NAME = "EMPLOYEE_TOKEN";
+interface EmployeeAuthOptions {
+  onLoginError?: (data: { message: string }) => void;
+}
+function useEmployeeAuth(
+  systemAdmin: boolean = false,
+  options: EmployeeAuthOptions = {}
+) {
+  const { onLoginError } = options;
   const [authenticated, setAuthenticated] = useState<boolean | null>(null);
   const [employee, setEmployee] = useState<Employee | null>(null);
   const navigate = useNavigate();
@@ -34,14 +43,31 @@ function useEmployeeAuth(systemAdmin: boolean = false) {
       }
     },
   });
-
+  const loginMutation = useMutation({
+    mutationFn: async (body: EmployeeLoginBody) =>
+      await loginEmployee(body.email, body.password),
+    onSuccess: (data) => {
+      const { token } = data;
+      if (token) {
+        localStorage.setItem(TOKEN_NAME, token);
+        authenticationQuery.refetch();
+      }
+    },
+    onError: (error) => {
+      if (error instanceof AxiosError) {
+        onLoginError && onLoginError(error.response?.data);
+      }
+    },
+  });
   return {
     authenticated: authenticated,
     loading: authenticationQuery.isLoading,
     employee: employee,
     refetch: authenticationQuery.refetch,
+    loginMutation,
+    login: loginMutation.mutate,
     logout: () => {
-      localStorage.removeItem("token");
+      localStorage.removeItem(TOKEN_NAME);
       authenticationQuery.refetch();
       navigate("/login");
     },

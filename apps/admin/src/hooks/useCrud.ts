@@ -52,6 +52,7 @@ export default function useCrud<
         onSuccess: (data) => {
           if (onGetSuccess) onGetSuccess(data);
         },
+        refetchOnWindowFocus: false,
       })
     : undefined;
   const updateRecordMutation = id

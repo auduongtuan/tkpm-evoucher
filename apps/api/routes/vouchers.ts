@@ -5,6 +5,7 @@ import {
   VoucherCreateBody,
   VoucherUpdateBody,
   VoucherUpdateSchema,
+  VoucherGenerateBody,
 } from "../schema/vouchers";
 async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
   fastify.get("/", async function (req, reply) {

@@ -1,0 +1,14 @@
+{
+  "name": "api-client",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "license": "MIT",
+  "devDependencies": {
+    "tsconfig": "workspace:*",
+    "api": "workspace:*",
+    "database": "workspace:*",
+    "typescript": "^4.5.2"
+  }
+}

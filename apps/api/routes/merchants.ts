@@ -2,35 +2,55 @@ import { FastifyInstance, FastifyPluginOptions } from "fastify";
 // import MerchantModel from "../models/MerchantModel";
 import { IdParamsSchema, IdParamsType } from "../schema/id";
 import { MerchantCreateSchema, MerchantCreateBody } from "../schema/merchants";
+import { simplifyMerchant } from "database";
 async function merchantRoutes(
   fastify: FastifyInstance,
   options: FastifyPluginOptions
 ) {
   fastify.get("/", async function (req, reply) {
-    return fastify.prisma.merchant.findMany({
+    const merchants = await fastify.prisma.merchant.findMany({
       include: {
-        stores: true,
+        stores: {
+          include: {
+            categories: {
+              include: {
+                category: true,
+              },
+            },
+          },
+        },
         employees: true,
+        campaigns: true,
       },
       orderBy: {
         createdAt: "asc",
       },
     });
+    return merchants.map((merchant) => simplifyMerchant(merchant));
   });
   fastify.get<{ Params: IdParamsType }>(
     "/:id",
     { schema: { params: IdParamsSchema } },
     async function (req, reply) {
-      console.log(req.params.id);
-      return await fastify.prisma.merchant.findUnique({
+      const merchant = await fastify.prisma.merchant.findUnique({
         where: {
           id: req.params.id,
         },
         include: {
-          stores: true,
+          stores: {
+            include: {
+              categories: {
+                include: {
+                  category: true,
+                },
+              },
+            },
+          },
           employees: true,
+          campaigns: true,
         },
       });
+      return simplifyMerchant(merchant);
     }
   );
   fastify.post<{ Body: MerchantCreateBody }>(
@@ -41,6 +61,7 @@ async function merchantRoutes(
         data: {
           name: req.body.name,
           image: req.body.image,
+          description: req.body.description,
         },
       });
     }
@@ -56,6 +77,7 @@ async function merchantRoutes(
         data: {
           name: req.body.name,
           image: req.body.image,
+          description: req.body.description,
         },
       });
     }

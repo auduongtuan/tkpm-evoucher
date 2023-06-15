@@ -21,7 +21,6 @@ async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
     "/:id",
     { schema: { params: IdParamsSchema } },
     async function (req, reply) {
-      console.log(req.params.id);
       return await fastify.prisma.category.findUnique({
         where: {
           id: req.params.id,

@@ -6,6 +6,8 @@ import {
   CampaignUpdateSchema,
   CampaignUpdateBody,
 } from "../schema/campaigns";
+import { generate } from "voucher-codes-generator";
+import { VoucherGenerateBody, VoucherGenerateSchema } from "../schema/vouchers";
 async function campaignRoutes(
   fastify: FastifyInstance,
   options: FastifyPluginOptions
@@ -142,6 +144,73 @@ async function campaignRoutes(
             : undefined,
         },
       });
+    }
+  );
+  fastify.post<{ Body: VoucherGenerateBody; Params: IdParamsType }>(
+    "/:id/generate-voucher",
+    { schema: { body: VoucherGenerateSchema, params: IdParamsSchema } },
+    async function (req, reply) {
+      const { userId, score } = req.body;
+      const campaign = await fastify.prisma.campaign.findUnique({
+        where: {
+          id: req.params.id,
+        },
+      });
+      if (!campaign) {
+        reply.status(404);
+        throw new Error("Campaign not found");
+      }
+      let voucherValue: number = -1;
+      const GAME_AVG_SCORE = 10;
+      const { maxVoucherFixed, maxVoucherPercent, discountType } = campaign;
+      if (discountType === "PERCENT" && maxVoucherPercent) {
+        voucherValue = Math.min(score / GAME_AVG_SCORE, 1) * maxVoucherPercent;
+      } else if (discountType === "FIXED" && maxVoucherFixed) {
+        voucherValue = Math.min(score / GAME_AVG_SCORE, 1) * maxVoucherFixed;
+      }
+      const voucherValueInBudget =
+        (discountType === "FIXED" ? voucherValue : maxVoucherFixed) || 0;
+      if (
+        (campaign.totalBudget || 0) + voucherValueInBudget >
+        (campaign.totalBudget || 0)
+      ) {
+        reply.status(403);
+        throw new Error("Campaign budget exceeded");
+      }
+      if (voucherValue < 0 || !discountType) {
+        reply.status(500);
+        throw new Error("Invalid voucher value");
+      }
+      fastify.prisma.campaign.update({
+        where: {
+          id: req.params.id,
+        },
+        data: {
+          spentBudget: (campaign.spentBudget || 0) + voucherValueInBudget,
+        },
+      });
+      const voucher = await fastify.prisma.voucher.create({
+        data: {
+          campaign: {
+            connect: {
+              id: req.params.id,
+            },
+          },
+          user: {
+            connect: {
+              id: userId,
+            },
+          },
+          couponCode: generate("AA0A0A0A0A"),
+          discountType: discountType,
+          discountValue: voucherValue,
+          maxDiscount:
+            discountType === "PERCENT" ? maxVoucherFixed : maxVoucherPercent,
+          expiredAt:
+            campaign.endedAt || new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
+        },
+      });
+      return voucher;
     }
   );
   fastify.delete<{ Params: IdParamsType }>(

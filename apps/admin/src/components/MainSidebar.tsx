@@ -123,7 +123,6 @@ const MainSidebar = () => {
   const location = useLocation();
   const handleMenuClick = ({ key }) => {
     const { path } = navigationItems.find((item) => item.key === key) || {};
-    console.log(path);
     if (path) {
       navigate(path);
     }
