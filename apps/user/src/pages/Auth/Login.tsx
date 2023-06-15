@@ -1,11 +1,11 @@
-import { createAuthentication } from "api-client";
+import { loginEmployee } from "api-client";
 import { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Alert, Button, Form, Input } from "antd";
 import { EmployeeLoginBody } from "../../../../api/schema/employees";
 import { useNavigate } from "react-router-dom";
 import { AxiosError } from "axios";
-import useEmployeeAuth from "@/hooks/useEmployeeAuth";
+import useEmployeeAuth from "@/hooks/useUserAuth";
 const Login = () => {
   // login page with antd components here
   const navigate = useNavigate();
@@ -20,7 +20,7 @@ const Login = () => {
 
   const loginMutation = useMutation({
     mutationFn: async (body: EmployeeLoginBody) =>
-      await createAuthentication(body.email, body.password),
+      await loginEmployee(body.email, body.password),
     onSuccess: (data) => {
       const { token } = data;
       if (token) {

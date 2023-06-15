@@ -1,41 +1,39 @@
 import { FastifyInstance, FastifyPluginOptions } from "fastify";
-import { EmployeeLoginBody, EmployeeLoginSchema } from "../schema/employees";
+import { UserLoginBody, UserLoginSchema } from "../schema/users";
 import { comparePassword } from "database";
 async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
   fastify.get(
     "/",
-    { onRequest: [fastify.auth.verifyEmployee] },
+    {
+      onRequest: [fastify.auth.verifyUser],
+    },
     async function (req, reply) {
-      if (!req.employee) {
+      if (!req.user) {
         reply.statusCode = 401;
         throw new Error("Not logged in");
       }
-      return req.employee;
+      return req.user;
     }
   );
-  fastify.post<{ Body: EmployeeLoginBody }>(
+  fastify.post<{ Body: UserLoginBody }>(
     "/login",
-    { schema: { body: EmployeeLoginSchema } },
+    { schema: { body: UserLoginSchema } },
     async function (req, reply) {
       const { email, password } = req.body;
-      const employee = await fastify.prisma.employee.findUnique({
+      const user = await fastify.prisma.user.findUnique({
         where: {
           email,
         },
       });
-      if (!employee || comparePassword(password, employee.password) === false) {
+      if (!user || comparePassword(password, user.password) === false) {
         reply.statusCode = 401;
         throw new Error("Email or password is incorrect");
       }
       const token = fastify.auth.sign({
-        employeeId: employee.id,
+        userId: user.id,
       });
       return { token };
     }
   );
-  // fastify.post("/logout", async function (req, reply) {
-  //   reply.clearCookie("token");
-  //   return { message: "Logged out" };
-  // });
 }
 export default routes;

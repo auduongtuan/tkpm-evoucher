@@ -1,25 +1,25 @@
-import { EmployeeLoginBody } from "./../../../api/schema/employees";
+import { UserLoginBody } from "./../../../api/schema/users";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { getEmployeeAuth, loginEmployee } from "api-client";
-import { Employee } from "database";
+import { getUserAuth, loginUser } from "api-client";
+import { User } from "database";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { AxiosError, AxiosResponse } from "axios";
-const TOKEN_NAME = "EMPLOYEE_TOKEN";
-interface EmployeeAuthOptions {
+import { AxiosError } from "axios";
+interface UserAuthOptions {
   onLoginError?: (data: { message: string }) => void;
 }
-function useEmployeeAuth(
+const TOKEN_NAME = "USER_TOKEN";
+function useUserAuth(
   systemAdmin: boolean = false,
-  options: EmployeeAuthOptions = {}
+  options: UserAuthOptions = {}
 ) {
   const { onLoginError } = options;
   const [authenticated, setAuthenticated] = useState<boolean | null>(null);
-  const [employee, setEmployee] = useState<Employee | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const navigate = useNavigate();
   const authenticationQuery = useQuery({
     queryKey: ["authentication"],
-    queryFn: getEmployeeAuth,
+    queryFn: getUserAuth,
     retry: (failureCount, error) => {
       if (error instanceof AxiosError && error.response?.status === 401) {
         return false;
@@ -29,23 +29,18 @@ function useEmployeeAuth(
     onError: () => {
       setAuthenticated(false);
     },
-    onSuccess: (data: Employee) => {
+    onSuccess: (data: User) => {
       if (data) {
-        if (systemAdmin && data.systemAdmin) {
-          setAuthenticated(true);
-        }
-        if (!systemAdmin) {
-          setAuthenticated(true);
-        }
-        setEmployee(data);
+        setAuthenticated(true);
+        setUser(data);
       } else {
         setAuthenticated(false);
       }
     },
   });
   const loginMutation = useMutation({
-    mutationFn: async (body: EmployeeLoginBody) =>
-      await loginEmployee(body.email, body.password),
+    mutationFn: async (body: UserLoginBody) =>
+      await loginUser(body.email, body.password),
     onSuccess: (data) => {
       const { token } = data;
       if (token) {
@@ -59,18 +54,19 @@ function useEmployeeAuth(
       }
     },
   });
+
   return {
     authenticated: authenticated,
     loading: authenticationQuery.isLoading,
-    employee: employee,
+    user: user,
     refetch: authenticationQuery.refetch,
-    loginMutation,
     login: loginMutation.mutate,
+    loginMutation,
     logout: () => {
-      localStorage.removeItem(TOKEN_NAME);
+      localStorage.removeItem("token");
       authenticationQuery.refetch();
       navigate("/login");
     },
   };
 }
-export default useEmployeeAuth;
+export default useUserAuth;

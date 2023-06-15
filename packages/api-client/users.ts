@@ -32,3 +32,11 @@ export async function deleteUser(id: number) {
   const res = await instance.delete(`/${id}`);
   return res.data;
 }
+export async function loginUser(email: string, password: string) {
+  const res = await instance.post("/auth/login", { email, password });
+  return res.data;
+}
+export async function getUserAuth() {
+  const res = await instance.get("/auth");
+  return res.data;
+}

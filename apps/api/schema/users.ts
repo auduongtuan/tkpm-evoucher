@@ -8,6 +8,11 @@ export const UserCreateSchema = Type.Object({
 });
 
 export const UserUpdateSchema = Type.Partial(UserCreateSchema);
+export const UserLoginSchema = Type.Object({
+  email: Type.String({ format: "email", minLength: 1 }),
+  password: Type.String({ minLength: 1 }),
+});
 
 export type UserCreateBody = Static<typeof UserCreateSchema>;
 export type UserUpdateBody = Static<typeof UserUpdateSchema>;
+export type UserLoginBody = Static<typeof UserLoginSchema>;

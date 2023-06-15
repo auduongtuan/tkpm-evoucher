@@ -1,6 +1,6 @@
 import MainLayout from "../components/MainLayout";
 import { Outlet, useNavigate } from "react-router-dom";
-import useEmployeeAuth from "@/hooks/useEmployeeAuth";
+import useEmployeeAuth from "@/hooks/useUserAuth";
 import { useEffect } from "react";
 import { Spin } from "antd";
 export default function Root() {

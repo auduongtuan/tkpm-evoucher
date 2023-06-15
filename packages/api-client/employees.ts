@@ -34,7 +34,7 @@ export async function deleteEmployee(id: number) {
   const res = await instance.delete(`/${id}`);
   return res.data;
 }
-export async function createAuthentication(email: string, password: string) {
+export async function loginEmployee(email: string, password: string) {
   const res = await instance.post("/auth/login", { email, password });
   return res.data;
 }
