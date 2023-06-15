@@ -11,23 +11,24 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <Layout className="min-h-screen">
       <MainSidebar />
-      <Layout className="p-6">
+      <div className="flex justify-center p-6 grow">
         {/* <Breadcrumb style={{ margin: "16px 0" }}>
           <Breadcrumb.Item>Home</Breadcrumb.Item>
           <Breadcrumb.Item>List</Breadcrumb.Item>
           <Breadcrumb.Item>App</Breadcrumb.Item>
         </Breadcrumb> */}
         <Content
-          style={{
-            padding: 24,
-            margin: 0,
-            minHeight: 280,
-            background: colorBgContainer,
-          }}
+          className="max-w-screen-xl p-6 bg-white rounded-md shrink-0"
+          // style={{
+          //   padding: 24,
+          //   margin: 0,
+          //   minHeight: 280,
+          //   background: colorBgContainer,
+          // }}
         >
           {children}
         </Content>
-      </Layout>
+      </div>
     </Layout>
   );
 };

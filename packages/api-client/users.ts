@@ -37,6 +37,15 @@ export async function loginUser(email: string, password: string) {
   return res.data;
 }
 export async function getUserAuth() {
-  const res = await instance.get("/auth");
-  return res.data;
+  const customInstance = createInstance("users", "USER");
+  if (localStorage.getItem("USER_TOKEN")) {
+    const res = await customInstance.get("/auth");
+    return res.data;
+  } else {
+    return null;
+  }
+  // if (customInstance.defaults.headers.common["Authorization"]) {
+  // } else {
+  //   return null;
+  // }
 }

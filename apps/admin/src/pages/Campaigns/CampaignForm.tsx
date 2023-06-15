@@ -176,6 +176,15 @@ const CampaignForm = () => {
           >
             <Input type="number" min={0} step={500} suffix={"VND"}></Input>
           </Form.Item>
+          <Form.Item label="Spent Budget" name={"spentBudget"}>
+            <Input
+              type="number"
+              min={0}
+              step={500}
+              suffix={"VND"}
+              disabled
+            ></Input>
+          </Form.Item>
           <Form.Item
             label="Discount type"
             name={"discountType"}

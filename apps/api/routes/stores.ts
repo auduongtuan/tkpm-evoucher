@@ -25,6 +25,7 @@ async function storeRoutes(
               category: true,
             },
           },
+          campaigns: true,
         },
         orderBy: {
           createdAt: "asc",
@@ -50,6 +51,7 @@ async function storeRoutes(
               category: true,
             },
           },
+          campaigns: true,
         },
         orderBy: {
           createdAt: "asc",

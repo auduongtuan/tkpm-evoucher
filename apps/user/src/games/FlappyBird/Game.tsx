@@ -241,7 +241,11 @@ function Game() {
   );
 
   return (
-    <div onClick={() => jump()} onKeyPress={jump}>
+    <div
+      onClick={() => jump()}
+      onKeyDown={() => jump()}
+      className="leading-[0] round-md overflow-hidden"
+    >
       <canvas
         ref={canvas}
         width={constants.CANVAS_WIDTH}

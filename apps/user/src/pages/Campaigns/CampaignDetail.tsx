@@ -2,13 +2,14 @@ import Link from "@/components/Link";
 import useRecord from "@/hooks/useRecord";
 import { getCampaign } from "api-client";
 import pluralize from "pluralize-esm";
-import { RiStore2Fill } from "react-icons/ri";
+import { RiStore2Fill, RiGamepadFill } from "react-icons/ri";
 import dayjs from "dayjs";
 import { Breadcrumb, Button } from "antd";
 import Description from "@/components/Description";
-import { PlayCircleFilled } from "@ant-design/icons";
 import GameModal from "@/games/GameModal";
 import useGameStore from "@/games/useGameStore";
+import useUserAuth from "@/hooks/useUserAuth";
+import useAppStore from "@/stores/useAppStore";
 const CampaignDetail = () => {
   // const { modalProps, closeModal } = useRouteModal("/campaigns");
   // const [form] = Form.useForm();
@@ -28,10 +29,12 @@ const CampaignDetail = () => {
     getFn: getCampaign,
   });
   const campaign = recordQuery?.data;
+  const { authenticated } = useUserAuth();
+  const loginModal = useAppStore((state) => state.loginModal);
   const openGameModal = useGameStore((state) => state.openModal);
-  return !recordQuery?.isLoading && campaign ? (
+  return id && !recordQuery?.isLoading && campaign ? (
     <div className="grid grid-cols-12 gap-6 p-4 bg-white rounded-xl">
-      <GameModal />
+      <GameModal campaignId={id} />
       <Breadcrumb
         className="col-span-12"
         items={[
@@ -55,12 +58,14 @@ const CampaignDetail = () => {
         ]}
       />
       <div className="col-span-12 md:col-span-7">
-        {campaign.image && (
+        {campaign.image ? (
           <img
             src={campaign.image}
             className="max-w-full aspect-[4/3] object-cover rounded-md"
             alt={campaign.name}
           />
+        ) : (
+          <div className="bg-gray-200 max-w-full aspect-[4/3] object-cover rounded-md"></div>
         )}
       </div>
       <div className="col-span-12 mt-2 md:col-span-5">
@@ -80,23 +85,34 @@ const CampaignDetail = () => {
           {campaign.description && campaign.description}
         </p>
         <div className="grid grid-cols-2 gap-4 mb-8">
-          <Description label="Games" className="col-span-2">
-            {campaign.games.map((game) => game.name).join(", ")}
-          </Description>
           <Description label="Started at">
             {dayjs(campaign.startedAt).format("DD/MM/YYYY")}
           </Description>
           <Description label="Ended at">
             {dayjs(campaign.endedAt).format("DD/MM/YYYY")}
           </Description>
+          <Description label="Games" className="col-span-2">
+            {campaign.games.map((game) => game.name).join(", ")}
+          </Description>
         </div>
         <Button
           type="primary"
           size="large"
-          icon={<PlayCircleFilled />}
-          onClick={() => openGameModal()}
+          icon={<RiGamepadFill className="text-xl" />}
+          className="flex items-center justify-center h-auto gap-3 px-3 py-2"
+          onClick={() =>
+            authenticated ? openGameModal() : loginModal.setOpen(true)
+          }
         >
-          Play now
+          <div className="flex flex-col items-start gap-0.5">
+            <span className="block text-lg font-medium leading-none">
+              Play now
+            </span>
+
+            <span className="text-sm text-white/80">
+              {!authenticated ? "Require logged in" : "And get vouchers"}
+            </span>
+          </div>
         </Button>
       </div>
       <div className="flex flex-col col-span-12 gap-8">

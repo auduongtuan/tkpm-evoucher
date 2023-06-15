@@ -5,28 +5,26 @@ import { User } from "database";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { AxiosError } from "axios";
+import useAppStore from "@/stores/useAppStore";
 interface UserAuthOptions {
   onLoginError?: (data: { message: string }) => void;
 }
 const TOKEN_NAME = "USER_TOKEN";
-function useUserAuth(
-  systemAdmin: boolean = false,
-  options: UserAuthOptions = {}
-) {
+function useUserAuth(options: UserAuthOptions = {}) {
   const { onLoginError } = options;
-  const [authenticated, setAuthenticated] = useState<boolean | null>(null);
-  const [user, setUser] = useState<User | null>(null);
-  const navigate = useNavigate();
+  const { user, setUser, authenticated, setAuthenticated } = useAppStore();
   const authenticationQuery = useQuery({
-    queryKey: ["authentication"],
+    queryKey: ["user", "authentication"],
     queryFn: getUserAuth,
-    retry: (failureCount, error) => {
-      if (error instanceof AxiosError && error.response?.status === 401) {
-        return false;
-      }
-      return true;
-    },
-    onError: () => {
+    // retry: (failureCount, error) => {
+    //   if (error instanceof AxiosError && error.response?.status === 401) {
+    //     return false;
+    //   }
+    //   return true;
+    // },
+
+    onError: (err) => {
+      console.log(err);
       setAuthenticated(false);
     },
     onSuccess: (data: User) => {
@@ -43,6 +41,7 @@ function useUserAuth(
       await loginUser(body.email, body.password),
     onSuccess: (data) => {
       const { token } = data;
+      console.log("token", token);
       if (token) {
         localStorage.setItem(TOKEN_NAME, token);
         authenticationQuery.refetch();
@@ -63,9 +62,9 @@ function useUserAuth(
     login: loginMutation.mutate,
     loginMutation,
     logout: () => {
-      localStorage.removeItem("token");
+      localStorage.removeItem(TOKEN_NAME);
       authenticationQuery.refetch();
-      navigate("/login");
+      // navigate("/login");
     },
   };
 }

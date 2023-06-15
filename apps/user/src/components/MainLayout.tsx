@@ -3,6 +3,8 @@ import React from "react";
 import { Layout, theme } from "antd";
 import MainSidebar from "./MainSidebar";
 import MainHeader from "./MainHeader";
+import LoginModal from "./LoginModal";
+import RegisterModal from "./RegisterModal";
 const { Content } = Layout;
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
@@ -11,6 +13,8 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
   } = theme.useToken();
   return (
     <div className="min-h-screen font-sans">
+      <LoginModal />
+      <RegisterModal />
       <MainHeader />
       {/* <MainSidebar /> */}
       <div className="flex justify-center w-full min-h-screen p-6 bg-gray-100">

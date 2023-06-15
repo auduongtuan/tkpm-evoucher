@@ -15,6 +15,8 @@ interface GameState {
   setGameStarted: (gameStarted: boolean) => void;
   setGameOver: (gameOver: boolean) => void;
   resetGame: () => void;
+  restartGame: () => void;
+  resetBestScore: (gameName: GameName) => void;
   setBestScore: (gameName: GameName, score: number) => void;
   bestScores: {
     [key in GameName]?: number;
@@ -37,12 +39,17 @@ const useGameStore = create<GameState>()(
       gameStarted: false,
       setGameOver: (gameOver) => set({ gameOver }),
       setGameStarted: (gameStarted) => set({ gameStarted }),
-      resetGame: () => set({ gameOver: false, gameStarted: true }),
+      resetGame: () => set({ gameOver: false, gameStarted: false }),
+      restartGame: () => set({ gameOver: false, gameStarted: true }),
       openModal: () => set({ modalOpen: true }),
       closeModal: () => set({ modalOpen: false }),
       score: 0,
       setScore: (score) => set({ score }),
       bestScores: {},
+      resetBestScore: (gameName) =>
+        set((state) => ({
+          bestScores: { ...state.bestScores, [gameName]: 0 },
+        })),
       setBestScore: (gameName, score) =>
         set((state) => {
           if (

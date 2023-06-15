@@ -1,6 +1,7 @@
 import { CampaignCreateBody, CampaignUpdateBody } from "api/schema/campaigns";
 import { Campaign, Game, Store, Merchant } from "database";
 import { createInstance } from "./base";
+import { VoucherGenerateBody } from "api/schema/vouchers";
 const instance = createInstance("campaigns");
 type CampainSelect = Campaign & {
   merchant: Merchant;
@@ -37,5 +38,15 @@ export async function updateCampaign(
 
 export async function deleteCampaign(id: number) {
   const res = await instance.delete(`/${id}`);
+  return res.data;
+}
+
+export async function generateCampaignVoucher(
+  id: number,
+  body: VoucherGenerateBody
+) {
+  const res = await instance.post(`/${id}/generate-voucher`, {
+    ...body,
+  });
   return res.data;
 }

@@ -26,6 +26,11 @@ async function campaignRoutes(
             store: true,
           },
         },
+        vouchers: {
+          select: {
+            id: true,
+          },
+        },
       },
       orderBy: {
         createdAt: "asc",
@@ -170,8 +175,9 @@ async function campaignRoutes(
       }
       const voucherValueInBudget =
         (discountType === "FIXED" ? voucherValue : maxVoucherFixed) || 0;
+      console.log(voucherValueInBudget);
       if (
-        (campaign.totalBudget || 0) + voucherValueInBudget >
+        (campaign.spentBudget || 0) + voucherValueInBudget >
         (campaign.totalBudget || 0)
       ) {
         reply.status(403);
@@ -181,7 +187,7 @@ async function campaignRoutes(
         reply.status(500);
         throw new Error("Invalid voucher value");
       }
-      fastify.prisma.campaign.update({
+      await fastify.prisma.campaign.update({
         where: {
           id: req.params.id,
         },
