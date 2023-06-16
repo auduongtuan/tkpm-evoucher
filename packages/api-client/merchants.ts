@@ -1,4 +1,7 @@
-import { MerchantCreateBody, MerchantUpdateBody } from "api/schema/merchants";
+import {
+  MerchantCreateBody,
+  MerchantUpdateBody,
+} from "database/schema/merchants";
 import { Merchant, Store, Employee, Campaign } from "database";
 import { createInstance } from "./base";
 import { StoreWithCategories } from "./types";
@@ -11,9 +14,7 @@ export async function getMerchants(): Promise<
   return res.data;
 }
 
-export async function getMerchant(
-  id: string | number
-): Promise<
+export async function getMerchant(id: string | number): Promise<
   Merchant & {
     stores: StoreWithCategories[];
     employees: Employee[];

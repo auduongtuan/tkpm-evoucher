@@ -1,4 +1,4 @@
-import { EmployeeLoginBody } from "./../../../api/schema/employees";
+import { EmployeeLoginBody } from "database/schema/employees";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { getEmployeeAuth, loginEmployee } from "api-client";
 import { Employee } from "database";

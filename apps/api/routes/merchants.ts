@@ -1,7 +1,10 @@
 import { FastifyInstance, FastifyPluginOptions } from "fastify";
 // import MerchantModel from "../models/MerchantModel";
-import { IdParamsSchema, IdParamsType } from "../schema/id";
-import { MerchantCreateSchema, MerchantCreateBody } from "../schema/merchants";
+import { IdParamsSchema, IdParamsType } from "database/schema/id";
+import {
+  MerchantCreateSchema,
+  MerchantCreateBody,
+} from "database/schema/merchants";
 import { simplifyMerchant } from "database";
 async function merchantRoutes(
   fastify: FastifyInstance,

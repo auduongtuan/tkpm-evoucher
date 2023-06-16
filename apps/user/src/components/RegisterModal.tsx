@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Form, Input, Button, Alert } from "antd";
 import useUserAuth from "@/hooks/useUserAuth";
 import { useMutation } from "@tanstack/react-query";
-import { UserCreateBody } from "../../../api/schema/users";
+import { UserCreateBody } from "database/schema/users";
 import { AxiosError } from "axios";
 import { createUser } from "api-client";
 const RegisterModal = () => {

@@ -1,11 +1,11 @@
 import { FastifyPluginOptions, FastifyInstance, FastifyRequest } from "fastify";
-import { IdParamsSchema, IdParamsType } from "../schema/id";
+import { IdParamsSchema, IdParamsType } from "database/schema/id";
 import {
   VoucherCreateSchema,
   VoucherCreateBody,
   VoucherUpdateBody,
   VoucherUpdateSchema,
-} from "../schema/vouchers";
+} from "database/schema/vouchers";
 import util from "util";
 import { pipeline } from "stream";
 import fs from "fs";

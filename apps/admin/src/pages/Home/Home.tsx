@@ -64,21 +64,42 @@ const Home = () => {
             <section>
               <Typography.Title level={4}>Top-campaign stores</Typography.Title>
               {!statistics["store"].isLoading &&
-                statistics["store"].data.map((store) => {
-                  return (
-                    <div className="flex mt-3">
-                      <div className="flex-grow w-12">{store.name}</div>
-                      <div>
-                        {store.campaigns && store.campaigns.length}{" "}
-                        {pluralize("campaign")}
+                statistics["store"].data
+                  .sort((a, b) => b?.campaigns?.length - a?.campaigns?.length)
+                  .slice(0, 5)
+                  .map((store) => {
+                    return (
+                      <div className="flex mt-3">
+                        <div className="flex-grow w-12">{store.name}</div>
+                        <div>
+                          {store.campaigns && store.campaigns.length}{" "}
+                          {pluralize("campaign")}
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+            </section>
+            <section>
+              <Typography.Title level={4}>Top users</Typography.Title>
+              {!statistics["user"].isLoading &&
+                statistics["user"].data
+                  .sort((a, b) => b?.vouchers?.length - a?.vouchers?.length)
+                  .slice(0, 5)
+                  .map((user) => {
+                    return (
+                      <div className="flex mt-3">
+                        <div className="flex-grow w-12">{user.fullName}</div>
+                        <div>
+                          {user.vouchers && user.vouchers.length}{" "}
+                          {pluralize("vouchers")}
+                        </div>
+                      </div>
+                    );
+                  })}
             </section>
           </div>
         </div>
-        <div className="">
+        <div className="flex flex-col gap-8">
           <section>
             <Typography.Title level={4}>Stores by category</Typography.Title>
             {!statistics["category"].isLoading && (

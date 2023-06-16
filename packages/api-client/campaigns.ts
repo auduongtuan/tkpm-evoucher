@@ -1,7 +1,10 @@
-import { CampaignCreateBody, CampaignUpdateBody } from "api/schema/campaigns";
+import {
+  CampaignCreateBody,
+  CampaignUpdateBody,
+} from "database/schema/campaigns";
 import { Campaign, Game, Store, Merchant } from "database";
 import { createInstance } from "./base";
-import { VoucherGenerateBody } from "api/schema/vouchers";
+import { VoucherGenerateBody } from "database/schema/vouchers";
 const instance = createInstance("campaigns");
 type CampainSelect = Campaign & {
   merchant: Merchant;

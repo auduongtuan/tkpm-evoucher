@@ -1,4 +1,4 @@
-import { UserCreateBody, UserUpdateBody } from "api/schema/users";
+import { UserCreateBody, UserUpdateBody } from "database/schema/users";
 import { User } from "database";
 import { createInstance } from "./base";
 const instance = createInstance("users");

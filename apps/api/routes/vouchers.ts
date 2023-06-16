@@ -1,12 +1,12 @@
 import { FastifyPluginOptions, FastifyInstance, FastifyRequest } from "fastify";
-import { IdParamsSchema, IdParamsType } from "../schema/id";
+import { IdParamsSchema, IdParamsType } from "database/schema/id";
 import {
   VoucherCreateSchema,
   VoucherCreateBody,
   VoucherUpdateBody,
   VoucherUpdateSchema,
   VoucherGenerateBody,
-} from "../schema/vouchers";
+} from "database/schema/vouchers";
 async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
   fastify.get("/", async function (req, reply) {
     return fastify.prisma.voucher.findMany({
@@ -23,7 +23,6 @@ async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
     "/:id",
     { schema: { params: IdParamsSchema } },
     async function (req, reply) {
-      console.log(req.params.id);
       return await fastify.prisma.voucher.findUnique({
         where: {
           id: req.params.id,

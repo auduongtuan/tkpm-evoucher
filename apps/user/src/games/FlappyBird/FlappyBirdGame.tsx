@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import useEventListener from "@use-it/event-listener";
+import useEventListener from "@/hooks/useEventListener";
 import { Circle, Rectangle } from "./types";
 import * as constants from "./constants";
 import useGameStore from "../useGameStore";
@@ -95,7 +95,7 @@ const fallOut = () =>
 // let hasFinished = false;
 let canGetScore = true;
 
-function Game() {
+function FlappyBirdGame() {
   const canvas = useRef<HTMLCanvasElement>(null);
   const gameState = useGameStore();
 
@@ -120,13 +120,16 @@ function Game() {
     if (key.code === "Space") {
       if (!gameState.gameStarted) {
         // hasStarted = true;
-        gameState.setGameStarted(true);
+        gameState.restartGame();
       }
       jump();
     }
   };
 
-  useEventListener("keypress", handler);
+  // useEventListener("keyup", (e) => {
+  //   console.log(e);
+  // });
+  useEventListener("keyup", handler);
 
   const draw = (context: CanvasRenderingContext2D) => {
     // draw background
@@ -243,7 +246,7 @@ function Game() {
   return (
     <div
       onClick={() => jump()}
-      onKeyDown={() => jump()}
+      // onKeyDown={() => jump()}
       className="leading-[0] round-md overflow-hidden"
     >
       <canvas
@@ -258,4 +261,4 @@ function Game() {
   );
 }
 
-export default Game;
+export default FlappyBirdGame;

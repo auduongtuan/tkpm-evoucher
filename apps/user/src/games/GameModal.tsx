@@ -1,59 +1,44 @@
 import { Modal } from "antd";
-import Game from "./FlappyBird/Game";
+import FlappyBirdGame from "./FlappyBird/FlappyBirdGame";
 import useGameStore from "./useGameStore";
 import { Button, message } from "antd";
 import { useEffect, useReducer } from "react";
-import { useMutation } from "@tanstack/react-query";
-import { VoucherGenerateBody } from "../../../api/schema/vouchers";
-import { generateCampaignVoucher } from "api-client";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { VoucherGenerateBody } from "database/schema/vouchers";
+import { generateCampaignVoucher, getGames } from "api-client";
+import { Game } from "database";
 import useUserAuth from "@/hooks/useUserAuth";
+import GamePanel from "./GamePanel";
+import SnakeGame from "./Snake/SnakeGame2";
+const GameComponents = {
+  FLAPPY_BIRD: FlappyBirdGame,
+  SNAKE: SnakeGame,
+};
+
 const GameModal = ({ campaignId }: { campaignId: number }) => {
   const gameState = useGameStore();
   const [lastUpdate, refresh] = useReducer(() => Date.now(), Date.now());
-
-  useEffect(() => {
-    gameState.setGameName("FLAPPY_BIRD");
-  }, []);
-  const { user } = useUserAuth();
-  const highScore = gameState.gameName
-    ? gameState.bestScores[gameState.gameName]
-    : undefined;
-  const generateVoucherMutation = useMutation({
-    mutationFn: async (body: VoucherGenerateBody) =>
-      await generateCampaignVoucher(campaignId, body),
-    onSuccess: (data) => {
-      console.log(data);
-      if (data) {
-        if (gameState.gameName) gameState.resetBestScore(gameState.gameName);
-        message.success("Voucher generated successfully");
-      }
+  const gameQuery = useQuery({
+    queryKey: ["game", "list"],
+    queryFn: async () => {
+      return await getGames();
+    },
+    onSuccess: (data: Game[]) => {
+      gameState.setGames(data);
     },
   });
-  const generateVoucher = () => {
-    if (user && highScore) {
-      generateVoucherMutation.mutate({
-        userId: user.id,
-        score: highScore,
-      });
-    } else {
-      message.error("Login credentials not found or score not found");
-    }
-  };
-  const cta = () => {
-    return (
-      <div className="flex gap-2 mt-4">
-        <Button size="middle" onClick={() => gameState.restartGame()}>
-          Retry
-        </Button>
-        <Button type="primary" size="middle" onClick={() => generateVoucher()}>
-          Exchange voucher
-        </Button>
-      </div>
-    );
-  };
+  const currentGame = gameState.games
+    ? gameState.games.find((game) => game.slug === gameState.gameName)
+    : undefined;
+
+  const GameComponent =
+    currentGame?.slug && currentGame?.slug in GameComponents
+      ? GameComponents[currentGame?.slug]
+      : null;
+  console.log(currentGame?.slug, GameComponent);
   return (
     <Modal
-      title={"Flappy Bird"}
+      title={currentGame?.name}
       open={gameState.modalOpen}
       onCancel={() => {
         gameState.closeModal();
@@ -61,45 +46,14 @@ const GameModal = ({ campaignId }: { campaignId: number }) => {
       }}
       footer={null}
     >
-      <div className="relative">
-        {!gameState.gameStarted && (
-          <div className="absolute top-0 flex flex-col items-center justify-center w-full h-full bg-gray-950/30">
-            <div className="flex flex-col items-center p-6 text-white rounded-lg w-80">
-              <div className="mb-2 text-3xl font-bold">Flappy Bird</div>
-              {highScore ? (
-                <div className="text-xl">Best Score: {highScore}</div>
-              ) : null}
-              {!highScore ? (
-                <div className="flex gap-2 mt-4">
-                  <Button
-                    size="large"
-                    onClick={() => gameState.setGameStarted(true)}
-                  >
-                    Start
-                  </Button>
-                </div>
-              ) : (
-                cta()
-              )}
-            </div>
-          </div>
-        )}
-        {gameState.gameOver && (
-          <div className="absolute top-0 flex flex-col items-center justify-center w-full h-full bg-gray-950/30">
-            <div className="flex flex-col items-center p-6 bg-white rounded-lg shadow-xl w-80">
-              <div className="mb-2 text-2xl font-bold">Game Over</div>
-              <div className="text-lg">Score: {gameState.score}</div>
-              {typeof highScore != "undefined" ? (
-                <>
-                  <div className="text-lg">Best Score: {highScore}</div>
-                  {cta()}
-                </>
-              ) : null}
-            </div>
-          </div>
-        )}
-        <Game key={lastUpdate} />
-      </div>
+      {GameComponent ? (
+        <div className="relative overflow-hidden rounded-md">
+          <GamePanel campaignId={campaignId} />
+          <GameComponent key={lastUpdate} />
+        </div>
+      ) : (
+        "Game not available yet"
+      )}
     </Modal>
   );
 };

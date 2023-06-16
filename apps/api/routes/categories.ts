@@ -1,11 +1,11 @@
 import { FastifyPluginOptions, FastifyInstance, FastifyRequest } from "fastify";
-import { IdParamsSchema, IdParamsType } from "../schema/id";
+import { IdParamsSchema, IdParamsType } from "database/schema/id";
 import {
   CategoryCreateSchema,
   CategoryCreateBody,
   CategoryUpdateBody,
   CategoryUpdateSchema,
-} from "../schema/categories";
+} from "database/schema/categories";
 async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
   fastify.get("/", async function (req, reply) {
     return fastify.prisma.category.findMany({

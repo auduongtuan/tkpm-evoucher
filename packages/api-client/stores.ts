@@ -1,5 +1,5 @@
-import { PaginationParamsType } from "./../../apps/api/schema/pagination";
-import { StoreCreateBody, StoreUpdateBody } from "api/schema/stores";
+import { PaginationParamsType } from "database/schema/pagination";
+import { StoreCreateBody, StoreUpdateBody } from "database/schema/stores";
 import { Campaign, Category, Store } from "database";
 import { createInstance } from "./base";
 const instance = createInstance("stores");

@@ -2,7 +2,7 @@ import { loginEmployee } from "api-client";
 import { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Alert, Button, Form, Input } from "antd";
-import { EmployeeLoginBody } from "../../../../api/schema/employees";
+import { EmployeeLoginBody } from "database/schema/employees";
 import { useNavigate } from "react-router-dom";
 import { AxiosError } from "axios";
 import useEmployeeAuth from "@/hooks/useUserAuth";

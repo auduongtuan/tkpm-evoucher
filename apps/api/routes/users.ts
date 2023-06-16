@@ -1,27 +1,14 @@
 import { FastifyPluginOptions, FastifyInstance, FastifyRequest } from "fastify";
-import { IdParamsSchema, IdParamsType } from "../schema/id";
+import { IdParamsSchema, IdParamsType } from "database/schema/id";
 import {
   UserCreateSchema,
   UserCreateBody,
   UserUpdateBody,
   UserUpdateSchema,
-} from "../schema/users";
+} from "database/schema/users";
 // import Users from "../models/UserModel";
-import { User, hashPassword } from "database";
-import type { Extended } from "helpers";
-type ExtendedUser = Extended<User>;
-function excludePassword(users: ExtendedUser[] | ExtendedUser | null) {
-  if (!users) return null;
-  if (Array.isArray(users)) {
-    return users.map((user) => {
-      const { password, ...rest } = user;
-      return rest;
-    });
-  } else {
-    const { password, ...rest } = users;
-    return rest;
-  }
-}
+import { User, hashPassword, excludePassword } from "database";
+
 async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
   fastify.get("/", async function (req, reply) {
     const users = await fastify.prisma.user.findMany({

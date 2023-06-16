@@ -1,4 +1,7 @@
-import { CategoryCreateBody, CategoryUpdateBody } from "api/schema/categories";
+import {
+  CategoryCreateBody,
+  CategoryUpdateBody,
+} from "database/schema/categories";
 import { Category } from "database";
 import { createInstance } from "./base";
 const instance = createInstance("categories");

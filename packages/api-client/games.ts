@@ -1,4 +1,4 @@
-import { GameCreateBody, GameUpdateBody } from "api/schema/games";
+import { GameCreateBody, GameUpdateBody } from "database/schema/games";
 import { Game } from "database";
 import { createInstance } from "./base";
 const instance = createInstance("games");

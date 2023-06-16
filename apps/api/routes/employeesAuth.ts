@@ -1,5 +1,8 @@
 import { FastifyInstance, FastifyPluginOptions } from "fastify";
-import { EmployeeLoginBody, EmployeeLoginSchema } from "../schema/employees";
+import {
+  EmployeeLoginBody,
+  EmployeeLoginSchema,
+} from "database/schema/employees";
 import { comparePassword } from "database";
 async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
   fastify.get(

@@ -1,9 +1,11 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-
-type GameName = "FLAPPY_BIRD" | "2048";
+import { Game } from "database";
+export type GameName = "FLAPPY_BIRD" | "2048" | "SNAKE";
 interface GameState {
   modalOpen: boolean;
+  games: Game[];
+  setGames: (games: Game[]) => void;
   gameName: GameName | null;
   setGameName: (gameName: GameName) => void;
   openModal: () => void;
@@ -32,6 +34,8 @@ interface GameState {
 const useGameStore = create<GameState>()(
   persist(
     (set) => ({
+      games: [],
+      setGames: (games) => set({ games }),
       modalOpen: false,
       gameOver: false,
       gameName: null,

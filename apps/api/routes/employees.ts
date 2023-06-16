@@ -1,11 +1,11 @@
 import { FastifyPluginOptions, FastifyInstance, FastifyRequest } from "fastify";
-import { IdParamsSchema, IdParamsType } from "../schema/id";
+import { IdParamsSchema, IdParamsType } from "database/schema/id";
 import {
   EmployeeCreateSchema,
   EmployeeCreateBody,
   EmployeeUpdateBody,
   EmployeeUpdateSchema,
-} from "../schema/employees";
+} from "database/schema/employees";
 // import Employees from "../models/EmployeeModel";
 import { Employee, hashPassword } from "database";
 import type { Extended } from "helpers";

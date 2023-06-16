@@ -1,4 +1,7 @@
-import { EmployeeCreateBody, EmployeeUpdateBody } from "api/schema/employees";
+import {
+  EmployeeCreateBody,
+  EmployeeUpdateBody,
+} from "database/schema/employees";
 import { Employee } from "database";
 import { createInstance } from "./base";
 const instance = createInstance("employees");

@@ -4,12 +4,16 @@ import { getCampaign } from "api-client";
 import pluralize from "pluralize-esm";
 import { RiStore2Fill, RiGamepadFill } from "react-icons/ri";
 import dayjs from "dayjs";
-import { Breadcrumb, Button } from "antd";
+import { Breadcrumb, Button, Select, Form, Radio } from "antd";
+import type { RadioChangeEvent } from "antd";
+
 import Description from "@/components/Description";
 import GameModal from "@/games/GameModal";
-import useGameStore from "@/games/useGameStore";
+import useGameStore, { GameName } from "@/games/useGameStore";
 import useUserAuth from "@/hooks/useUserAuth";
 import useAppStore from "@/stores/useAppStore";
+import { useEffect } from "react";
+
 const CampaignDetail = () => {
   // const { modalProps, closeModal } = useRouteModal("/campaigns");
   // const [form] = Form.useForm();
@@ -32,6 +36,13 @@ const CampaignDetail = () => {
   const { authenticated } = useUserAuth();
   const loginModal = useAppStore((state) => state.loginModal);
   const openGameModal = useGameStore((state) => state.openModal);
+  const { gameName, setGameName } = useGameStore();
+  useEffect(() => {
+    if (campaign && campaign.games) {
+      console.log(campaign.games[0]?.slug);
+      setGameName(campaign?.games[0]?.slug as GameName);
+    }
+  }, [campaign]);
   return id && !recordQuery?.isLoading && campaign ? (
     <div className="grid grid-cols-12 gap-6 p-4 bg-white rounded-xl">
       <GameModal campaignId={id} />
@@ -95,25 +106,46 @@ const CampaignDetail = () => {
             {campaign.games.map((game) => game.name).join(", ")}
           </Description>
         </div>
-        <Button
-          type="primary"
-          size="large"
-          icon={<RiGamepadFill className="text-xl" />}
-          className="flex items-center justify-center h-auto gap-3 px-3 py-2"
-          onClick={() =>
-            authenticated ? openGameModal() : loginModal.setOpen(true)
-          }
-        >
-          <div className="flex flex-col items-start gap-0.5">
-            <span className="block text-lg font-medium leading-none">
-              Play now
-            </span>
+        {dayjs().isBefore(campaign.endedAt) ? (
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2 grow">
+              <Description label="Choose one game to start" className="">
+                <Radio.Group
+                  className="w-full grow"
+                  onChange={({ target: { value } }: RadioChangeEvent) =>
+                    setGameName(value)
+                  }
+                  value={gameName}
+                  options={campaign.games.map((game) => ({
+                    label: game.name,
+                    value: game.slug,
+                  }))}
+                  optionType="button"
+                  buttonStyle="solid"
+                ></Radio.Group>
+              </Description>
+            </div>
+            <Button
+              type="primary"
+              size="large"
+              icon={<RiGamepadFill className="text-xl" />}
+              className="flex items-center justify-start h-auto gap-3 px-3 py-2"
+              onClick={() =>
+                authenticated ? openGameModal() : loginModal.setOpen(true)
+              }
+            >
+              <div className="flex flex-col items-start gap-0.5">
+                <span className="block text-lg font-medium leading-none">
+                  Play now
+                </span>
 
-            <span className="text-sm text-white/80">
-              {!authenticated ? "Require logged in" : "And get vouchers"}
-            </span>
+                <span className="text-sm text-white/80">
+                  {!authenticated ? "Require logged in" : "And get vouchers"}
+                </span>
+              </div>
+            </Button>
           </div>
-        </Button>
+        ) : null}
       </div>
       <div className="flex flex-col col-span-12 gap-8">
         <section>

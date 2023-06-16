@@ -1,12 +1,12 @@
-import { PaginationParamsType } from "./../schema/pagination";
+import { PaginationParamsType } from "database/schema/pagination";
 import { FastifyInstance, FastifyPluginOptions } from "fastify";
-import { IdParamsSchema, IdParamsType } from "../schema/id";
+import { IdParamsSchema, IdParamsType } from "database/schema/id";
 import {
   StoreSchema,
   StoreCreateBody,
   StoreUpdateSchema,
   StoreUpdateBody,
-} from "../schema/stores";
+} from "database/schema/stores";
 import { simplifyCategories } from "database";
 async function storeRoutes(
   fastify: FastifyInstance,

@@ -4,8 +4,9 @@
   "main": "./index.ts",
   "types": "./index.ts",
   "dependencies": {
-    "@prisma/client": "^4.13.0",
     "@faker-js/faker": "latest",
+    "@prisma/client": "^4.13.0",
+    "@sinclair/typebox": "^0.28.9",
     "helpers": "workspace:*"
   },
   "devDependencies": {

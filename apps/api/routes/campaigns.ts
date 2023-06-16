@@ -1,13 +1,18 @@
 import { FastifyInstance, FastifyPluginOptions } from "fastify";
-import { IdParamsSchema, IdParamsType } from "../schema/id";
+import { IdParamsSchema, IdParamsType } from "database/schema/id";
 import {
   CampaignCreateSchema,
   CampaignCreateBody,
   CampaignUpdateSchema,
   CampaignUpdateBody,
-} from "../schema/campaigns";
+} from "database/schema/campaigns";
 import { generate } from "voucher-codes-generator";
-import { VoucherGenerateBody, VoucherGenerateSchema } from "../schema/vouchers";
+import {
+  VoucherGenerateBody,
+  VoucherGenerateSchema,
+} from "database/schema/vouchers";
+import dayjs from "dayjs";
+import { isCampaignExpired } from "database";
 async function campaignRoutes(
   fastify: FastifyInstance,
   options: FastifyPluginOptions
@@ -164,6 +169,10 @@ async function campaignRoutes(
       if (!campaign) {
         reply.status(404);
         throw new Error("Campaign not found");
+      }
+      if (isCampaignExpired(campaign)) {
+        reply.status(403);
+        throw new Error("Campaign ended");
       }
       let voucherValue: number = -1;
       const GAME_AVG_SCORE = 10;

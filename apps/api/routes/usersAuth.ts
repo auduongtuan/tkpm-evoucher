@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyPluginOptions } from "fastify";
-import { UserLoginBody, UserLoginSchema } from "../schema/users";
-import { comparePassword } from "database";
+import { UserLoginBody, UserLoginSchema } from "database/schema/users";
+import { comparePassword, excludePassword } from "database";
 async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
   fastify.get(
     "/",
@@ -12,7 +12,7 @@ async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
         reply.statusCode = 401;
         throw new Error("Not logged in");
       }
-      return req.user;
+      return excludePassword(req.user);
     }
   );
   fastify.post<{ Body: UserLoginBody }>(

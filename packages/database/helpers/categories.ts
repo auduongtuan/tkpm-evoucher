@@ -5,7 +5,7 @@ import {
   Employee,
   Campaign,
   Store,
-} from "./index";
+} from "../index";
 export function simplifyCategories(
   categories: (CategoriesOnStores & { category: Category })[]
 ) {
