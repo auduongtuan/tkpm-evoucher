@@ -21,6 +21,8 @@ import Home from "./pages/Home/Home";
 import { RouterProviderProps } from "react-router-dom";
 import MerchantDetail from "./pages/Merchants/MerchantDetail";
 import CampaignDetail from "./pages/Campaigns/CampaignDetail";
+import StoreList from "./pages/Stores/StoreList";
+import StoreDetail from "./pages/Stores/StoreDetail";
 const router: RouterProviderProps["router"] = createBrowserRouter([
   {
     path: "/",
@@ -38,6 +40,14 @@ const router: RouterProviderProps["router"] = createBrowserRouter([
       {
         path: "/campaign/:id",
         element: <CampaignDetail />,
+      },
+      {
+        path: "/stores",
+        element: <StoreList />,
+      },
+      {
+        path: "/store/:id",
+        element: <StoreDetail />,
       },
     ],
   },

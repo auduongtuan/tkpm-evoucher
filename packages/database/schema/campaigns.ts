@@ -19,3 +19,15 @@ export const CampaignUpdateSchema = Type.Partial(CampaignCreateSchema);
 
 export type CampaignCreateBody = Static<typeof CampaignCreateSchema>;
 export type CampaignUpdateBody = Static<typeof CampaignUpdateSchema>;
+
+export const CampaignsParamsSchema = Type.Object({
+  status: Type.Optional(
+    Type.Union([
+      Type.Literal("all"),
+      Type.Literal("upcoming"),
+      Type.Literal("ongoing"),
+      Type.Literal("expired"),
+    ])
+  ),
+});
+export type CampaignsParamsType = Static<typeof CampaignsParamsSchema>;

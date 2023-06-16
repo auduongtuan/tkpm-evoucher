@@ -1,4 +1,4 @@
-import { PaginationParamsType } from "database/schema/pagination";
+import { PaginationQueryType } from "database/schema/pagination";
 import { FastifyInstance, FastifyPluginOptions } from "fastify";
 import { IdParamsSchema, IdParamsType } from "database/schema/id";
 import {
@@ -6,15 +6,28 @@ import {
   StoreCreateBody,
   StoreUpdateSchema,
   StoreUpdateBody,
+  StoresParamsType,
 } from "database/schema/stores";
-import { simplifyCategories } from "database";
+import { simplifyCampaigns, simplifyCategories } from "database";
 async function storeRoutes(
   fastify: FastifyInstance,
   options: FastifyPluginOptions
 ) {
-  fastify.get<{ Querystring: PaginationParamsType }>(
+  fastify.get<{ Querystring: PaginationQueryType & StoresParamsType }>(
     "/",
     async function (req, reply) {
+      const whereCondition = {
+        categories: req.query.categoryId
+          ? {
+              some: {
+                categoryId: req.query.categoryId
+                  ? Number(req.query.categoryId)
+                  : undefined,
+              },
+            }
+          : undefined,
+      };
+
       const stores = await fastify.prisma.store.findMany({
         take: req.query.take ? Number(req.query.take) : undefined,
         skip: req.query.skip ? Number(req.query.skip) : undefined,
@@ -25,42 +38,22 @@ async function storeRoutes(
               category: true,
             },
           },
-          campaigns: true,
+          campaigns: {
+            include: {
+              campaign: true,
+            },
+          },
         },
         orderBy: {
           createdAt: "asc",
         },
+        where: whereCondition,
       });
       // https://www.prisma.io/docs/guides/other/troubleshooting-orm/help-articles/working-with-many-to-many-relations
       return stores.map((store) => ({
         ...store,
         categories: simplifyCategories(store.categories),
-      }));
-    }
-  );
-  fastify.get<{ Querystring: PaginationParamsType }>(
-    "/nearest",
-    async function (req, reply) {
-      const stores = await fastify.prisma.store.findMany({
-        take: req.query.take ? Number(req.query.take) : undefined,
-        skip: req.query.skip ? Number(req.query.skip) : undefined,
-        include: {
-          merchant: true,
-          categories: {
-            include: {
-              category: true,
-            },
-          },
-          campaigns: true,
-        },
-        orderBy: {
-          createdAt: "asc",
-        },
-      });
-      // https://www.prisma.io/docs/guides/other/troubleshooting-orm/help-articles/working-with-many-to-many-relations
-      return stores.map((store) => ({
-        ...store,
-        categories: store.categories.map((category) => category.category),
+        campaigns: simplifyCampaigns(store.campaigns),
       }));
     }
   );
@@ -80,12 +73,18 @@ async function storeRoutes(
               category: true,
             },
           },
+          campaigns: {
+            include: {
+              campaign: true,
+            },
+          },
         },
       });
       return store
         ? {
             ...store,
-            categories: store.categories.map((category) => category.category),
+            categories: simplifyCategories(store.categories),
+            campaigns: simplifyCampaigns(store.campaigns),
           }
         : null;
     }

@@ -1,3 +1,4 @@
+import { PaginationQueryType } from "database";
 import { FastifyInstance, FastifyPluginOptions } from "fastify";
 import { IdParamsSchema, IdParamsType } from "database/schema/id";
 import {
@@ -5,6 +6,7 @@ import {
   CampaignCreateBody,
   CampaignUpdateSchema,
   CampaignUpdateBody,
+  CampaignsParamsType,
 } from "database/schema/campaigns";
 import { generate } from "voucher-codes-generator";
 import {
@@ -17,7 +19,32 @@ async function campaignRoutes(
   fastify: FastifyInstance,
   options: FastifyPluginOptions
 ) {
-  fastify.get("/", async function (req, reply) {
+  fastify.get<{
+    Querystring: PaginationQueryType & CampaignsParamsType;
+  }>("/", async function (req, reply) {
+    const currentDate = new Date();
+    const whereCondition = {
+      all: {},
+      upcoming: {
+        startedAt: {
+          gte: currentDate,
+        },
+      },
+      ongoing: {
+        startedAt: {
+          lte: currentDate,
+        },
+        endedAt: {
+          gte: currentDate,
+        },
+      },
+      expired: {
+        endedAt: {
+          lte: currentDate,
+        },
+      },
+    };
+
     const campaigns = await fastify.prisma.campaign.findMany({
       include: {
         merchant: true,
@@ -39,6 +66,11 @@ async function campaignRoutes(
       },
       orderBy: {
         createdAt: "asc",
+      },
+      where: {
+        ...(req.query.status && req.query.status in whereCondition
+          ? whereCondition[req.query.status]
+          : {}),
       },
     });
     // https://www.prisma.io/docs/guides/other/troubleshooting-orm/help-articles/working-with-many-to-many-relations

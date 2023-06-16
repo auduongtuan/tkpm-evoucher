@@ -13,6 +13,7 @@ import useGameStore, { GameName } from "@/games/useGameStore";
 import useUserAuth from "@/hooks/useUserAuth";
 import useAppStore from "@/stores/useAppStore";
 import { useEffect } from "react";
+import CampaignStatus from "@/components/CampaignStatus";
 
 const CampaignDetail = () => {
   // const { modalProps, closeModal } = useRouteModal("/campaigns");
@@ -35,17 +36,16 @@ const CampaignDetail = () => {
   const campaign = recordQuery?.data;
   const { authenticated } = useUserAuth();
   const loginModal = useAppStore((state) => state.loginModal);
-  const openGameModal = useGameStore((state) => state.openModal);
-  const { gameName, setGameName } = useGameStore();
+  const { gameName, setGameName, openModal, setCampaign } = useGameStore();
   useEffect(() => {
     if (campaign && campaign.games) {
-      console.log(campaign.games[0]?.slug);
+      setCampaign(campaign);
       setGameName(campaign?.games[0]?.slug as GameName);
     }
   }, [campaign]);
   return id && !recordQuery?.isLoading && campaign ? (
     <div className="grid grid-cols-12 gap-6 p-4 bg-white rounded-xl">
-      <GameModal campaignId={id} />
+      <GameModal />
       <Breadcrumb
         className="col-span-12"
         items={[
@@ -87,6 +87,10 @@ const CampaignDetail = () => {
             {campaign.merchant.name}
           </Link>
         </div>
+        <div className="mt-2">
+          <CampaignStatus campaign={campaign} />
+        </div>
+
         <div className="mt-2 text-sm text-gray-600">
           {campaign.stores.length} {pluralize("store", campaign.stores.length)}{" "}
           applied
@@ -95,19 +99,16 @@ const CampaignDetail = () => {
         <p className="mt-4 leading-normal text-md">
           {campaign.description && campaign.description}
         </p>
-        <div className="grid grid-cols-2 gap-4 mb-8">
+        <div className="grid grid-cols-2 gap-4 mb-5">
           <Description label="Started at">
             {dayjs(campaign.startedAt).format("DD/MM/YYYY")}
           </Description>
           <Description label="Ended at">
             {dayjs(campaign.endedAt).format("DD/MM/YYYY")}
           </Description>
-          <Description label="Games" className="col-span-2">
-            {campaign.games.map((game) => game.name).join(", ")}
-          </Description>
         </div>
         {dayjs().isBefore(campaign.endedAt) ? (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-2 grow">
               <Description label="Choose one game to start" className="">
                 <Radio.Group
@@ -131,7 +132,7 @@ const CampaignDetail = () => {
               icon={<RiGamepadFill className="text-xl" />}
               className="flex items-center justify-start h-auto gap-3 px-3 py-2"
               onClick={() =>
-                authenticated ? openGameModal() : loginModal.setOpen(true)
+                authenticated ? openModal() : loginModal.setOpen(true)
               }
             >
               <div className="flex flex-col items-start gap-0.5">
@@ -149,7 +150,7 @@ const CampaignDetail = () => {
       </div>
       <div className="flex flex-col col-span-12 gap-8">
         <section>
-          <h2>Store applied</h2>
+          <h2>Stores applied</h2>
           <div className="flex flex-col gap-2">
             {campaign.stores.map((store) => {
               return (

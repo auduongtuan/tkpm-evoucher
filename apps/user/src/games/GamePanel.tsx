@@ -1,22 +1,38 @@
-import useGameStore from "./useGameStore";
+import useGameStore, { VoucherStringDate } from "./useGameStore";
 import { Button, message } from "antd";
 import { useMutation } from "@tanstack/react-query";
 import { VoucherGenerateBody } from "database/schema/vouchers";
 import { generateCampaignVoucher } from "api-client";
+import { useState } from "react";
 import useUserAuth from "@/hooks/useUserAuth";
-const GamePanel = ({ campaignId }: { campaignId: number }) => {
+import { Voucher } from "database";
+const expVoucher = {
+  campaignId: 2,
+  couponCode: "RJ5S8E3E6Y",
+  createdAt: "2023-06-16T14:30:56.818Z",
+  discountType: "FIXED",
+  discountValue: 20000,
+  expiredAt: "2023-06-30T06:08:56.000Z",
+  id: 8,
+  maxDiscount: 20,
+  updatedAt: "2023-06-16T14:30:56.818Z",
+  userId: 4,
+};
+const GamePanel = () => {
   const gameState = useGameStore();
   const highScore = gameState.gameName
     ? gameState.bestScores[gameState.gameName]
     : undefined;
   const generateVoucherMutation = useMutation({
     mutationFn: async (body: VoucherGenerateBody) =>
-      await generateCampaignVoucher(campaignId, body),
+      gameState.campaign
+        ? await generateCampaignVoucher(gameState.campaign.id, body)
+        : null,
     onSuccess: (data) => {
-      console.log(data);
       if (data) {
         if (gameState.gameName) gameState.resetBestScore(gameState.gameName);
-        message.success("Voucher generated successfully");
+        gameState.setVoucherInfo(data as VoucherStringDate);
+        // message.success("Voucher generated successfully");
       }
     },
   });

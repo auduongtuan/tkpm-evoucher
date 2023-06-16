@@ -1,7 +1,16 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { Game } from "database";
+import { Game, Voucher } from "database";
+import { DetailCampaign } from "api-client";
 export type GameName = "FLAPPY_BIRD" | "2048" | "SNAKE";
+export type VoucherStringDate = Omit<
+  Voucher,
+  "createdAt" | "expiredAt" | "updatedAt"
+> & {
+  createdAt: string;
+  expiredAt: string;
+  updatedAt: string;
+};
 interface GameState {
   modalOpen: boolean;
   games: Game[];
@@ -23,6 +32,10 @@ interface GameState {
   bestScores: {
     [key in GameName]?: number;
   };
+  voucherInfo: VoucherStringDate | null;
+  setVoucherInfo: (voucherInfo: VoucherStringDate | null) => void;
+  campaign: DetailCampaign | null;
+  setCampaign: (campaign: DetailCampaign) => void;
 }
 // const getBestScoresFromLocalStorage = () => {
 //   try {
@@ -66,6 +79,10 @@ const useGameStore = create<GameState>()(
             return {};
           }
         }),
+      voucherInfo: null,
+      setVoucherInfo: (voucherInfo) => set({ voucherInfo }),
+      campaign: null,
+      setCampaign: (campaign) => set({ campaign }),
     }),
     {
       name: "game-storage", // name of item in the storage (must be unique)

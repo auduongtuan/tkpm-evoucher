@@ -4,7 +4,7 @@ import {
 } from "database/schema/merchants";
 import { Merchant, Store, Employee, Campaign } from "database";
 import { createInstance } from "./base";
-import { StoreWithCategories } from "./types";
+import { StoreWithCategories } from "./stores";
 const instance = createInstance("merchants");
 export async function getMerchants(): Promise<
   Array<Merchant & { stores: StoreWithCategories[]; employees: Employee[] }>

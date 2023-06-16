@@ -1,23 +1,29 @@
 import {
   CampaignCreateBody,
   CampaignUpdateBody,
+  CampaignsParamsType,
 } from "database/schema/campaigns";
 import { Campaign, Game, Store, Merchant } from "database";
 import { createInstance } from "./base";
 import { VoucherGenerateBody } from "database/schema/vouchers";
 const instance = createInstance("campaigns");
-type CampainSelect = Campaign & {
+export type DetailCampaign = Campaign & {
   merchant: Merchant;
   stores: Store[];
   games: Game[];
 };
-export async function getCampaigns(): Promise<CampainSelect[]> {
-  const res = await instance.get("/");
+
+export async function getCampaigns(
+  params?: CampaignsParamsType
+): Promise<DetailCampaign[]> {
+  const res = await instance.get("/", { params });
 
   return res.data;
 }
 
-export async function getCampaign(id: string | number): Promise<CampainSelect> {
+export async function getCampaign(
+  id: string | number
+): Promise<DetailCampaign> {
   const res = await instance.get(`/${id}`);
   return res.data;
 }

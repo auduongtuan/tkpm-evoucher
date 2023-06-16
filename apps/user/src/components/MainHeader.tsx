@@ -3,6 +3,7 @@ import Link from "./Link";
 const { Header } = Layout;
 import useAppStore from "@/stores/useAppStore";
 import useUserAuth from "@/hooks/useUserAuth";
+import { useNavigate } from "react-router-dom";
 const items1: MenuProps["items"] = [
   {
     key: "/",
@@ -24,6 +25,7 @@ const MainHeader = () => {
   const loginModal = useAppStore((state) => state.loginModal);
   const registerModal = useAppStore((state) => state.registerModal);
   const { authenticated, user, logout } = useUserAuth();
+  const navigate = useNavigate();
   return (
     <Header className="flex items-center header">
       <div className="flex items-center grow">
@@ -40,7 +42,7 @@ const MainHeader = () => {
           mode="horizontal"
           defaultSelectedKeys={["/"]}
           items={items1}
-          onSelect={(item) => console.log(item)}
+          onSelect={(item) => navigate(item.key)}
           className="ml-8"
         />
       </div>

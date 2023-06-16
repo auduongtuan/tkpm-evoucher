@@ -25,8 +25,8 @@ const Canvas = forwardRef<HTMLCanvasElement, CanvasProps>(
       const dpi = window.devicePixelRatio;
       // console.log(dpi);
       // context.scale(dpi, dpi);
-      canvas.width = canvas.clientWidth;
-      canvas.height = canvas.clientHeight;
+      // canvas.width = canvas.clientWidth;
+      // canvas.height = canvas.clientHeight;
 
       draw(context);
       return () => context.clearRect(0, 0, window.innerWidth, 400);
