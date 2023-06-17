@@ -1,6 +1,6 @@
-import { PaginationQueryType } from "database";
+import { PaginationQueryType, computeCampaignStatus } from "database";
 import { FastifyInstance, FastifyPluginOptions } from "fastify";
-import { IdParamsSchema, IdParamsType } from "database/schema/id";
+import { IdParamsSchema, IdParamsType } from "database";
 import {
   CampaignCreateSchema,
   CampaignCreateBody,
@@ -13,7 +13,6 @@ import {
   VoucherGenerateBody,
   VoucherGenerateSchema,
 } from "database/schema/vouchers";
-import dayjs from "dayjs";
 import { isCampaignExpired } from "database";
 async function campaignRoutes(
   fastify: FastifyInstance,
@@ -75,7 +74,7 @@ async function campaignRoutes(
     });
     // https://www.prisma.io/docs/guides/other/troubleshooting-orm/help-articles/working-with-many-to-many-relations
     return campaigns.map((campaign) => ({
-      ...campaign,
+      ...computeCampaignStatus(campaign),
       stores: campaign.stores.map((store) => store.store),
       games: campaign.games.map((game) => game.game),
     }));
@@ -104,7 +103,7 @@ async function campaignRoutes(
       });
       return campaign
         ? {
-            ...campaign,
+            ...computeCampaignStatus(campaign),
             stores: campaign.stores.map((store) => store.store),
             games: campaign.games.map((game) => game.game),
           }

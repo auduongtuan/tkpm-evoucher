@@ -71,6 +71,7 @@ const StoreDetail = () => {
                 <Link
                   to={`/stores/category/${category.id}`}
                   className="underline underline-offset-4 decoration-gray-200"
+                  key={"category-tag" + category.id}
                 >
                   {category.name}
                 </Link>

@@ -9,7 +9,7 @@ import type { RadioChangeEvent } from "antd";
 
 import Description from "@/components/Description";
 import GameModal from "@/games/GameModal";
-import useGameStore, { GameName } from "@/games/useGameStore";
+import useGameStore, { GameName } from "@/stores/useGameStore";
 import useUserAuth from "@/hooks/useUserAuth";
 import useAppStore from "@/stores/useAppStore";
 import { useEffect } from "react";

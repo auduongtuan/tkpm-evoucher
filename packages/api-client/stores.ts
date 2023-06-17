@@ -1,18 +1,15 @@
 import { PaginationQueryType } from "database/schema/pagination";
+import { StoreCreateBody, StoreUpdateBody, StoresParamsType } from "database";
 import {
-  StoreCreateBody,
-  StoreUpdateBody,
-  StoresParamsType,
-} from "database/schema/stores";
-import { Campaign, Category, Store, Merchant } from "database";
+  Campaign,
+  Category,
+  Store,
+  Merchant,
+  DetailStore,
+  StoreWithCategories,
+} from "database";
 import { createInstance } from "./base";
 const instance = createInstance("stores");
-export type DetailStore = Store & {
-  categories: Category[];
-  campaigns: Campaign[];
-  merchant: Merchant;
-};
-export type StoreWithCategories = Store & { categories: Category[] };
 
 export async function getStores(
   params?: PaginationQueryType & StoresParamsType

@@ -11,8 +11,9 @@ export function comparePassword(password: string, hashedPassword: string) {
   const match = bcrypt.compareSync(password, hashedPassword);
   return match;
 }
-type ExtendedUser = Extended<User>;
-export function excludePassword(users: ExtendedUser[] | ExtendedUser | null) {
+export function excludePassword<T extends { password: string }>(
+  users: T[] | T | null
+) {
   if (!users) return null;
   if (Array.isArray(users)) {
     return users.map((user) => {

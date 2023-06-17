@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { Game, Voucher } from "database";
-import { DetailCampaign } from "api-client";
+import { Game, Voucher, DetailCampaign } from "database";
 export type GameName = "FLAPPY_BIRD" | "2048" | "SNAKE";
 export type VoucherStringDate = Omit<
   Voucher,

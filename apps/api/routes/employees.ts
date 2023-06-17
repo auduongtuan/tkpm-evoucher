@@ -1,4 +1,4 @@
-import { FastifyPluginOptions, FastifyInstance, FastifyRequest } from "fastify";
+import { FastifyPluginOptions, FastifyInstance } from "fastify";
 import { IdParamsSchema, IdParamsType } from "database/schema/id";
 import {
   EmployeeCreateSchema,
@@ -7,23 +7,9 @@ import {
   EmployeeUpdateSchema,
 } from "database/schema/employees";
 // import Employees from "../models/EmployeeModel";
-import { Employee, hashPassword } from "database";
-import type { Extended } from "helpers";
-type ExtendedEmployee = Extended<Employee>;
-function excludePassword(
-  employees: ExtendedEmployee[] | ExtendedEmployee | null
-) {
-  if (!employees) return null;
-  if (Array.isArray(employees)) {
-    return employees.map((employee) => {
-      const { password, ...rest } = employee;
-      return rest;
-    });
-  } else {
-    const { password, ...rest } = employees;
-    return rest;
-  }
-}
+import { hashPassword } from "database";
+import { excludePassword } from "database";
+
 async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
   fastify.get("/", async function (req, reply) {
     const employees = await fastify.prisma.employee.findMany({

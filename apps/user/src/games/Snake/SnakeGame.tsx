@@ -6,7 +6,7 @@ type CanvasProps = React.DetailedHTMLProps<
   draw: (context: CanvasRenderingContext2D) => void;
 };
 import useGameLogic, { Position } from "./useGameLogic";
-import useGameStore from "../useGameStore";
+import useGameStore from "../../stores/useGameStore";
 const Canvas = forwardRef<HTMLCanvasElement, CanvasProps>(
   ({ draw, ...props }, canvasRef) => {
     useEffect(() => {

@@ -7,9 +7,10 @@ import {
   VoucherUpdateSchema,
   VoucherGenerateBody,
 } from "database/schema/vouchers";
+import { computeVoucherStatus } from "database";
 async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
   fastify.get("/", async function (req, reply) {
-    return fastify.prisma.voucher.findMany({
+    const vouchers = await fastify.prisma.voucher.findMany({
       include: {
         user: true,
         campaign: true,
@@ -18,12 +19,13 @@ async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
         id: "asc",
       },
     });
+    return vouchers.map((voucher) => computeVoucherStatus(voucher));
   });
   fastify.get<{ Params: IdParamsType }>(
     "/:id",
     { schema: { params: IdParamsSchema } },
     async function (req, reply) {
-      return await fastify.prisma.voucher.findUnique({
+      const voucher = await fastify.prisma.voucher.findUnique({
         where: {
           id: req.params.id,
         },
@@ -32,6 +34,7 @@ async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
           campaign: true,
         },
       });
+      return voucher ? computeVoucherStatus(voucher) : null;
     }
   );
   fastify.post<{ Body: VoucherCreateBody }>(

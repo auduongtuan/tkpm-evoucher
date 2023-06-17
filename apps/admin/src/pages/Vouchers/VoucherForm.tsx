@@ -100,6 +100,9 @@ const VoucherForm = () => {
           <Form.Item label="Expired at" name={"expiredAt"}>
             <DatePicker showTime></DatePicker>
           </Form.Item>
+          <Form.Item label="Used at" name={"usedAt"}>
+            <DatePicker showTime></DatePicker>
+          </Form.Item>
         </Form>
       </Modal>
     </>

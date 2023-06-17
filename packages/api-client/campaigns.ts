@@ -3,15 +3,10 @@ import {
   CampaignUpdateBody,
   CampaignsParamsType,
 } from "database/schema/campaigns";
-import { Campaign, Game, Store, Merchant } from "database";
+import { Campaign, Game, Store, Merchant, DetailCampaign } from "database";
 import { createInstance } from "./base";
 import { VoucherGenerateBody } from "database/schema/vouchers";
 const instance = createInstance("campaigns");
-export type DetailCampaign = Campaign & {
-  merchant: Merchant;
-  stores: Store[];
-  games: Game[];
-};
 
 export async function getCampaigns(
   params?: CampaignsParamsType

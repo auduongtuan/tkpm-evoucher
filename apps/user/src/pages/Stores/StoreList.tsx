@@ -1,35 +1,14 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  Row,
-  Col,
-  Typography,
-  Select,
-  Switch,
-  message,
-  Tag,
-  Badge,
-  Divider,
-} from "antd";
-import { capitalize } from "lodash-es";
-import {
-  getMerchants,
-  getStores,
-  getUsers,
-  getCategories,
-  getGames,
-  getCampaigns,
-  getVouchers,
-  DetailStore,
-} from "api-client";
+import { useQuery } from "@tanstack/react-query";
+import { Select, Switch, message, Badge, Divider } from "antd";
+import { getStores, getCategories } from "api-client";
+import { DetailStore } from "database";
 import pluralize from "pluralize-esm";
-import { RiGamepadFill } from "react-icons/ri";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "@/components/Link";
 import SectionTitle from "@/components/SectionTitle";
 import useAppStore from "@/stores/useAppStore";
 import { StoresParamsType } from "database";
 import ThumbnailImage from "@/components/ThumbnailImage";
-import { distance } from "helpers";
 import StoreAddress from "@/components/StoreAddress";
 import { useNavigate, useParams } from "react-router-dom";
 const StoreCard = ({ store }: { store: DetailStore }) => {

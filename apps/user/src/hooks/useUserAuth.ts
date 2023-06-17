@@ -2,8 +2,6 @@ import { UserLoginBody } from "database/schema/users";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { getUserAuth, loginUser } from "api-client";
 import { User } from "database";
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 import { AxiosError } from "axios";
 import useAppStore from "@/stores/useAppStore";
 interface UserAuthOptions {
@@ -16,13 +14,6 @@ function useUserAuth(options: UserAuthOptions = {}) {
   const authenticationQuery = useQuery({
     queryKey: ["user", "authentication"],
     queryFn: getUserAuth,
-    // retry: (failureCount, error) => {
-    //   if (error instanceof AxiosError && error.response?.status === 401) {
-    //     return false;
-    //   }
-    //   return true;
-    // },
-
     onError: (err) => {
       console.log(err);
       setAuthenticated(false);

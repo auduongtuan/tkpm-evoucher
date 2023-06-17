@@ -1,18 +1,10 @@
-import { useEffect, useRef, useState, useCallback } from "react";
 import { Form, Input, Modal, Select, Row, Col, Typography } from "antd";
-import type { InputRef } from "antd";
-import {
-  createStore,
-  getCategories,
-  getMerchants,
-  getStore,
-  updateStore,
-} from "api-client";
+import { createStore, getCategories, getStore, updateStore } from "api-client";
 import useRouteModal from "@/hooks/useRouteModal";
 import { useQuery } from "@tanstack/react-query";
 import useCrud from "@/hooks/useCrud";
 import { MerchantSelect } from "@/components/RecordSelect";
-import useGoogleMapsApi from "@/hooks/useGoogleMapsApi";
+import useGoogleMapAutocomplete from "@/hooks/useGoogleMapAutocomplete";
 
 const StoreForm = () => {
   const { modalProps, closeModal } = useRouteModal("/stores");
@@ -35,43 +27,8 @@ const StoreForm = () => {
     queryKey: ["category_list"],
     queryFn: getCategories,
   });
-  const google = useGoogleMapsApi();
-  const [addressSearchInput, setAddressSearchInput] =
-    useState<HTMLInputElement | null>(null);
-
-  const refAutocompleteRef = useCallback((c: InputRef | null) => {
-    if (c !== null) {
-      setAddressSearchInput(c.input);
-    }
-  }, []);
-  useEffect(() => {
-    if (!google || !addressSearchInput) return;
-    const center = { lat: 50.064192, lng: -130.605469 };
-    // Create a bounding box with sides ~10km away from the center point
-    const defaultBounds = {
-      north: center.lat + 0.1,
-      south: center.lat - 0.1,
-      east: center.lng + 0.1,
-      west: center.lng - 0.1,
-    };
-    const options = {
-      // bounds: defaultBounds,
-      componentRestrictions: { country: "vn" },
-      fields: ["address_components", "geometry", "icon", "name"],
-      strictBounds: false,
-      types: ["establishment"],
-    };
-    if (!addressSearchInput) {
-      console.log("ko co input");
-    }
-    const autocomplete = new google.maps.places.Autocomplete(
-      addressSearchInput,
-      options
-    );
-    autocomplete.addListener("place_changed", () => {
-      const place = autocomplete.getPlace();
-      addressSearchInput.value = place.name || "";
-
+  const { inputRef } = useGoogleMapAutocomplete({
+    onPlaceChanged: (place) => {
       if (place.address_components) {
         form.setFieldValue(
           "address",
@@ -89,8 +46,8 @@ const StoreForm = () => {
         form.setFieldValue("lat", place.geometry.location.lat());
         form.setFieldValue("lng", place.geometry.location.lng());
       }
-    });
-  }, [google, addressSearchInput]);
+    },
+  });
 
   return (
     <>
@@ -141,7 +98,7 @@ const StoreForm = () => {
           </Form.Item>
           <Typography.Title level={5}>Store Address</Typography.Title>
           <Input
-            ref={refAutocompleteRef}
+            ref={inputRef}
             placeholder="Search for a location"
             className="mb-4"
           />

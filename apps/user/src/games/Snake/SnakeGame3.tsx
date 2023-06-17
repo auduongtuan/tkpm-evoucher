@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import useGameStore from "../useGameStore";
+import useGameStore from "../../stores/useGameStore";
 import {
   canvas_size,
   apple_start,

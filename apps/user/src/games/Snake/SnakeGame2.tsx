@@ -1,7 +1,7 @@
 import useEventListener from "@/hooks/useEventListener";
 import useInterval from "@/hooks/useInterval";
 import { useEffect, useState } from "react";
-import useGameStore from "../useGameStore";
+import useGameStore from "../../stores/useGameStore";
 const Snake = (props) => {
   return (
     <div>

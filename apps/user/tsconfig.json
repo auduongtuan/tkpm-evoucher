@@ -23,6 +23,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src"],
+  "include": ["src", "../admin/src/hooks/useGoogleMapAutocomplete.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

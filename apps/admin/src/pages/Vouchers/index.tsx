@@ -24,6 +24,19 @@ const Vouchers = () => {
             dataIndex: "campaign",
             render: (campaign: Campaign) => campaign.name,
           },
+          {
+            title: "Discount Type",
+            dataIndex: "discountType",
+          },
+          {
+            title: "Discount Value",
+            dataIndex: "discountValue",
+          },
+          {
+            title: "Status",
+            dataIndex: "status",
+            render: (status: string) => status,
+          },
           // {
           //   title: "Phone",
           //   dataIndex: "phone",

@@ -18,7 +18,7 @@ export interface AppState {
   userCoords: [number, number] | null;
   requestUserCoords: () => void;
 }
-const useAppStore = create<AppState>(
+const useAppStore = create<AppState>()(
   persist(
     (set) => ({
       loginModal: {

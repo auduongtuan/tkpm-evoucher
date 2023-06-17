@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import useEventListener from "@/hooks/useEventListener";
 import { Circle, Rectangle } from "./types";
 import * as constants from "./constants";
-import useGameStore from "../useGameStore";
+import useGameStore from "../../stores/useGameStore";
 import useInterval from "@/hooks/useInterval";
 // import EndDialog from './EndDialog'
 

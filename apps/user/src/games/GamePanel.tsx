@@ -1,4 +1,4 @@
-import useGameStore, { VoucherStringDate } from "./useGameStore";
+import useGameStore, { VoucherStringDate } from "../stores/useGameStore";
 import { Button, message } from "antd";
 import { useMutation } from "@tanstack/react-query";
 import { VoucherGenerateBody } from "database/schema/vouchers";
