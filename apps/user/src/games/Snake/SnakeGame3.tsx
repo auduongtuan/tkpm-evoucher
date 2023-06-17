@@ -82,8 +82,8 @@ const SnakeGame = () => {
       }
       const newScore = gameState.score + 1;
       gameState.setScore(newScore);
-      if (gameState.gameName)
-        gameState.setBestScore(gameState.gameName, newScore);
+      if (gameState.gameSlug)
+        gameState.setBestScore(gameState.gameSlug, newScore);
       if (gameState.score === maxPoints) {
         setHasFinishedGame(true);
         endGame();

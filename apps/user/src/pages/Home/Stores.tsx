@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import SectionTitle from "@/components/SectionTitle";
 import { getStores } from "api-client";
-import Link from "@/components/Link";
+import { Link } from "ui";
 import useAppStore from "@/stores/useAppStore";
 import ThumbnailImage from "@/components/ThumbnailImage";
 import StoreAddress from "@/components/StoreAddress";

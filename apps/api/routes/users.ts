@@ -10,20 +10,29 @@ import {
 import { User, hashPassword, excludePassword } from "database";
 
 async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
-  fastify.get("/", async function (req, reply) {
-    const users = await fastify.prisma.user.findMany({
-      include: {
-        vouchers: true,
-      },
-      orderBy: {
-        id: "asc",
-      },
-    });
-    return excludePassword(users);
-  });
+  fastify.get(
+    "/",
+    {
+      onRequest: [fastify.auth.verifySystemAdmin],
+    },
+    async function (req, reply) {
+      const users = await fastify.prisma.user.findMany({
+        include: {
+          vouchers: true,
+        },
+        orderBy: {
+          id: "asc",
+        },
+      });
+      return excludePassword(users);
+    }
+  );
   fastify.get<{ Params: IdParamsType }>(
     "/:id",
-    { schema: { params: IdParamsSchema } },
+    {
+      onRequest: [fastify.auth.verifySystemAdmin],
+      schema: { params: IdParamsSchema },
+    },
     async function (req, reply) {
       const user = await fastify.prisma.user.findUnique({
         where: {
@@ -36,6 +45,7 @@ async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
       return excludePassword(user);
     }
   );
+
   fastify.post<{ Body: UserCreateBody }>(
     "/",
     { schema: { body: UserCreateSchema } },

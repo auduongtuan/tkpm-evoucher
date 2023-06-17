@@ -21,8 +21,11 @@ async function campaignRoutes(
   fastify.get<{
     Querystring: PaginationQueryType & CampaignsParamsType;
   }>("/", async function (req, reply) {
+    const merchantId = req.query.merchantId
+      ? Number(req.query.merchantId)
+      : undefined;
     const currentDate = new Date();
-    const whereCondition = {
+    const statusWhereCondition = {
       all: {},
       upcoming: {
         startedAt: {
@@ -67,9 +70,10 @@ async function campaignRoutes(
         endedAt: "desc",
       },
       where: {
-        ...(req.query.status && req.query.status in whereCondition
-          ? whereCondition[req.query.status]
+        ...(req.query.status && req.query.status in statusWhereCondition
+          ? statusWhereCondition[req.query.status]
           : {}),
+        ...(merchantId ? { merchantId } : {}),
       },
     });
     // https://www.prisma.io/docs/guides/other/troubleshooting-orm/help-articles/working-with-many-to-many-relations
@@ -205,14 +209,24 @@ async function campaignRoutes(
         reply.status(403);
         throw new Error("Campaign ended");
       }
+      const game = await fastify.prisma.game.findUnique({
+        where: {
+          slug: req.body.gameSlug,
+        },
+      });
+      if (!game) {
+        reply.status(404);
+        throw new Error("Game not found");
+      }
       let voucherValue: number = -1;
-      const GAME_AVG_SCORE = 10;
+      const GAME_AVG_SCORE = game.averageScore || 10;
       const { maxVoucherFixed, maxVoucherPercent, discountType } = campaign;
       if (discountType === "PERCENT" && maxVoucherPercent) {
         voucherValue = Math.min(score / GAME_AVG_SCORE, 1) * maxVoucherPercent;
       } else if (discountType === "FIXED" && maxVoucherFixed) {
         voucherValue = Math.min(score / GAME_AVG_SCORE, 1) * maxVoucherFixed;
       }
+      voucherValue = Math.round(voucherValue);
       const voucherValueInBudget =
         (discountType === "FIXED" ? voucherValue : maxVoucherFixed) || 0;
       console.log(voucherValueInBudget);

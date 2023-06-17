@@ -1,4 +1,4 @@
-import Link from "@/components/Link";
+import { Link, Description, CampaignStatus } from "ui";
 import useRecord from "@/hooks/useRecord";
 import { getCampaign } from "api-client";
 import pluralize from "pluralize-esm";
@@ -7,13 +7,11 @@ import dayjs from "dayjs";
 import { Breadcrumb, Button, Select, Form, Radio } from "antd";
 import type { RadioChangeEvent } from "antd";
 
-import Description from "@/components/Description";
 import GameModal from "@/games/GameModal";
-import useGameStore, { GameName } from "@/stores/useGameStore";
+import useGameStore, { GameSlug } from "@/stores/useGameStore";
 import useUserAuth from "@/hooks/useUserAuth";
 import useAppStore from "@/stores/useAppStore";
 import { useEffect } from "react";
-import CampaignStatus from "@/components/CampaignStatus";
 
 const CampaignDetail = () => {
   // const { modalProps, closeModal } = useRouteModal("/campaigns");
@@ -36,11 +34,11 @@ const CampaignDetail = () => {
   const campaign = recordQuery?.data;
   const { authenticated } = useUserAuth();
   const loginModal = useAppStore((state) => state.loginModal);
-  const { gameName, setGameName, openModal, setCampaign } = useGameStore();
+  const { gameSlug, setGameSlug, openModal, setCampaign } = useGameStore();
   useEffect(() => {
     if (campaign && campaign.games) {
       setCampaign(campaign);
-      setGameName(campaign?.games[0]?.slug as GameName);
+      setGameSlug(campaign?.games[0]?.slug as GameSlug);
     }
   }, [campaign]);
   return id && !recordQuery?.isLoading && campaign ? (
@@ -114,9 +112,9 @@ const CampaignDetail = () => {
                 <Radio.Group
                   className="w-full grow"
                   onChange={({ target: { value } }: RadioChangeEvent) =>
-                    setGameName(value)
+                    setGameSlug(value)
                   }
-                  value={gameName}
+                  value={gameSlug}
                   options={campaign.games.map((game) => ({
                     label: game.name,
                     value: game.slug,

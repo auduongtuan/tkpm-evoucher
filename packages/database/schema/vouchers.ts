@@ -19,6 +19,11 @@ export type VoucherUpdateBody = Static<typeof VoucherUpdateSchema>;
 export const VoucherGenerateSchema = Type.Object({
   userId: Type.Integer(),
   score: Type.Number(),
+  gameSlug: Type.String({ minLength: 1 }),
 });
 
 export type VoucherGenerateBody = Static<typeof VoucherGenerateSchema>;
+export const VouchersParamsSchema = Type.Object({
+  merchantId: Type.Optional(Type.Integer()),
+});
+export type VouchersParamsType = Static<typeof VouchersParamsSchema>;

@@ -1,25 +1,10 @@
-import Link from "@/components/Link";
 import useRecord from "@/hooks/useRecord";
 import { getStore } from "api-client";
-import pluralize from "pluralize-esm";
-import { RiGameFill, RiStore2Fill } from "react-icons/ri";
+import { RiGameFill } from "react-icons/ri";
 import { Breadcrumb, Button, Empty } from "antd";
-import Description from "@/components/Description";
+import { Description, Link } from "ui";
 import SectionTitle from "@/components/SectionTitle";
 const StoreDetail = () => {
-  // const { modalProps, closeModal } = useRouteModal("/stores");
-  // const [form] = Form.useForm();
-  // const { formModalProps } = useCrud({
-  //   name: "store",
-  //   getFn: getStore,
-  //   onGetSuccess: (data) => {
-  //     form.setFieldsValue({ ...data });
-  //   },
-  //   updateFn: updateStore,
-  //   createFn: createStore,
-  //   closeModal: closeModal,
-  //   form: form,
-  // });
   const { id, recordQuery } = useRecord({
     name: "store",
     getFn: getStore,

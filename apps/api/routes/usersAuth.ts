@@ -1,6 +1,11 @@
 import { FastifyInstance, FastifyPluginOptions } from "fastify";
 import { UserLoginBody, UserLoginSchema } from "database/schema/users";
-import { comparePassword, excludePassword } from "database";
+import {
+  comparePassword,
+  computeVoucherStatus,
+  excludePassword,
+  simplifyStores,
+} from "database";
 async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
   fastify.get(
     "/",
@@ -15,10 +20,54 @@ async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
       return excludePassword(req.user);
     }
   );
+  fastify.get(
+    "/vouchers",
+    {
+      onRequest: [fastify.auth.verifyUser],
+    },
+    async function (req, reply) {
+      // if (!req.user) {
+      //   reply.statusCode = 401;
+      //   throw new Error("Not logged in");
+      // }
+      if (!req.user) return;
+      const vouchers = await fastify.prisma.voucher.findMany({
+        where: {
+          userId: req.user.id,
+        },
+        include: {
+          campaign: {
+            include: {
+              merchant: true,
+              stores: {
+                include: {
+                  store: true,
+                },
+              },
+            },
+          },
+        },
+      });
+      return {
+        ...excludePassword(req.user),
+        vouchers: vouchers.map((voucher) => ({
+          ...computeVoucherStatus(voucher),
+          campaign: {
+            ...voucher.campaign,
+            stores: simplifyStores(voucher.campaign.stores),
+          },
+        })),
+      };
+    }
+  );
   fastify.post<{ Body: UserLoginBody }>(
     "/login",
     { schema: { body: UserLoginSchema } },
     async function (req, reply) {
+      if (req.user) {
+        reply.statusCode = 400;
+        throw new Error("Already logged in");
+      }
       const { email, password } = req.body;
       const user = await fastify.prisma.user.findUnique({
         where: {

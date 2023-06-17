@@ -47,7 +47,7 @@ model Employee {
 
 model Game {
   id           Int                @id @default(autoincrement())
-  slug         String
+  slug         String             @unique
   description  String?
   name         String
   image        String?

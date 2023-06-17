@@ -31,6 +31,7 @@ async function merchantRoutes(
     });
     return merchants.map((merchant) => simplifyMerchant(merchant));
   });
+  // phan quyen employee
   fastify.get<{ Params: IdParamsType }>(
     "/:id",
     { schema: { params: IdParamsSchema } },
@@ -58,7 +59,10 @@ async function merchantRoutes(
   );
   fastify.post<{ Body: MerchantCreateBody }>(
     "/",
-    { schema: { body: MerchantCreateSchema } },
+    {
+      onRequest: [fastify.auth.verifySystemAdmin],
+      schema: { body: MerchantCreateSchema },
+    },
     async function (req, reply) {
       return fastify.prisma.merchant.create({
         data: {
@@ -71,7 +75,10 @@ async function merchantRoutes(
   );
   fastify.put<{ Body: MerchantCreateBody; Params: IdParamsType }>(
     "/:id",
-    { schema: { body: MerchantCreateSchema, params: IdParamsSchema } },
+    {
+      onRequest: [fastify.auth.verifySystemAdmin],
+      schema: { body: MerchantCreateSchema, params: IdParamsSchema },
+    },
     async function (req, reply) {
       return await fastify.prisma.merchant.update({
         where: {
@@ -87,7 +94,10 @@ async function merchantRoutes(
   );
   fastify.delete<{ Params: IdParamsType }>(
     "/:id",
-    { schema: { params: IdParamsSchema } },
+    {
+      onRequest: [fastify.auth.verifySystemAdmin],
+      schema: { params: IdParamsSchema },
+    },
     async function (req, reply) {
       await fastify.prisma.merchant.delete({
         where: {

@@ -1,6 +1,6 @@
 import { UserLoginBody } from "database/schema/users";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { getUserAuth, loginUser } from "api-client";
+import { getAuthUser, loginUser } from "api-client";
 import { User } from "database";
 import { AxiosError } from "axios";
 import useAppStore from "@/stores/useAppStore";
@@ -13,7 +13,7 @@ function useUserAuth(options: UserAuthOptions = {}) {
   const { user, setUser, authenticated, setAuthenticated } = useAppStore();
   const authenticationQuery = useQuery({
     queryKey: ["user", "authentication"],
-    queryFn: getUserAuth,
+    queryFn: getAuthUser,
     onError: (err) => {
       console.log(err);
       setAuthenticated(false);
@@ -54,6 +54,8 @@ function useUserAuth(options: UserAuthOptions = {}) {
     loginMutation,
     logout: () => {
       localStorage.removeItem(TOKEN_NAME);
+      setUser(null);
+      setAuthenticated(false);
       authenticationQuery.refetch();
       // navigate("/login");
     },

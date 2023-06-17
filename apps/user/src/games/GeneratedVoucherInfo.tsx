@@ -1,8 +1,6 @@
 import { Divider } from "antd";
-import FlappyBirdGame from "./FlappyBird/FlappyBirdGame";
-import SnakeGame from "./Snake/SnakeGame3";
 import dayjs from "dayjs";
-import Description from "@/components/Description";
+import { Description } from "ui";
 import { Button } from "antd";
 import { DetailCampaign } from "database";
 import useGameStore, { VoucherStringDate } from "../stores/useGameStore";

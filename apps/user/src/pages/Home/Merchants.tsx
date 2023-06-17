@@ -1,20 +1,8 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Row, Col, Typography } from "antd";
-import { capitalize } from "lodash-es";
+import { useQuery } from "@tanstack/react-query";
 import SectionTitle from "@/components/SectionTitle";
-import {
-  getMerchants,
-  getStores,
-  getUsers,
-  getCategories,
-  getGames,
-  getCampaigns,
-  getVouchers,
-} from "api-client";
+import { getMerchants } from "api-client";
 import pluralize from "pluralize-esm";
-import { RiGamepadFill } from "react-icons/ri";
-import { useEffect } from "react";
-import Link from "@/components/Link";
+import { Link } from "ui";
 import ThumbnailImage from "@/components/ThumbnailImage";
 
 const Merchants = () => {

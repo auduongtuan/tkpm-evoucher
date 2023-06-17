@@ -15,7 +15,7 @@ import {
   RiUser3Fill,
 } from "react-icons/ri";
 import { SubMenuType } from "antd/es/menu/hooks/useItems";
-import useEmployeeAuth from "@/hooks/useEmployeeAuth";
+import useEmployeeAuth from "ui/hooks/useEmployeeAuth";
 const { Header, Content, Footer, Sider } = Layout;
 type MenuItem = Required<MenuProps>["items"][number];
 

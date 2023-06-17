@@ -26,14 +26,13 @@ const GameModal = () => {
     },
   });
   const currentGame = gameState.games
-    ? gameState.games.find((game) => game.slug === gameState.gameName)
+    ? gameState.games.find((game) => game.slug === gameState.gameSlug)
     : undefined;
   const { campaign, voucherInfo } = gameState;
   const GameComponent =
     currentGame?.slug && currentGame?.slug in GameComponents
       ? GameComponents[currentGame?.slug]
       : null;
-  console.log(currentGame?.slug, GameComponent);
   return (
     <Modal
       title={voucherInfo ? "Congratulations!" : currentGame?.name}

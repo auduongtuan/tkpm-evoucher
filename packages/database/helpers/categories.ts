@@ -5,13 +5,13 @@ import {
   Employee,
   Campaign,
   Store,
-} from "../index";
+} from "@prisma/client";
 export function simplifyCategories(
   categories: (CategoriesOnStores & { category: Category })[]
 ) {
   return categories.map((category) => category.category);
 }
-type FullQueriedMerchant =
+export type FullQueriedMerchant =
   | (Merchant & {
       employees: Employee[];
       stores: (Store & {

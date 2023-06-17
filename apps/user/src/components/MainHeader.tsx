@@ -1,19 +1,10 @@
 import { Button, Layout, Menu, MenuProps, Typography, theme } from "antd";
-import Link from "./Link";
+import { Link } from "ui";
 const { Header } = Layout;
 import useAppStore from "@/stores/useAppStore";
 import useUserAuth from "@/hooks/useUserAuth";
 import { useNavigate } from "react-router-dom";
-const items1: MenuProps["items"] = [
-  {
-    key: "/",
-    label: "Home",
-  },
-  {
-    key: "/stores",
-    label: "Stores",
-  },
-];
+
 const MainHeader = () => {
   const {
     token: { colorTextLightSolid },
@@ -22,6 +13,24 @@ const MainHeader = () => {
   const registerModal = useAppStore((state) => state.registerModal);
   const { authenticated, user, logout } = useUserAuth();
   const navigate = useNavigate();
+  const items1: MenuProps["items"] = [
+    {
+      key: "/",
+      label: "Home",
+    },
+    {
+      key: "/stores",
+      label: "Stores",
+    },
+    ...(authenticated
+      ? [
+          {
+            key: "/user/vouchers",
+            label: "Your Vouchers",
+          },
+        ]
+      : []),
+  ];
   return (
     <Header className="flex items-center header">
       <div className="flex items-center grow">
@@ -39,7 +48,7 @@ const MainHeader = () => {
           defaultSelectedKeys={["/"]}
           items={items1}
           onSelect={(item) => navigate(item.key)}
-          className="ml-8"
+          className="ml-8 grow"
         />
       </div>
       <div>

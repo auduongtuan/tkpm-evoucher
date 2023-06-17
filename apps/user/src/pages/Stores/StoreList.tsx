@@ -4,7 +4,7 @@ import { getStores, getCategories } from "api-client";
 import { DetailStore } from "database";
 import pluralize from "pluralize-esm";
 import { useEffect, useState } from "react";
-import Link from "@/components/Link";
+import { Link } from "ui";
 import SectionTitle from "@/components/SectionTitle";
 import useAppStore from "@/stores/useAppStore";
 import { StoresParamsType } from "database";

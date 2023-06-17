@@ -29,5 +29,6 @@ export const CampaignsParamsSchema = Type.Object({
       Type.Literal("expired"),
     ])
   ),
+  merchantId: Type.Optional(Type.Integer()),
 });
 export type CampaignsParamsType = Static<typeof CampaignsParamsSchema>;

@@ -33,6 +33,9 @@ async function storeRoutes(
       const categoryId = req.query.categoryId
         ? Number(req.query.categoryId)
         : undefined;
+      const merchantId = req.query.merchantId
+        ? Number(req.query.merchantId)
+        : undefined;
       const nearBy: { lat: number | null; lng: number | null } = {
         lat: null,
         lng: null,
@@ -56,7 +59,17 @@ async function storeRoutes(
             categoryId
               ? Prisma.sql`LEFT JOIN "CategoriesOnStores" ON "CategoriesOnStores"."storeId" = id WHERE "CategoriesOnStores"."categoryId" = ${categoryId}`
               : Prisma.empty
-          } ORDER BY ${
+          } ${
+          merchantId
+            ? categoryId
+              ? Prisma.sql`AND`
+              : Prisma.sql`WHERE`
+            : Prisma.empty
+        } ${
+          merchantId
+            ? Prisma.sql`"Store"."merchantId" = ${merchantId}`
+            : Prisma.empty
+        } ORDER BY ${
           nearBy.lat && nearBy.lng
             ? Prisma.sql`(POW((lng-${nearBy.lng}),2) + POW((lat-${nearBy.lat}),2)) ASC, "Store"."createdAt" DESC`
             : Prisma.sql`"Store"."createdAt" DESC`
@@ -138,9 +151,13 @@ async function storeRoutes(
   );
   fastify.post<{ Body: StoreCreateBody }>(
     "/",
-    { schema: { body: StoreSchema } },
+    {
+      onRequest: [fastify.auth.verifyEmployee],
+      schema: { body: StoreSchema },
+    },
     async function (req, reply) {
       const { categoryIds, ...rest } = req.body;
+      fastify.auth.verifyHasMerchantPermission(req, reply, rest.merchantId);
       return fastify.prisma.store.create({
         data: {
           ...rest,
@@ -164,6 +181,20 @@ async function storeRoutes(
     "/:id",
     { schema: { body: StoreUpdateSchema, params: IdParamsSchema } },
     async function (req, reply) {
+      const currentStore = await fastify.prisma.store.findUnique({
+        where: {
+          id: req.params.id,
+        },
+      });
+      if (!currentStore) {
+        reply.code(404);
+        throw new Error("Store not found");
+      }
+      fastify.auth.verifyHasMerchantPermission(
+        req,
+        reply,
+        currentStore.merchantId
+      );
       const { categoryIds, ...rest } = req.body;
       return await fastify.prisma.store.update({
         where: {

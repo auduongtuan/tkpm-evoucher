@@ -15,6 +15,7 @@ export type StoreCreateBody = Static<typeof StoreSchema>;
 export type StoreUpdateBody = Static<typeof StoreUpdateSchema>;
 
 export const StoresParamsSchema = Type.Object({
+  merchantId: Type.Optional(Type.Integer()),
   categoryId: Type.Optional(Type.Integer()),
   nearBy: Type.Optional(Type.String()),
 });

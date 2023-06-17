@@ -3,9 +3,8 @@ import SectionTitle from "@/components/SectionTitle";
 import { getCampaigns } from "api-client";
 import { RiGamepadFill } from "react-icons/ri";
 import { useEffect, useState } from "react";
-import Link from "@/components/Link";
 import { Radio, RadioChangeEvent, Empty } from "antd";
-import CampaignStatus from "@/components/CampaignStatus";
+import { Link, Description, CampaignStatus } from "ui";
 
 const Campaigns = () => {
   useEffect(() => {

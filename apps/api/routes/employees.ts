@@ -11,20 +11,27 @@ import { hashPassword } from "database";
 import { excludePassword } from "database";
 
 async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
-  fastify.get("/", async function (req, reply) {
-    const employees = await fastify.prisma.employee.findMany({
-      include: {
-        merchant: true,
-      },
-      orderBy: {
-        id: "asc",
-      },
-    });
-    return excludePassword(employees);
-  });
+  fastify.get(
+    "/",
+    { onRequest: [fastify.auth.verifySystemAdmin] },
+    async function (req, reply) {
+      const employees = await fastify.prisma.employee.findMany({
+        include: {
+          merchant: true,
+        },
+        orderBy: {
+          id: "asc",
+        },
+      });
+      return excludePassword(employees);
+    }
+  );
   fastify.get<{ Params: IdParamsType }>(
     "/:id",
-    { schema: { params: IdParamsSchema } },
+    {
+      onRequest: [fastify.auth.verifySystemAdmin],
+      schema: { params: IdParamsSchema },
+    },
     async function (req, reply) {
       const employee = await fastify.prisma.employee.findUnique({
         where: {
@@ -39,7 +46,10 @@ async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
   );
   fastify.post<{ Body: EmployeeCreateBody }>(
     "/",
-    { schema: { body: EmployeeCreateSchema } },
+    {
+      onRequest: [fastify.auth.verifySystemAdmin],
+      schema: { body: EmployeeCreateSchema },
+    },
     async function (req, reply) {
       const { password, ...rest } = req.body;
       const employee = await fastify.prisma.employee.create({

@@ -1,4 +1,4 @@
-import Link from "@/components/Link";
+import { Link } from "ui";
 import useRecord from "@/hooks/useRecord";
 import { getMerchant } from "api-client";
 import pluralize from "pluralize-esm";

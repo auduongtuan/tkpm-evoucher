@@ -1,3 +1,4 @@
+import { VouchersParamsType } from "./../../../packages/database/schema/vouchers";
 import { FastifyPluginOptions, FastifyInstance, FastifyRequest } from "fastify";
 import { IdParamsSchema, IdParamsType } from "database/schema/id";
 import {
@@ -9,18 +10,36 @@ import {
 } from "database/schema/vouchers";
 import { computeVoucherStatus } from "database";
 async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
-  fastify.get("/", async function (req, reply) {
-    const vouchers = await fastify.prisma.voucher.findMany({
-      include: {
-        user: true,
-        campaign: true,
-      },
-      orderBy: {
-        id: "asc",
-      },
-    });
-    return vouchers.map((voucher) => computeVoucherStatus(voucher));
-  });
+  fastify.get<{ Querystring: VouchersParamsType }>(
+    "/",
+    {
+      onRequest: [fastify.auth.verifyEmployee],
+    },
+    async function (req, reply) {
+      const merchantId = req.query.merchantId
+        ? Number(req.query.merchantId)
+        : undefined;
+      if (!req.employee?.systemAdmin) {
+        if (!merchantId) {
+          reply.statusCode = 400;
+          throw new Error("Merchant ID is required for non-admin");
+        }
+      }
+      const vouchers = await fastify.prisma.voucher.findMany({
+        include: {
+          user: true,
+          campaign: true,
+        },
+        orderBy: {
+          id: "asc",
+        },
+        where: {
+          ...(merchantId ? { campaign: { merchantId } } : {}),
+        },
+      });
+      return vouchers.map((voucher) => computeVoucherStatus(voucher));
+    }
+  );
   fastify.get<{ Params: IdParamsType }>(
     "/:id",
     { schema: { params: IdParamsSchema } },

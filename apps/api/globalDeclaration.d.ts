@@ -12,6 +12,11 @@ declare module "fastify" {
       verifyEmployee: () => void;
       verifyUser: () => void;
       verifySystemAdmin: () => void;
+      verifyHasMerchantPermission: (
+        req: FastifyRequest,
+        reply: FastifyReply,
+        merchantId: number
+      ) => void;
     };
   }
   interface FastifyRequest {

@@ -3,9 +3,7 @@ import { Button, message } from "antd";
 import { useMutation } from "@tanstack/react-query";
 import { VoucherGenerateBody } from "database/schema/vouchers";
 import { generateCampaignVoucher } from "api-client";
-import { useState } from "react";
 import useUserAuth from "@/hooks/useUserAuth";
-import { Voucher } from "database";
 const expVoucher = {
   campaignId: 2,
   couponCode: "RJ5S8E3E6Y",
@@ -20,8 +18,8 @@ const expVoucher = {
 };
 const GamePanel = () => {
   const gameState = useGameStore();
-  const highScore = gameState.gameName
-    ? gameState.bestScores[gameState.gameName]
+  const highScore = gameState.gameSlug
+    ? gameState.bestScores[gameState.gameSlug]
     : undefined;
   const generateVoucherMutation = useMutation({
     mutationFn: async (body: VoucherGenerateBody) =>
@@ -30,14 +28,14 @@ const GamePanel = () => {
         : null,
     onSuccess: (data) => {
       if (data) {
-        if (gameState.gameName) gameState.resetBestScore(gameState.gameName);
+        if (gameState.gameSlug) gameState.resetBestScore(gameState.gameSlug);
         gameState.setVoucherInfo(data as VoucherStringDate);
         // message.success("Voucher generated successfully");
       }
     },
   });
   const currentGame = gameState.games
-    ? gameState.games.find((game) => game.slug === gameState.gameName)
+    ? gameState.games.find((game) => game.slug === gameState.gameSlug)
     : undefined;
   const cta = () => {
     return (
@@ -54,13 +52,14 @@ const GamePanel = () => {
   const { user } = useUserAuth();
 
   const generateVoucher = () => {
-    if (user && highScore) {
+    if (user && highScore && gameState.gameSlug) {
       generateVoucherMutation.mutate({
         userId: user.id,
         score: highScore,
+        gameSlug: gameState.gameSlug,
       });
     } else {
-      message.error("Login credentials not found or score not found");
+      message.error("Login credentials not found or score/game not found");
     }
   };
   return !gameState.gameStarted || gameState.gameOver ? (

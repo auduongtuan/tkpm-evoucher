@@ -1,3 +1,4 @@
+import { ExcludePassword } from "./../helpers/password";
 import {
   Campaign,
   Merchant,
@@ -25,6 +26,19 @@ export type DetailStore = Store & {
 export type StoreWithCategories = Store & { categories: Category[] };
 export type ExtendedUser = Extended<User>;
 
-export type DetailVoucher = Voucher & {
+export type VoucherWithStatus = Voucher & {
   status: VoucherStatus;
+};
+
+export type CamapignWithMerchantAndStores = Campaign & {
+  merchant: Merchant;
+  stores: Store[];
+};
+
+export type DetailVoucher = VoucherWithStatus & {
+  campaign: CamapignWithMerchantAndStores;
+};
+
+export type UserWithDetailVouchers = ExcludePassword<User> & {
+  vouchers: DetailVoucher[];
 };

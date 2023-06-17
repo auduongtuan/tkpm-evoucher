@@ -2,17 +2,22 @@ import {
   VoucherCreateBody,
   VoucherUpdateBody,
   Voucher,
-  DetailVoucher,
+  VoucherWithStatus,
+  VouchersParamsType,
 } from "database";
 import { createInstance } from "./base";
 const instance = createInstance("vouchers");
-export async function getVouchers(): Promise<DetailVoucher[]> {
-  const res = await instance.get("/");
-
+export async function getVouchers(
+  params?: VouchersParamsType
+): Promise<VoucherWithStatus[]> {
+  const res = await instance.get("/", { params });
+  console.log("Params", params);
   return res.data;
 }
 
-export async function getVoucher(id: string | number): Promise<DetailVoucher> {
+export async function getVoucher(
+  id: string | number
+): Promise<VoucherWithStatus> {
   const res = await instance.get(`/${id}`);
   return res.data;
 }

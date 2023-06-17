@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { Game, Voucher, DetailCampaign } from "database";
-export type GameName = "FLAPPY_BIRD" | "2048" | "SNAKE";
+export type GameSlug = "FLAPPY_BIRD" | "2048" | "SNAKE";
 export type VoucherStringDate = Omit<
   Voucher,
   "createdAt" | "expiredAt" | "updatedAt"
@@ -14,8 +14,8 @@ interface GameState {
   modalOpen: boolean;
   games: Game[];
   setGames: (games: Game[]) => void;
-  gameName: GameName | null;
-  setGameName: (gameName: GameName) => void;
+  gameSlug: GameSlug | null;
+  setGameSlug: (gameSlug: GameSlug) => void;
   openModal: () => void;
   closeModal: () => void;
   score: number;
@@ -26,10 +26,10 @@ interface GameState {
   setGameOver: (gameOver: boolean) => void;
   resetGame: () => void;
   restartGame: () => void;
-  resetBestScore: (gameName: GameName) => void;
-  setBestScore: (gameName: GameName, score: number) => void;
+  resetBestScore: (gameSlug: GameSlug) => void;
+  setBestScore: (gameSlug: GameSlug, score: number) => void;
   bestScores: {
-    [key in GameName]?: number;
+    [key in GameSlug]?: number;
   };
   voucherInfo: VoucherStringDate | null;
   setVoucherInfo: (voucherInfo: VoucherStringDate | null) => void;
@@ -50,8 +50,8 @@ const useGameStore = create<GameState>()(
       setGames: (games) => set({ games }),
       modalOpen: false,
       gameOver: false,
-      gameName: null,
-      setGameName: (gameName) => set({ gameName }),
+      gameSlug: null,
+      setGameSlug: (gameSlug) => set({ gameSlug: gameSlug }),
       gameStarted: false,
       setGameOver: (gameOver) => set({ gameOver }),
       setGameStarted: (gameStarted) => set({ gameStarted }),
@@ -62,18 +62,18 @@ const useGameStore = create<GameState>()(
       score: 0,
       setScore: (score) => set({ score }),
       bestScores: {},
-      resetBestScore: (gameName) =>
+      resetBestScore: (gameSlug) =>
         set((state) => ({
-          bestScores: { ...state.bestScores, [gameName]: 0 },
+          bestScores: { ...state.bestScores, [gameSlug]: 0 },
         })),
-      setBestScore: (gameName, score) =>
+      setBestScore: (gameSlug, score) =>
         set((state) => {
           if (
-            !(gameName in state.bestScores) ||
-            score > (state.bestScores[gameName] as number)
+            !(gameSlug in state.bestScores) ||
+            score > (state.bestScores[gameSlug] as number)
           ) {
-            console.log(state.bestScores[gameName]);
-            return { bestScores: { ...state.bestScores, [gameName]: score } };
+            console.log(state.bestScores[gameSlug]);
+            return { bestScores: { ...state.bestScores, [gameSlug]: score } };
           } else {
             return {};
           }
