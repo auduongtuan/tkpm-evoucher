@@ -4,6 +4,7 @@ import useRouteModal from "@/hooks/useRouteModal";
 import useCrud from "@/hooks/useCrud";
 import { useWatch } from "antd/es/form/Form";
 import { Upload } from "ui";
+import UploadFormItem from "@/components/UploadFormItem";
 
 const MerchantForm = () => {
   const { modalProps, closeModal } = useRouteModal("/merchants");
@@ -19,7 +20,6 @@ const MerchantForm = () => {
     closeModal: closeModal,
     form: form,
   });
-  const image = useWatch("image", form);
 
   return (
     <>
@@ -35,22 +35,7 @@ const MerchantForm = () => {
           <Form.Item label="Description" name={"description"}>
             <Input.TextArea></Input.TextArea>
           </Form.Item>
-          <label className="block mb-2 text-sm">Image</label>
-          {image && <img src={image} className="max-w-full mb-4 rounded-md" />}
-          <Form.Item
-            label="Image"
-            name={"image"}
-            hidden
-            shouldUpdate
-            // rules={[{ type: "url", message: "Please input valid url" }]}
-          >
-            <Input type="hidden"></Input>
-          </Form.Item>
-          <Upload
-            onUploadDone={(response) => {
-              form.setFieldsValue({ image: response.url });
-            }}
-          ></Upload>
+          <UploadFormItem form={form} />
         </Form>
       </Modal>
     </>

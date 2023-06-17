@@ -24,7 +24,7 @@ const Campaigns = () => {
   });
   return (
     <div className="p-4 bg-white rounded-xl">
-      <SectionTitle title={"Ongoing Campaigns"} />
+      <SectionTitle title={"Campaigns"} />
       <Radio.Group
         className="mt-3"
         defaultValue={"all"}

@@ -36,6 +36,15 @@ const GameForm = () => {
           >
             <Input></Input>
           </Form.Item>
+          <Form.Item
+            label="Average Score"
+            name={"averageScore"}
+            rules={[
+              { required: true, message: "Please input game average score!" },
+            ]}
+          >
+            <Input type="number" min={0} step={1}></Input>
+          </Form.Item>
         </Form>
       </Modal>
     </>

@@ -5,12 +5,12 @@
   "types": "./index.ts",
   "dependencies": {
     "@faker-js/faker": "latest",
-    "@prisma/client": "^4.13.0",
+    "@prisma/client": "^4.15.0",
     "@sinclair/typebox": "^0.28.9",
     "helpers": "workspace:*"
   },
   "devDependencies": {
-    "prisma": "^4.13.0"
+    "prisma": "^4.15.0"
   },
   "scripts": {
     "db:generate": "prisma generate",

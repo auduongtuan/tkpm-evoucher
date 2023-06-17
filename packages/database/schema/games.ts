@@ -4,6 +4,7 @@ export const GameCreateSchema = Type.Object({
   name: Type.String({ minLength: 1 }),
   slug: Type.String({ minLength: 1 }),
   image: Type.Optional(Type.String({ minLength: 1 })),
+  averageScore: Type.Number(),
 });
 
 export const GameUpdateSchema = Type.Partial(GameCreateSchema);

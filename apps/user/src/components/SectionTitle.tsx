@@ -9,7 +9,11 @@ const SectionTitle = ({
   return (
     <div className="flex items-center">
       <div className="text-xl font-semibold grow">{title}</div>
-      {moreLink && <Link to={moreLink}>View more</Link>}
+      {moreLink && (
+        <Link to={moreLink} preventScrollReset={false}>
+          View more
+        </Link>
+      )}
     </div>
   );
 };

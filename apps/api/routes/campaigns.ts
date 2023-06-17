@@ -65,7 +65,7 @@ async function campaignRoutes(
         },
       },
       orderBy: {
-        createdAt: "asc",
+        endedAt: "desc",
       },
       where: {
         ...(req.query.status && req.query.status in whereCondition

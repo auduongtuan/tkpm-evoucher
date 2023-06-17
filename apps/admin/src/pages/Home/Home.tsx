@@ -49,7 +49,7 @@ const Home = () => {
               <Typography.Title level={4}>Overall</Typography.Title>
               {Object.keys(statistics).map((recordType) => {
                 return (
-                  <div className="flex mt-3">
+                  <div className="flex mt-3" key={recordType}>
                     <div className="flex-grow w-12">
                       {pluralize(capitalize(recordType))}
                     </div>
@@ -69,7 +69,7 @@ const Home = () => {
                   .slice(0, 5)
                   .map((store) => {
                     return (
-                      <div className="flex mt-3">
+                      <div className="flex mt-3" key={store.id}>
                         <div className="flex-grow w-12">{store.name}</div>
                         <div>
                           {store.campaigns && store.campaigns.length}{" "}
@@ -87,7 +87,7 @@ const Home = () => {
                   .slice(0, 5)
                   .map((user) => {
                     return (
-                      <div className="flex mt-3">
+                      <div className="flex mt-3" key={user.id}>
                         <div className="flex-grow w-12">{user.fullName}</div>
                         <div>
                           {user.vouchers && user.vouchers.length}{" "}

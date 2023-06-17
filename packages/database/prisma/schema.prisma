@@ -45,14 +45,15 @@ model Employee {
 // }
 
 model Game {
-  id          Int                @id @default(autoincrement())
-  slug        String
-  description String?
-  name        String
-  image       String?
-  createdAt   DateTime           @default(now())
-  updatedAt   DateTime           @updatedAt
-  campaigns   GamesOnCampaigns[]
+  id           Int                @id @default(autoincrement())
+  slug         String
+  description  String?
+  name         String
+  image        String?
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  campaigns    GamesOnCampaigns[]
+  averageScore Int                @default(0)
 }
 
 model Campaign {
@@ -65,11 +66,11 @@ model Campaign {
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
   games             GamesOnCampaigns[]
-  totalBudget       Float?
-  spentBudget       Float?
-  maxVoucherPercent Float?
-  maxVoucherFixed   Float?
-  discountType      DiscountType?
+  totalBudget       Float
+  spentBudget       Float               @default(0)
+  maxVoucherPercent Float
+  maxVoucherFixed   Float
+  discountType      DiscountType
   merchantId        Int
   merchant          Merchant            @relation(fields: [merchantId], references: [id])
   vouchers          Voucher[]
@@ -112,6 +113,7 @@ model Store {
   id         Int                  @id @default(autoincrement())
   name       String
   address    String
+  image      String?
   lat        Float
   lng        Float
   createdAt  DateTime             @default(now())

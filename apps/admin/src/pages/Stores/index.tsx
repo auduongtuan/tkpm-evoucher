@@ -28,7 +28,6 @@ const Stores = () => {
             width: "15%",
 
             render: (categories: Category[]) => {
-              console.log(categories);
               return categories.map((category) => category.name).join(", ");
             },
           },

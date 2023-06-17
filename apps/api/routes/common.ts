@@ -1,15 +1,8 @@
-import { FastifyPluginOptions, FastifyInstance, FastifyRequest } from "fastify";
-import { IdParamsSchema, IdParamsType } from "database/schema/id";
-import {
-  VoucherCreateSchema,
-  VoucherCreateBody,
-  VoucherUpdateBody,
-  VoucherUpdateSchema,
-} from "database/schema/vouchers";
+import { FastifyPluginOptions, FastifyInstance } from "fastify";
 import util from "util";
 import { pipeline } from "stream";
 import fs from "fs";
-import { getApiUrl } from "../helpers/apiUrl";
+import { getApiUrl } from "helpers/server";
 const pump = util.promisify(pipeline);
 async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
   fastify.post("/upload", async function (req, reply) {

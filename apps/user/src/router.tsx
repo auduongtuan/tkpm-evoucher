@@ -46,6 +46,10 @@ const router: RouterProviderProps["router"] = createBrowserRouter([
         element: <StoreList />,
       },
       {
+        path: "/stores/category/:categoryId",
+        element: <StoreList />,
+      },
+      {
         path: "/store/:id",
         element: <StoreDetail />,
       },

@@ -13,10 +13,6 @@ const items1: MenuProps["items"] = [
     key: "/stores",
     label: "Stores",
   },
-  {
-    key: "/campaigns",
-    label: "Campaigns",
-  },
 ];
 const MainHeader = () => {
   const {

@@ -8,7 +8,8 @@ import {
   StoreUpdateBody,
   StoresParamsType,
 } from "database/schema/stores";
-import { simplifyCampaigns, simplifyCategories } from "database";
+import { uniqBy } from "helpers";
+import { Prisma, simplifyCampaigns, simplifyCategories, Store } from "database";
 async function storeRoutes(
   fastify: FastifyInstance,
   options: FastifyPluginOptions
@@ -27,10 +28,46 @@ async function storeRoutes(
             }
           : undefined,
       };
+      const take = req.query.take ? Number(req.query.take) : undefined;
+      const skip = req.query.skip ? Number(req.query.skip) : undefined;
+      const categoryId = req.query.categoryId
+        ? Number(req.query.categoryId)
+        : undefined;
+      const nearBy: { lat: number | null; lng: number | null } = {
+        lat: null,
+        lng: null,
+      };
+      if (req.query.nearBy) {
+        const [lat, lng] = req.query.nearBy
+          .split(",")
+          .map((part) => Number(part.trim()));
+        if (isNaN(lat) || isNaN(lng)) {
+          reply.code(400);
+          throw new Error("Invalid nearBy query");
+        }
+        nearBy.lat = lat;
+        nearBy.lng = lng;
+      }
+      const takeAndSkip = Prisma.sql`LIMIT ${take} OFFSET ${skip}`;
+
+      const storeIds = uniqBy(
+        await fastify.prisma.$queryRaw<{ id: number }[]>`
+          SELECT "Store"."id" FROM "Store" ${
+            categoryId
+              ? Prisma.sql`LEFT JOIN "CategoriesOnStores" ON "CategoriesOnStores"."storeId" = id WHERE "CategoriesOnStores"."categoryId" = ${categoryId}`
+              : Prisma.empty
+          } ORDER BY ${
+          nearBy.lat && nearBy.lng
+            ? Prisma.sql`(POW((lng-${nearBy.lng}),2) + POW((lat-${nearBy.lat}),2)) ASC, "Store"."createdAt" DESC`
+            : Prisma.sql`"Store"."createdAt" DESC`
+        } ${takeAndSkip}
+        `,
+        "id"
+      );
 
       const stores = await fastify.prisma.store.findMany({
-        take: req.query.take ? Number(req.query.take) : undefined,
-        skip: req.query.skip ? Number(req.query.skip) : undefined,
+        // take: take,
+        // skip: skip,
         include: {
           merchant: true,
           categories: {
@@ -44,17 +81,27 @@ async function storeRoutes(
             },
           },
         },
-        orderBy: {
-          createdAt: "asc",
+        where: {
+          id: {
+            in: storeIds.map((store) => store.id),
+          },
         },
-        where: whereCondition,
+        // orderBy: {
+        //   createdAt: "asc",
+        // },
+        // where: whereCondition,
       });
       // https://www.prisma.io/docs/guides/other/troubleshooting-orm/help-articles/working-with-many-to-many-relations
-      return stores.map((store) => ({
-        ...store,
-        categories: simplifyCategories(store.categories),
-        campaigns: simplifyCampaigns(store.campaigns),
-      }));
+      return storeIds.map((storeId) => {
+        const store = stores.find(
+          (store) => store.id === storeId.id
+        ) as typeof stores[0];
+        return {
+          ...store,
+          categories: simplifyCategories(store.categories),
+          campaigns: simplifyCampaigns(store.campaigns),
+        };
+      });
     }
   );
 

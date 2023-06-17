@@ -15,6 +15,7 @@ import pluralize from "pluralize-esm";
 import { RiGamepadFill } from "react-icons/ri";
 import { useEffect } from "react";
 import Link from "@/components/Link";
+import ThumbnailImage from "@/components/ThumbnailImage";
 
 const Merchants = () => {
   const merchantList = useQuery({
@@ -34,20 +35,23 @@ const Merchants = () => {
                 key={merchant.id + "record"}
                 className="flex flex-col mt-3 no-underline text-inherit"
               >
-                {merchant.image ? (
-                  <img
-                    src={merchant.image}
-                    className="aspect-[4/3] object-cover rounded-md"
-                    alt={merchant.name}
-                  />
-                ) : (
-                  <div className="aspect-[4/3] object-cover rounded-md bg-gray-200"></div>
-                )}
+                <ThumbnailImage src={merchant.image} alt={merchant.name} />
                 <div className="mt-4 font-medium leading-normal text-md">
                   {merchant.name}
                 </div>
                 <div className="mt-1 text-sm text-gray-600">
-                  {merchant.stores.length} stores
+                  {merchant.stores.length}{" "}
+                  {pluralize("store", merchant.stores.length)}
+                </div>
+                <div className="mt-1 text-sm text-gray-600">
+                  {[
+                    ...merchant.stores.reduce<Set<string>>((acc, curr) => {
+                      curr.categories.forEach((category) =>
+                        acc.add(category.name)
+                      );
+                      return acc;
+                    }, new Set<string>()),
+                  ].join(", ")}
                 </div>
               </Link>
             );

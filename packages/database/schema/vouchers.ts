@@ -6,8 +6,8 @@ export const VoucherCreateSchema = Type.Object({
   userId: Type.Integer(),
   discountType: Type.Union([Type.Literal("PERCENT"), Type.Literal("FIXED")]),
   discountValue: Type.Number(),
-  maxDiscount: Type.Optional(Type.Number()),
-  expiredAt: Type.Optional(Type.String({ format: "date-time" })),
+  maxDiscount: Type.Number(),
+  expiredAt: Type.String({ format: "date-time" }),
 });
 
 export const VoucherUpdateSchema = Type.Partial(VoucherCreateSchema);

@@ -18,6 +18,10 @@ const Games = () => {
             title: "Slug",
             dataIndex: "slug",
           },
+          {
+            title: "Average Score",
+            dataIndex: "averageScore",
+          },
         ]}
       />
       <Outlet />
