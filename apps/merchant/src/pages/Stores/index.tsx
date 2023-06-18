@@ -2,9 +2,9 @@ import { deleteStore, getStores } from "api-client";
 import { Merchant, Store, Category } from "database";
 import { Outlet } from "react-router-dom";
 import RecordList from "ui/admin-components/RecordList";
-import useEmployeeAuth from "ui/hooks/useEmployeeAuth";
+import useAdminStore from "ui/hooks/useAdminStore";
 const Stores = () => {
-  const { authenticated, employee } = useEmployeeAuth(false);
+  const employee = useAdminStore((state) => state.employee);
   return (
     <>
       <Outlet />

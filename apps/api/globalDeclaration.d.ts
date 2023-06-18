@@ -15,7 +15,7 @@ declare module "fastify" {
       verifyHasMerchantPermission: (
         req: FastifyRequest,
         reply: FastifyReply,
-        merchantId: number
+        merchantId?: number | null
       ) => void;
     };
   }

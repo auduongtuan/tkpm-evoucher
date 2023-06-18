@@ -47,7 +47,7 @@ export default fp(async (fastify, opts) => {
     done: HookHandlerDoneFunction
   ) => {
     await verifyEmployeeBase(req, reply);
-    done();
+    // done();
   };
 
   const verifySystemAdmin = async (
@@ -60,7 +60,7 @@ export default fp(async (fastify, opts) => {
       reply.statusCode = 401;
       throw new Error("Employee not found or not an admin");
     }
-    done();
+    // done();
   };
   const verifyEmployeeOrUser = async (
     req: FastifyRequest,
@@ -135,15 +135,14 @@ export default fp(async (fastify, opts) => {
   const verifyHasMerchantPermission = (
     req: FastifyRequest,
     reply: FastifyReply,
-    merchantId: number
+    merchantId?: number | null
   ) => {
-    if (
-      !req.employee ||
-      !req.employee.systemAdmin ||
-      merchantId !== req.employee.merchantId
-    ) {
+    const isAdmin = req.employee && req.employee.systemAdmin;
+    const hasMerchantPermission =
+      req.employee && merchantId && req.employee.merchantId === merchantId;
+    if (!isAdmin && !hasMerchantPermission) {
       reply.statusCode = 403;
-      throw new Error("Do not have permission");
+      throw new Error("Do not have permission on this merchant");
     }
   };
   fastify.decorate("auth", {

@@ -1,25 +1,43 @@
 import { useState } from "react";
 import { Form, Input, Modal, Checkbox, Select, DatePicker } from "antd";
-import { createVoucher, getVoucher, updateVoucher } from "api-client";
+import {
+  createVoucher,
+  getMerchantCampaigns,
+  getVoucher,
+  updateVoucher,
+} from "api-client";
 import useRouteModal from "ui/hooks/useRouteModal";
 import useCrud from "ui/hooks/useCrud";
 import { CampaignSelect, UserSelect } from "ui/admin-components/RecordSelect";
+import UserFindSelect from "ui/admin-components/UserFindSelect";
 import dayjs from "dayjs";
+import useAdminStore from "ui/hooks/useAdminStore";
+import { User } from "database";
 
 const VoucherForm = () => {
   const { modalProps, closeModal } = useRouteModal("/vouchers");
   const [form] = Form.useForm();
+  const [options, setOptions] = useState<User[]>([]);
   const { id, formModalProps } = useCrud({
     name: "voucher",
     getFn: getVoucher,
     onGetSuccess: (data) => {
-      form.setFieldsValue({ ...data, expiredAt: dayjs(data.expiredAt) });
+      form.setFieldsValue({
+        ...data,
+        expiredAt: dayjs(data.expiredAt),
+        usedAt: data.usedAt ? dayjs(data.usedAt) : null,
+      });
+      setOptions([data.user]);
     },
     updateFn: updateVoucher,
     createFn: createVoucher,
     closeModal: closeModal,
     form: form,
   });
+  const merchantId = useAdminStore(
+    (state) => state.employee?.merchantId
+  ) as number;
+
   const discountType = Form.useWatch("discountType", form);
   return (
     <>
@@ -34,13 +52,7 @@ const VoucherForm = () => {
           >
             <Input></Input>
           </Form.Item>
-          {/* couponCode: Type.String({ minLength: 1 }),
-  campaignId: Type.Integer(),
-  userId: Type.Integer(),
-  discountType: Type.Union([Type.Literal("PERCENT"), Type.Literal("FIXED")]),
-  discountValue: Type.Number(),
-  maxDiscount: Type.Optional(Type.Number()),
-  expiredAt: Type.Optional(Type.String({ format: "date-time" })), */}
+
           <Form.Item
             label="Campaign"
             name={"campaignId"}
@@ -48,15 +60,27 @@ const VoucherForm = () => {
               { required: true, message: "Please select voucher campaign!" },
             ]}
           >
-            <CampaignSelect />
+            <CampaignSelect
+              getFn={async () => getMerchantCampaigns(merchantId)}
+            />
           </Form.Item>
 
           <Form.Item
             label="User"
             name={"userId"}
+            help={
+              <p className="mt-1.5 mb-2">
+                Search by user email or phone number
+              </p>
+            }
             rules={[{ required: true, message: "Please select voucher user!" }]}
           >
-            <UserSelect />
+            <UserFindSelect
+              options={options.map((options) => ({
+                value: options.id,
+                label: options.fullName,
+              }))}
+            />
           </Form.Item>
 
           <Form.Item

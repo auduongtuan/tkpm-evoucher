@@ -8,7 +8,7 @@ import { Link } from "ui";
 import SectionTitle from "@/components/SectionTitle";
 import useAppStore from "@/stores/useAppStore";
 import { StoresParamsType } from "database";
-import ThumbnailImage from "@/components/ThumbnailImage";
+import ThumbnailImage from "ui/components/ThumbnailImage";
 import StoreAddress from "@/components/StoreAddress";
 import { useNavigate, useParams } from "react-router-dom";
 const StoreCard = ({ store }: { store: DetailStore }) => {

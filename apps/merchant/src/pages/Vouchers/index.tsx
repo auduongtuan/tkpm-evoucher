@@ -3,9 +3,9 @@ import RecordList from "ui/admin-components/RecordList";
 import { Voucher, User, Campaign, VoucherWithStatus } from "database";
 import { Outlet } from "react-router-dom";
 import { VoucherStatus } from "ui";
-import useEmployeeAuth from "ui/hooks/useEmployeeAuth";
+import useAdminStore from "ui/hooks/useAdminStore";
 const Vouchers = () => {
-  const { authenticated, employee } = useEmployeeAuth(false);
+  const employee = useAdminStore((state) => state.employee);
   console.log(employee?.merchantId);
   return (
     <>

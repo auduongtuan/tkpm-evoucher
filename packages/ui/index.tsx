@@ -14,3 +14,6 @@ export * from "./components/VoucherStatus";
 
 export { default as Link } from "./components/Link";
 export * from "./components/Link";
+
+export { default as SystemLogo } from "./components/SystemLogo";
+export * from "./components/SystemLogo";

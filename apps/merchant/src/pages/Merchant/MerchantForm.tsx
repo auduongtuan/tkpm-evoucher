@@ -1,17 +1,20 @@
 import { Form, Input, Modal, Typography, message } from "antd";
-import { createMerchant, getMerchant, updateMerchant } from "api-client";
+import { createMerchant, getFullMerchant, updateMerchant } from "api-client";
 import useRouteModal from "ui/hooks/useRouteModal";
 import useCrud from "ui/hooks/useCrud";
 import { useWatch } from "antd/es/form/Form";
 import { Upload } from "ui";
 import UploadFormItem from "ui/admin-components/UploadFormItem";
+import useAdminStore from "ui/hooks/useAdminStore";
 
 const MerchantForm = () => {
-  const { modalProps, closeModal } = useRouteModal("/merchants");
+  const { modalProps, closeModal } = useRouteModal("/merchant");
+  const employee = useAdminStore((state) => state.employee);
   const [form] = Form.useForm();
   const { formModalProps } = useCrud({
     name: "merchant",
-    getFn: getMerchant,
+    getFn: getFullMerchant,
+    recordId: employee && employee.merchantId ? employee.merchantId : undefined,
     onGetSuccess: (data) => {
       form.setFieldsValue({ ...data });
     },

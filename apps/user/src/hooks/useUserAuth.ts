@@ -6,10 +6,12 @@ import { AxiosError } from "axios";
 import useAppStore from "@/stores/useAppStore";
 interface UserAuthOptions {
   onLoginError?: (data: { message: string }) => void;
+  onLoginSuccess?: (data: User) => void;
+  onLogout?: () => void;
 }
 const TOKEN_NAME = "USER_TOKEN";
 function useUserAuth(options: UserAuthOptions = {}) {
-  const { onLoginError } = options;
+  const { onLoginError, onLoginSuccess, onLogout } = options;
   const { user, setUser, authenticated, setAuthenticated } = useAppStore();
   const authenticationQuery = useQuery({
     queryKey: ["user", "authentication"],
@@ -22,6 +24,7 @@ function useUserAuth(options: UserAuthOptions = {}) {
       if (data) {
         setAuthenticated(true);
         setUser(data);
+        onLoginSuccess && onLoginSuccess(data);
       } else {
         setAuthenticated(false);
       }
@@ -57,6 +60,7 @@ function useUserAuth(options: UserAuthOptions = {}) {
       setUser(null);
       setAuthenticated(false);
       authenticationQuery.refetch();
+      onLogout && onLogout();
       // navigate("/login");
     },
   };

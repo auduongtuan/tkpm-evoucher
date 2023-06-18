@@ -1,5 +1,5 @@
 import { Form, Input, Modal, Typography, message } from "antd";
-import { createMerchant, getMerchant, updateMerchant } from "api-client";
+import { createMerchant, getFullMerchant, updateMerchant } from "api-client";
 import useRouteModal from "ui/hooks/useRouteModal";
 import useCrud from "ui/hooks/useCrud";
 import { useWatch } from "antd/es/form/Form";
@@ -11,7 +11,7 @@ const MerchantForm = () => {
   const [form] = Form.useForm();
   const { formModalProps } = useCrud({
     name: "merchant",
-    getFn: getMerchant,
+    getFn: getFullMerchant,
     onGetSuccess: (data) => {
       form.setFieldsValue({ ...data });
     },

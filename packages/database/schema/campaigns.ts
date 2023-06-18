@@ -11,7 +11,7 @@ export const CampaignCreateSchema = Type.Object({
   maxVoucherFixed: Type.Number(),
   maxVoucherPercent: Type.Number(),
   totalBudget: Type.Number(),
-  spentBudget: Type.Number(),
+  spentBudget: Type.Optional(Type.Number()),
   merchantId: Type.Integer(),
 });
 

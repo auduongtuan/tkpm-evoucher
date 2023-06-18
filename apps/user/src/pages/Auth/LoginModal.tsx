@@ -1,5 +1,5 @@
 import useAppStore from "@/stores/useAppStore";
-import { Modal } from "antd";
+import { Modal, message } from "antd";
 import { useState, useEffect } from "react";
 import { Form, Input, Button, Alert } from "antd";
 import useUserAuth from "@/hooks/useUserAuth";
@@ -11,9 +11,11 @@ const LoginModal = () => {
     onLoginError: (data) => {
       setErrorMessage(data.message);
     },
+    onLoginSuccess: (data) => {
+      message.success("Login successfully!");
+    },
   });
   useEffect(() => {
-    console.log("check authenicate useEffect");
     if (authenticated) {
       loginModal.setOpen(false);
     }
@@ -54,7 +56,7 @@ const LoginModal = () => {
           name="password"
           rules={[{ required: true, message: "Please enter an password" }]}
         >
-          <Input type="password" />
+          <Input.Password />
         </Form.Item>
       </Form>
     </Modal>

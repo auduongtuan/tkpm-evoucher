@@ -4,6 +4,7 @@ import {
   Voucher,
   VoucherWithStatus,
   VouchersParamsType,
+  VoucherWithCampaignAndUser,
 } from "database";
 import { createInstance } from "./base";
 const instance = createInstance("vouchers");
@@ -17,7 +18,7 @@ export async function getVouchers(
 
 export async function getVoucher(
   id: string | number
-): Promise<VoucherWithStatus> {
+): Promise<VoucherWithCampaignAndUser> {
   const res = await instance.get(`/${id}`);
   return res.data;
 }

@@ -5,7 +5,9 @@ import {
   UserCreateBody,
   UserUpdateBody,
   UserUpdateSchema,
-} from "database/schema/users";
+  UserFindQueryType,
+  UserFindQuerySchema,
+} from "database";
 // import Users from "../models/UserModel";
 import { User, hashPassword, excludePassword } from "database";
 
@@ -27,6 +29,24 @@ async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
       return excludePassword(users);
     }
   );
+
+  fastify.get<{ Querystring: UserFindQueryType }>(
+    "/find",
+    {
+      onRequest: [fastify.auth.verifyEmployee],
+      schema: UserFindQuerySchema,
+    },
+    async function (req, reply) {
+      const { email, phone } = req.query;
+      const user = await fastify.prisma.user.findFirst({
+        where: {
+          OR: [{ email: email }, { phone: phone }],
+        },
+      });
+      return excludePassword(user);
+    }
+  );
+
   fastify.get<{ Params: IdParamsType }>(
     "/:id",
     {

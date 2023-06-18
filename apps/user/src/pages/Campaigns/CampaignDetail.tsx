@@ -1,5 +1,5 @@
 import { Link, Description, CampaignStatus } from "ui";
-import useRecord from "@/hooks/useRecord";
+import useRecord from "ui/hooks/useRecord";
 import { getCampaign } from "api-client";
 import pluralize from "pluralize-esm";
 import { RiStore2Fill, RiGamepadFill } from "react-icons/ri";
@@ -105,7 +105,7 @@ const CampaignDetail = () => {
             {dayjs(campaign.endedAt).format("DD/MM/YYYY")}
           </Description>
         </div>
-        {dayjs().isBefore(campaign.endedAt) ? (
+        {campaign.status === "ongoing" ? (
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-2 grow">
               <Description label="Choose one game to start" className="">

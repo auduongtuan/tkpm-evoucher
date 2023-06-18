@@ -1,4 +1,4 @@
-import useRecord from "@/hooks/useRecord";
+import useRecord from "ui/hooks/useRecord";
 import { getStore } from "api-client";
 import { RiGameFill } from "react-icons/ri";
 import { Breadcrumb, Button, Empty } from "antd";

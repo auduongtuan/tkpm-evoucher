@@ -158,7 +158,7 @@ async function storeRoutes(
     async function (req, reply) {
       const { categoryIds, ...rest } = req.body;
       fastify.auth.verifyHasMerchantPermission(req, reply, rest.merchantId);
-      return fastify.prisma.store.create({
+      const store = await fastify.prisma.store.create({
         data: {
           ...rest,
           categories: categoryIds
@@ -174,12 +174,16 @@ async function storeRoutes(
             : undefined,
         },
       });
+      return store;
     }
   );
 
   fastify.put<{ Body: StoreUpdateBody; Params: IdParamsType }>(
     "/:id",
-    { schema: { body: StoreUpdateSchema, params: IdParamsSchema } },
+    {
+      onRequest: [fastify.auth.verifyEmployee],
+      schema: { body: StoreUpdateSchema, params: IdParamsSchema },
+    },
     async function (req, reply) {
       const currentStore = await fastify.prisma.store.findUnique({
         where: {
@@ -220,11 +224,40 @@ async function storeRoutes(
   );
   fastify.delete<{ Params: IdParamsType }>(
     "/:id",
-    { schema: { params: IdParamsSchema } },
+    {
+      onRequest: [fastify.auth.verifyEmployee],
+      schema: { params: IdParamsSchema },
+    },
     async function (req, reply) {
-      await fastify.prisma.store.delete({
+      const currentStore = await fastify.prisma.store.findUnique({
         where: {
           id: req.params.id,
+        },
+      });
+      if (!currentStore) {
+        reply.code(404);
+        throw new Error("Store not found");
+      }
+      fastify.auth.verifyHasMerchantPermission(
+        req,
+        reply,
+        currentStore.merchantId
+      );
+      // delete all campaigns on store
+      await fastify.prisma.campaignsOnStores.deleteMany({
+        where: {
+          storeId: currentStore.id,
+        },
+      });
+      // delete all categories on store
+      await fastify.prisma.categoriesOnStores.deleteMany({
+        where: {
+          storeId: currentStore.id,
+        },
+      });
+      await fastify.prisma.store.delete({
+        where: {
+          id: currentStore.id,
         },
       });
     }

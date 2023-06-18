@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-
 import type { MenuProps } from "antd";
 import { Button, Layout, Menu, Typography, theme } from "antd";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -15,8 +14,9 @@ import {
   RiUser3Fill,
 } from "react-icons/ri";
 import { SubMenuType } from "antd/es/menu/hooks/useItems";
-import useEmployeeAuth from "ui/hooks/useEmployeeAuth";
-const { Header, Content, Footer, Sider } = Layout;
+import useAdminStore from "ui/hooks/useAdminStore";
+import { SystemLogo } from "ui";
+const { Sider } = Layout;
 type MenuItem = Required<MenuProps>["items"][number];
 
 type NavigationItem = {
@@ -76,27 +76,7 @@ const navigationItems: NavigationItem[] = [
     path: "/vouchers",
     icon: <RiCoupon2Fill />,
   },
-
-  // {
-  //   label: "Merchant List",
-  //   key: "_merchants_list",
-  //   path: "/merchants",
-  //   parent: "_merchants",
-  // },
 ];
-// function getItem(navItem: NavigationItem) {
-//   const { path, parent, ...rest } = navItem;
-
-//   return {
-//     ...rest,
-//     children:
-//       navigationItems
-//         .filter(
-//           (navItem) => "parent" in navItem || navItem.parent == navItem.key
-//         )
-//         .map((subNavItem) => getItem(subNavItem)) || undefined,
-//   };
-// }
 
 const items: MenuItem[] = navigationItems.reduce<MenuItem[]>((acc, navItem) => {
   const { path, parent, ...rest } = navItem;
@@ -115,9 +95,6 @@ const items: MenuItem[] = navigationItems.reduce<MenuItem[]>((acc, navItem) => {
 }, []);
 
 const MainSidebar = () => {
-  const {
-    token: { colorBgContainer, colorTextLightSolid },
-  } = theme.useToken();
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -127,7 +104,8 @@ const MainSidebar = () => {
       navigate(path);
     }
   };
-  const { employee, logout } = useEmployeeAuth(true);
+  const employee = useAdminStore((state) => state.employee);
+  const logout = useAdminStore((state) => state.logout);
   return (
     <Sider
       // collapsible
@@ -135,13 +113,7 @@ const MainSidebar = () => {
       onCollapse={(value) => setCollapsed(value)}
     >
       <div className="flex flex-col h-full">
-        <Typography.Title
-          level={4}
-          color={colorTextLightSolid}
-          className="text-white m-0 py-4 px-6"
-        >
-          eVoucher
-        </Typography.Title>
+        <SystemLogo subName="Admin" />
         <Menu
           theme="dark"
           defaultSelectedKeys={[location.pathname.replace("/", "_")]}
@@ -150,7 +122,7 @@ const MainSidebar = () => {
           onClick={handleMenuClick}
         />
         <div className="flex-grow"></div>
-        <div className="flex-grow-0 text-white py-4 px-6">
+        <div className="flex-grow-0 px-6 py-4 text-white">
           <div>{employee && employee.fullName}</div>
           <Button
             type="link"

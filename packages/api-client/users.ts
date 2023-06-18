@@ -1,3 +1,4 @@
+import { UserFindQueryType } from "./../database/schema/users";
 import { ExcludePassword } from "./../database/helpers/password";
 import { UserCreateBody, UserUpdateBody } from "database/schema/users";
 import { UserWithDetailVouchers, User } from "database";
@@ -15,7 +16,12 @@ export async function getUser(
   const res = await instance.get(`/${id}`);
   return res.data;
 }
-
+export async function findUser(
+  params: UserFindQueryType
+): Promise<ExcludePassword<User>> {
+  const res = await instance.get(`/find`, { params });
+  return res.data;
+}
 export async function createUser(
   body: UserCreateBody
 ): Promise<ExcludePassword<User>> {

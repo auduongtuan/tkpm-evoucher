@@ -20,7 +20,7 @@ async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
           merchant: true,
         },
         orderBy: {
-          id: "asc",
+          createdAt: "desc",
         },
       });
       return excludePassword(employees);
@@ -29,7 +29,7 @@ async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
   fastify.get<{ Params: IdParamsType }>(
     "/:id",
     {
-      onRequest: [fastify.auth.verifySystemAdmin],
+      onRequest: [fastify.auth.verifyEmployee],
       schema: { params: IdParamsSchema },
     },
     async function (req, reply) {
@@ -41,20 +41,33 @@ async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
           merchant: true,
         },
       });
+      if (!employee) {
+        reply.statusCode = 404;
+        throw new Error("Employee not found");
+      }
+      fastify.auth.verifyHasMerchantPermission(
+        req,
+        reply,
+        employee.merchantId as number
+      );
       return excludePassword(employee);
     }
   );
   fastify.post<{ Body: EmployeeCreateBody }>(
     "/",
     {
-      onRequest: [fastify.auth.verifySystemAdmin],
+      onRequest: [fastify.auth.verifyEmployee],
       schema: { body: EmployeeCreateSchema },
     },
     async function (req, reply) {
-      const { password, ...rest } = req.body;
+      const { password, merchantId, systemAdmin, ...rest } = req.body;
+      fastify.auth.verifyHasMerchantPermission(req, reply, merchantId);
       const employee = await fastify.prisma.employee.create({
         data: {
           ...rest,
+          merchantId:
+            req.employee?.systemAdmin && systemAdmin ? null : merchantId,
+          systemAdmin: req.employee?.systemAdmin && systemAdmin ? true : false,
           password: hashPassword(password),
         },
       });
@@ -63,15 +76,35 @@ async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
   );
   fastify.put<{ Body: EmployeeUpdateBody; Params: IdParamsType }>(
     "/:id",
-    { schema: { body: EmployeeUpdateSchema, params: IdParamsSchema } },
+    {
+      onRequest: [fastify.auth.verifyEmployee],
+      schema: { body: EmployeeUpdateSchema, params: IdParamsSchema },
+    },
     async function (req, reply) {
-      const { password, ...rest } = req.body;
+      const currentEmployee = await fastify.prisma.employee.findUnique({
+        where: {
+          id: req.params.id,
+        },
+      });
+      if (!currentEmployee) {
+        reply.statusCode = 404;
+        throw new Error("Employee not found");
+      }
+      fastify.auth.verifyHasMerchantPermission(
+        req,
+        reply,
+        currentEmployee.merchantId
+      );
+      const { password, systemAdmin, merchantId, ...rest } = req.body;
       const employee = await fastify.prisma.employee.update({
         where: {
           id: req.params.id,
         },
         data: {
           ...rest,
+          systemAdmin: req.employee?.systemAdmin && systemAdmin ? true : false,
+          merchantId:
+            req.employee?.systemAdmin && systemAdmin ? null : merchantId,
           ...(password
             ? {
                 password: hashPassword(password),
@@ -84,8 +117,25 @@ async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
   );
   fastify.delete<{ Params: IdParamsType }>(
     "/:id",
-    { schema: { params: IdParamsSchema } },
+    {
+      onRequest: [fastify.auth.verifyEmployee],
+      schema: { params: IdParamsSchema },
+    },
     async function (req, reply) {
+      const currentEmployee = await fastify.prisma.employee.findUnique({
+        where: {
+          id: req.params.id,
+        },
+      });
+      if (!currentEmployee) {
+        reply.statusCode = 404;
+        throw new Error("Employee not found");
+      }
+      fastify.auth.verifyHasMerchantPermission(
+        req,
+        reply,
+        currentEmployee.merchantId
+      );
       await fastify.prisma.employee.delete({
         where: {
           id: req.params.id,

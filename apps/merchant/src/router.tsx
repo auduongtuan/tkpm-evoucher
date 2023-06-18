@@ -1,19 +1,17 @@
 import Root from "./pages/root";
 import Categories from "./pages/Categories";
-import Merchants from "./pages/Merchants";
+import Merchant from "./pages/Merchant";
 import Stores from "./pages/Stores";
 import { RouterProviderProps, createBrowserRouter } from "react-router-dom";
 import GameForm from "./pages/Games/GameForm";
 import Campaigns from "./pages/Campaigns";
 import Games from "./pages/Games";
-import MerchantForm from "./pages/Merchants/MerchantForm";
+import MerchantForm from "./pages/Merchant/MerchantForm";
 import StoreForm from "./pages/Stores/StoreForm";
 import CategoryForm from "./pages/Categories/CategoryForm";
 import CampaignForm from "./pages/Campaigns/CampaignForm";
 import Employees from "./pages/Employees";
 import EmployeeForm from "./pages/Employees/EmployeeForm";
-import Users from "./pages/Users";
-import UserForm from "./pages/Users/UserForm";
 import Vouchers from "./pages/Vouchers";
 import VoucherForm from "./pages/Vouchers/VoucherForm";
 import Login from "./pages/Auth/Login";
@@ -29,17 +27,17 @@ const router: RouterProviderProps["router"] = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: "merchants",
-        element: <Merchants />,
+        path: "merchant",
+        element: <Merchant />,
         children: [
           {
-            path: "new",
+            path: "edit",
             element: <MerchantForm />,
           },
-          {
-            path: "edit/:id",
-            element: <MerchantForm />,
-          },
+          // {
+          //   path: "edit/:id",
+          //   element: <MerchantForm />,
+          // },
         ],
       },
       {
@@ -137,20 +135,6 @@ const router: RouterProviderProps["router"] = createBrowserRouter([
           {
             path: "edit/:id",
             element: <VoucherForm />,
-          },
-        ],
-      },
-      {
-        path: "users",
-        element: <Users />,
-        children: [
-          {
-            path: "new",
-            element: <UserForm />,
-          },
-          {
-            path: "edit/:id",
-            element: <UserForm />,
           },
         ],
       },

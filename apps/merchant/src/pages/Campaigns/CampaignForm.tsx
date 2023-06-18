@@ -6,16 +6,19 @@ import {
   createCampaign,
   getCampaign,
   updateCampaign,
-  getMerchant,
+  getFullMerchant,
   getGames,
 } from "api-client";
 import useRouteModal from "ui/hooks/useRouteModal";
 import useCrud from "ui/hooks/useCrud";
 import { MerchantSelect } from "ui/admin-components/RecordSelect";
 import { useQuery } from "@tanstack/react-query";
+import useAdminStore from "ui/hooks/useAdminStore";
+import UploadFormItem from "ui/admin-components/UploadFormItem";
 const CampaignForm = () => {
   const { modalProps, closeModal } = useRouteModal("/campaigns");
   const [form] = Form.useForm();
+  const merchantId = useAdminStore((state) => state.employee?.merchantId);
   const { formModalProps } = useCrud({
     name: "campaign",
     getFn: getCampaign,
@@ -29,7 +32,6 @@ const CampaignForm = () => {
             ? [dayjs(data.startedAt), dayjs(data.endedAt)]
             : [dayjs(), null],
       });
-      setMerchantId(data.merchantId);
     },
     updateFn: updateCampaign,
     createFn: createCampaign,
@@ -52,19 +54,19 @@ const CampaignForm = () => {
     },
     form: form,
   });
-  const [merchantId, setMerchantId] = useState<number>();
   const merchantQuery = useQuery({
     queryKey: ["merchant", merchantId],
-    queryFn: async () => await getMerchant(merchantId as number),
+    queryFn: async () => await getFullMerchant(merchantId as number),
     enabled: !!merchantId,
+    onSuccess: (data) => {
+      form.setFieldValue("merchantId", data.id);
+    },
   });
   const gameListQuery = useQuery({
     queryKey: ["game", "list"],
     queryFn: getGames,
   });
-  const onValuesChange = ({ merchantId }) => {
-    if (merchantId) setMerchantId(merchantId);
-  };
+
   const rangeConfig = {
     rules: [
       {
@@ -82,13 +84,15 @@ const CampaignForm = () => {
           layout="vertical"
           autoComplete="off"
           form={form}
-          onValuesChange={onValuesChange}
           initialValues={{
             startedAt: "",
             endedAt: "",
           }}
           className="my-4"
         >
+          <Form.Item name="merchantId" hidden>
+            <Input type="hidden" />
+          </Form.Item>
           <Form.Item
             label="Name"
             name={"name"}
@@ -103,13 +107,7 @@ const CampaignForm = () => {
           >
             <Input.TextArea />
           </Form.Item>
-          <Form.Item
-            label="Merchant"
-            name={"merchantId"}
-            rules={[{ required: true, message: "Please select merchant!" }]}
-          >
-            <MerchantSelect />
-          </Form.Item>
+
           {merchantId && (
             <Form.Item
               label="Stores applied"
@@ -222,6 +220,7 @@ const CampaignForm = () => {
               className="w-full"
             />
           </Form.Item>
+          <UploadFormItem form={form} />
         </Form>
       </Modal>
     </>

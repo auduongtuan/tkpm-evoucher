@@ -23,7 +23,6 @@ export async function createStore(
   body: StoreCreateBody
 ): Promise<StoreWithCategories> {
   const res = await instance.post("/", { ...body });
-
   return res.data;
 }
 

@@ -3,7 +3,7 @@ import SectionTitle from "@/components/SectionTitle";
 import { getStores } from "api-client";
 import { Link } from "ui";
 import useAppStore from "@/stores/useAppStore";
-import ThumbnailImage from "@/components/ThumbnailImage";
+import ThumbnailImage from "ui/components/ThumbnailImage";
 import StoreAddress from "@/components/StoreAddress";
 const Stores = () => {
   const appState = useAppStore();

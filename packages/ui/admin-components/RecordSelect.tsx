@@ -8,10 +8,15 @@ const RecordSelectHOC = <T extends { id: number }>(
   getFn: () => Promise<Array<(T & { [key: string]: any }) | T>>,
   labelProp: string = "name"
 ) => {
-  const RecordSelect = (rest: SelectProps) => {
+  const RecordSelect = ({
+    getFn: customGetFn,
+    ...rest
+  }: SelectProps & {
+    getFn?: () => Promise<Array<(T & { [key: string]: any }) | T>>;
+  }) => {
     const recordListQuery = useQuery({
       queryKey: [name, "list"],
-      queryFn: getFn,
+      queryFn: customGetFn || getFn,
     });
     return (
       <Select

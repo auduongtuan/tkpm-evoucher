@@ -38,6 +38,7 @@ async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
       onRequest: [fastify.auth.verifySystemAdmin],
     },
     async function (req, reply) {
+      console.log("RUN CATEGORY POST");
       return fastify.prisma.category.create({
         data: {
           ...req.body,
@@ -69,6 +70,20 @@ async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
       onRequest: [fastify.auth.verifySystemAdmin],
     },
     async function (req, reply) {
+      const category = await fastify.prisma.category.findUnique({
+        where: {
+          id: req.params.id,
+        },
+      });
+      if (!category) {
+        reply.statusCode = 404;
+        throw new Error("Category not found");
+      }
+      await fastify.prisma.categoriesOnStores.deleteMany({
+        where: {
+          categoryId: req.params.id,
+        },
+      });
       await fastify.prisma.category.delete({
         where: {
           id: req.params.id,

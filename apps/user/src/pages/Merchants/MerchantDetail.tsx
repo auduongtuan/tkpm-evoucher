@@ -1,10 +1,10 @@
 import { Link } from "ui";
-import useRecord from "@/hooks/useRecord";
-import { getMerchant } from "api-client";
+import useRecord from "ui/hooks/useRecord";
+import { getFullMerchant } from "api-client";
 import pluralize from "pluralize-esm";
 import { RiGameFill, RiStore2Fill } from "react-icons/ri";
 import { Breadcrumb, Empty } from "antd";
-import ThumbnailImage from "@/components/ThumbnailImage";
+import ThumbnailImage from "ui/components/ThumbnailImage";
 import SectionTitle from "@/components/SectionTitle";
 const MerchantDetail = () => {
   // const { modalProps, closeModal } = useRouteModal("/merchants");
@@ -22,7 +22,7 @@ const MerchantDetail = () => {
   // });
   const { id, recordQuery } = useRecord({
     name: "merchant",
-    getFn: getMerchant,
+    getFn: getFullMerchant,
   });
   const merchant = recordQuery?.data;
   return !recordQuery?.isLoading && merchant ? (
@@ -102,7 +102,8 @@ const MerchantDetail = () => {
             {merchant.stores.length > 0 ? (
               merchant.stores.map((store) => {
                 return (
-                  <div
+                  <Link
+                    to={`/store/${store.id}`}
                     key={store.id + "record"}
                     className="flex items-center gap-4 mt-3"
                   >
@@ -116,7 +117,7 @@ const MerchantDetail = () => {
                         {store.address}
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 );
               })
             ) : (

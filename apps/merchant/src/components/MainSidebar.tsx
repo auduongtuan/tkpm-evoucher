@@ -16,6 +16,7 @@ import {
 } from "react-icons/ri";
 import { SubMenuType } from "antd/es/menu/hooks/useItems";
 import useEmployeeAuth from "ui/hooks/useEmployeeAuth";
+import { SystemLogo } from "ui";
 const { Header, Content, Footer, Sider } = Layout;
 type MenuItem = Required<MenuProps>["items"][number];
 
@@ -29,9 +30,9 @@ type NavigationItem = {
 const navigationItems: NavigationItem[] = [
   { label: "Home", key: "_", path: "/", icon: <RiHome2Fill /> },
   {
-    label: "Merchants",
-    key: "_merchants",
-    path: "/merchants",
+    label: "Your Merchant",
+    key: "_merchant",
+    path: "/merchant",
     icon: <RiStore2Fill />,
   },
   {
@@ -64,12 +65,12 @@ const navigationItems: NavigationItem[] = [
     path: "/employees",
     icon: <RiShieldUserFill />,
   },
-  {
-    label: "Users",
-    key: "_users",
-    path: "/users",
-    icon: <RiUser3Fill />,
-  },
+  // {
+  //   label: "Users",
+  //   key: "_users",
+  //   path: "/users",
+  //   icon: <RiUser3Fill />,
+  // },
   {
     label: "Vouchers",
     key: "_vouchers",
@@ -115,9 +116,6 @@ const items: MenuItem[] = navigationItems.reduce<MenuItem[]>((acc, navItem) => {
 }, []);
 
 const MainSidebar = () => {
-  const {
-    token: { colorBgContainer, colorTextLightSolid },
-  } = theme.useToken();
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -135,13 +133,7 @@ const MainSidebar = () => {
       onCollapse={(value) => setCollapsed(value)}
     >
       <div className="flex flex-col h-full">
-        <Typography.Title
-          level={4}
-          color={colorTextLightSolid}
-          className="px-6 py-4 m-0 text-white"
-        >
-          eVoucher
-        </Typography.Title>
+        <SystemLogo subName="Merchant" />
         <Menu
           theme="dark"
           defaultSelectedKeys={[location.pathname.replace("/", "_")]}

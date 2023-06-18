@@ -3,7 +3,7 @@ import SectionTitle from "@/components/SectionTitle";
 import { getMerchants } from "api-client";
 import pluralize from "pluralize-esm";
 import { Link } from "ui";
-import ThumbnailImage from "@/components/ThumbnailImage";
+import ThumbnailImage from "ui/components/ThumbnailImage";
 
 const Merchants = () => {
   const merchantList = useQuery({

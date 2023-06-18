@@ -7,7 +7,6 @@ import useCrud from "ui/hooks/useCrud";
 const UserForm = () => {
   const { modalProps, closeModal } = useRouteModal("/users");
   const [form] = Form.useForm();
-  const [systemAdmin, setSystemAdmin] = useState(false);
   const { id, formModalProps } = useCrud({
     name: "user",
     getFn: getUser,
@@ -19,19 +18,10 @@ const UserForm = () => {
     closeModal: closeModal,
     form: form,
   });
-  const onValuesChange = ({ systemAdmin }) => {
-    if (systemAdmin !== undefined) setSystemAdmin(systemAdmin);
-  };
   return (
     <>
       <Modal {...modalProps} {...formModalProps}>
-        <Form
-          layout="vertical"
-          autoComplete="off"
-          form={form}
-          onValuesChange={onValuesChange}
-          className="my-4"
-        >
+        <Form layout="vertical" autoComplete="off" form={form} className="my-4">
           <Form.Item
             label="Full Name"
             name={"fullName"}
@@ -66,7 +56,7 @@ const UserForm = () => {
               },
             ]}
           >
-            <Input></Input>
+            <Input.Password></Input.Password>
           </Form.Item>
         </Form>
       </Modal>

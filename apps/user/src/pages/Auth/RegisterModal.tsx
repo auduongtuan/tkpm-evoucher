@@ -7,6 +7,7 @@ import { useMutation } from "@tanstack/react-query";
 import { UserCreateBody } from "database/schema/users";
 import { AxiosError } from "axios";
 import { createUser } from "api-client";
+import { phoneRegex } from "helpers";
 const RegisterModal = () => {
   const registerModal = useAppStore((state) => state.registerModal);
   const [form] = Form.useForm();
@@ -85,7 +86,7 @@ const RegisterModal = () => {
           rules={[
             { required: true, message: "Please enter a phone number" },
             {
-              pattern: /([\+84|84|0]+(3|5|7|8|9|1[2|6|8|9]))+([0-9]{8})\b/,
+              pattern: phoneRegex,
               message: "Please enter a valid phone number",
             },
           ]}

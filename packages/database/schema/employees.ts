@@ -5,7 +5,7 @@ export const EmployeeCreateSchema = Type.Object({
   phone: Type.String({ minLength: 1 }),
   fullName: Type.String({ minLength: 1 }),
   password: Type.String({ minLength: 1 }),
-  systemAdmin: Type.Boolean(),
+  systemAdmin: Type.Optional(Type.Boolean()),
   merchantId: Type.Optional(Type.Integer()),
 });
 

@@ -5,7 +5,13 @@ import {
   MerchantCreateSchema,
   MerchantCreateBody,
 } from "database/schema/merchants";
-import { simplifyMerchant } from "database";
+import {
+  CategoriesOnStores,
+  Store,
+  excludePassword,
+  simplifyMerchant,
+  simplifyStores,
+} from "database";
 async function merchantRoutes(
   fastify: FastifyInstance,
   options: FastifyPluginOptions
@@ -40,6 +46,19 @@ async function merchantRoutes(
         where: {
           id: req.params.id,
         },
+      });
+      return merchant;
+    }
+  );
+  // phan quyen employee
+  fastify.get<{ Params: IdParamsType }>(
+    "/:id/full",
+    { schema: { params: IdParamsSchema } },
+    async function (req, reply) {
+      const merchant = await fastify.prisma.merchant.findUnique({
+        where: {
+          id: req.params.id,
+        },
         include: {
           stores: {
             include: {
@@ -55,6 +74,79 @@ async function merchantRoutes(
         },
       });
       return simplifyMerchant(merchant);
+    }
+  );
+  // get categories and stores of merchant
+  fastify.get<{ Params: IdParamsType }>(
+    "/:id/categories",
+    { schema: { params: IdParamsSchema } },
+    async function (req, reply) {
+      const categories = await fastify.prisma.category.findMany({
+        include: {
+          stores: {
+            include: {
+              store: true,
+            },
+            where: {
+              store: { merchantId: req.params.id },
+            },
+          },
+        },
+        orderBy: {
+          id: "asc",
+        },
+        // where: {
+        //   stores: { some: { store: { merchantId: req.params.id } } },
+        // },
+      });
+      return categories.map((category) => {
+        return {
+          ...category,
+          stores: category.stores.map((store) => store.store),
+        };
+      });
+    }
+  );
+  // get categories and stores of merchant
+  fastify.get<{ Params: IdParamsType }>(
+    "/:id/employees",
+    {
+      onRequest: [fastify.auth.verifyEmployee],
+      schema: { params: IdParamsSchema },
+    },
+    async function (req, reply) {
+      fastify.auth.verifyHasMerchantPermission(req, reply, req.params.id);
+      const employees = await fastify.prisma.employee.findMany({
+        where: {
+          merchantId: req.params.id,
+          systemAdmin: false,
+        },
+        orderBy: {
+          createdAt: "asc",
+        },
+      });
+      return excludePassword(employees);
+    }
+  );
+  // get campaigns of merchant
+  fastify.get<{ Params: IdParamsType }>(
+    "/:id/campaigns",
+    {
+      onRequest: [fastify.auth.verifyEmployee],
+      schema: { params: IdParamsSchema },
+    },
+    async function (req, reply) {
+      fastify.auth.verifyHasMerchantPermission(req, reply, req.params.id);
+      const campaigns = await fastify.prisma.campaign.findMany({
+        where: {
+          merchantId: req.params.id,
+        },
+        include: {
+          stores: true,
+          games: true,
+        },
+      });
+      return campaigns;
     }
   );
   fastify.post<{ Body: MerchantCreateBody }>(
@@ -76,10 +168,11 @@ async function merchantRoutes(
   fastify.put<{ Body: MerchantCreateBody; Params: IdParamsType }>(
     "/:id",
     {
-      onRequest: [fastify.auth.verifySystemAdmin],
+      onRequest: [fastify.auth.verifyEmployee],
       schema: { body: MerchantCreateSchema, params: IdParamsSchema },
     },
     async function (req, reply) {
+      fastify.auth.verifyHasMerchantPermission(req, reply, req.params.id);
       return await fastify.prisma.merchant.update({
         where: {
           id: req.params.id,

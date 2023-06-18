@@ -19,6 +19,8 @@ import {
   Colors,
 } from "chart.js";
 import { Doughnut } from "react-chartjs-2";
+import { Campaign } from "database";
+import { formatCurrency, quantityPluralize } from "helpers";
 ChartJS.register(Colors);
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -55,7 +57,7 @@ const Home = () => {
                     </div>
                     <div>
                       {!statistics[recordType].isLoading &&
-                        statistics[recordType].data.length}
+                        statistics[recordType].data?.length}
                     </div>
                   </div>
                 );
@@ -65,15 +67,38 @@ const Home = () => {
               <Typography.Title level={4}>Top-campaign stores</Typography.Title>
               {!statistics["store"].isLoading &&
                 statistics["store"].data
-                  .sort((a, b) => b?.campaigns?.length - a?.campaigns?.length)
+                  ?.sort((a, b) => b?.campaigns?.length - a?.campaigns?.length)
                   .slice(0, 5)
                   .map((store) => {
                     return (
                       <div className="flex mt-3" key={store.id}>
                         <div className="flex-grow w-12">{store.name}</div>
                         <div>
-                          {store.campaigns && store.campaigns.length}{" "}
-                          {pluralize("campaign")}
+                          {store.campaigns &&
+                            quantityPluralize(
+                              store.campaigns?.length,
+                              "campaign"
+                            )}
+                        </div>
+                      </div>
+                    );
+                  })}
+            </section>
+            <section>
+              <Typography.Title level={4}>
+                Top-budget campaigns
+              </Typography.Title>
+              {!statistics["campaign"].isLoading &&
+                statistics["campaign"].data
+                  ?.sort((a, b) => b?.campaigns?.length - a?.campaigns?.length)
+                  .slice(0, 5)
+                  .map((campaign: Campaign) => {
+                    return (
+                      <div className="flex mt-3" key={campaign.id}>
+                        <div className="flex-grow w-12">{campaign.name}</div>
+                        <div>
+                          {campaign.totalBudget &&
+                            formatCurrency(campaign.totalBudget)}
                         </div>
                       </div>
                     );
@@ -83,15 +108,15 @@ const Home = () => {
               <Typography.Title level={4}>Top users</Typography.Title>
               {!statistics["user"].isLoading &&
                 statistics["user"].data
-                  .sort((a, b) => b?.vouchers?.length - a?.vouchers?.length)
+                  ?.sort((a, b) => b?.vouchers?.length - a?.vouchers?.length)
                   .slice(0, 5)
                   .map((user) => {
                     return (
                       <div className="flex mt-3" key={user.id}>
                         <div className="flex-grow w-12">{user.fullName}</div>
                         <div>
-                          {user.vouchers && user.vouchers.length}{" "}
-                          {pluralize("vouchers")}
+                          {user.vouchers &&
+                            quantityPluralize(user.vouchers?.length, "voucher")}
                         </div>
                       </div>
                     );
@@ -124,7 +149,7 @@ const Home = () => {
                     {
                       label: "Quantity of stores",
                       data: statistics["category"].data.map(
-                        (category) => category.stores.length
+                        (category) => category.stores?.length
                       ),
                       // backgroundColor: [
                       //   "rgb(255, 99, 132)",
@@ -162,7 +187,7 @@ const Home = () => {
                     {
                       label: "Quantity of vouchers",
                       data: statistics["campaign"].data.map(
-                        (campaign) => campaign.vouchers.length
+                        (campaign) => campaign.vouchers?.length
                       ),
                       // backgroundColor: [
                       //   "rgb(255, 99, 132)",

@@ -11,7 +11,8 @@ export function simplifyCategories(
 ) {
   return categories.map((category) => category.category);
 }
-export type FullQueriedMerchant =
+
+type FullQueriedMerchant =
   | (Merchant & {
       employees: Employee[];
       stores: (Store & {
@@ -28,9 +29,7 @@ export function simplifyMerchant(merchant: FullQueriedMerchant) {
         ...merchant,
         stores: merchant.stores.map((store) => ({
           ...store,
-          categories: store.categories
-            ? store.categories.map((category) => category.category)
-            : [],
+          categories: simplifyCategories(store.categories),
         })),
       }
     : null;

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { DatePicker, Form, Input, Modal, Select } from "antd";
 import dayjs, { Dayjs } from "dayjs";
 
@@ -6,13 +5,14 @@ import {
   createCampaign,
   getCampaign,
   updateCampaign,
-  getMerchant,
+  getFullMerchant,
   getGames,
 } from "api-client";
 import useRouteModal from "ui/hooks/useRouteModal";
 import useCrud from "ui/hooks/useCrud";
 import { MerchantSelect } from "ui/admin-components/RecordSelect";
 import { useQuery } from "@tanstack/react-query";
+import { useWatch } from "antd/es/form/Form";
 const CampaignForm = () => {
   const { modalProps, closeModal } = useRouteModal("/campaigns");
   const [form] = Form.useForm();
@@ -29,7 +29,6 @@ const CampaignForm = () => {
             ? [dayjs(data.startedAt), dayjs(data.endedAt)]
             : [dayjs(), null],
       });
-      setMerchantId(data.merchantId);
     },
     updateFn: updateCampaign,
     createFn: createCampaign,
@@ -52,19 +51,16 @@ const CampaignForm = () => {
     },
     form: form,
   });
-  const [merchantId, setMerchantId] = useState<number>();
+  const merchantId = useWatch("merchantId", form);
   const merchantQuery = useQuery({
     queryKey: ["merchant", merchantId],
-    queryFn: async () => await getMerchant(merchantId as number),
+    queryFn: async () => await getFullMerchant(merchantId as number),
     enabled: !!merchantId,
   });
   const gameListQuery = useQuery({
     queryKey: ["game", "list"],
     queryFn: getGames,
   });
-  const onValuesChange = ({ merchantId }) => {
-    if (merchantId) setMerchantId(merchantId);
-  };
   const rangeConfig = {
     rules: [
       {
@@ -82,7 +78,6 @@ const CampaignForm = () => {
           layout="vertical"
           autoComplete="off"
           form={form}
-          onValuesChange={onValuesChange}
           initialValues={{
             startedAt: "",
             endedAt: "",

@@ -1,15 +1,37 @@
 import { Form, Input, Modal, Select, Row, Col, Typography } from "antd";
-import { createStore, getCategories, getStore, updateStore } from "api-client";
+import {
+  createStore,
+  getCategories,
+  getFullMerchant,
+  getStore,
+  updateStore,
+} from "api-client";
 import useRouteModal from "ui/hooks/useRouteModal";
 import { useQuery } from "@tanstack/react-query";
 import useCrud from "ui/hooks/useCrud";
 import { MerchantSelect } from "ui/admin-components/RecordSelect";
 import useGoogleMapAutocomplete from "ui/hooks/useGoogleMapAutocomplete";
 const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string;
-
+import useAdminStore from "ui/hooks/useAdminStore";
+import useRecord from "ui/hooks/useRecord";
 const StoreForm = () => {
   const { modalProps, closeModal } = useRouteModal("/stores");
   const [form] = Form.useForm();
+  const employee = useAdminStore((state) => state.employee);
+  const merchantId =
+    employee && employee.merchantId ? employee.merchantId : undefined;
+  if (!merchantId) return null;
+  const merchant = useRecord({
+    name: "merchant",
+    getFn: getFullMerchant,
+    recordId: merchantId,
+    onGetSuccess: (data) => {
+      form.setFieldValue("merchantId", data.id);
+      if (!form.getFieldValue("name")) {
+        form.setFieldValue("name", data.name);
+      }
+    },
+  });
   const { formModalProps } = useCrud({
     name: "store",
     form: form,
@@ -24,6 +46,7 @@ const StoreForm = () => {
     createFn: createStore,
     closeModal: closeModal,
   });
+
   const categoryListQuery = useQuery({
     queryKey: ["category_list"],
     queryFn: getCategories,
@@ -55,16 +78,8 @@ const StoreForm = () => {
     <>
       <Modal {...modalProps} {...formModalProps}>
         <Form layout="vertical" autoComplete="off" form={form} className="my-4">
-          <Form.Item
-            label="Merchant"
-            name={"merchantId"}
-            rules={[{ required: true, message: "Please select a merchant!" }]}
-          >
-            <MerchantSelect
-              onSelect={(value, { label }) => {
-                form.setFieldValue("name", label + " ");
-              }}
-            />
+          <Form.Item name="merchantId" hidden>
+            <Input type="hidden" />
           </Form.Item>
           <Form.Item
             label="Category"

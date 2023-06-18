@@ -1,14 +1,24 @@
-import { deleteCategory, getCategory, getCategories } from "api-client";
+import {
+  deleteCategory,
+  getCategory,
+  getCategories,
+  getMerchantCategories,
+} from "api-client";
 import RecordList from "ui/admin-components/RecordList";
 import { Category, Store } from "database";
 import { Outlet } from "react-router-dom";
+import useAdminStore from "ui/hooks/useAdminStore";
 const Categories = () => {
+  const employee = useAdminStore((state) => state.employee);
+  const merchantId = employee?.merchantId;
+  if (!merchantId) return null;
   return (
     <>
       <RecordList<Category>
         name="category"
-        getFn={getCategories}
+        getFn={async () => await getMerchantCategories(merchantId)}
         deleteFn={deleteCategory}
+        viewOnly
         columns={[
           {
             title: "Name",

@@ -20,15 +20,19 @@ export default function useCrud<
   closeModal,
   onGetSuccess,
   onCreateSuccess,
+  onCreateError,
   onUpdateSuccess,
   valuesFilter,
   form,
+  recordId,
 }: {
   name: string;
   form: FormInstance;
+  recordId?: number;
   getFn: (id: number) => Promise<GetReturnType>;
   onGetSuccess?: (data: GetReturnType) => Promise<unknown> | unknown;
   onCreateSuccess?: (data: CreateReturnType) => Promise<unknown> | unknown;
+  onCreateError?: (error: unknown) => Promise<unknown> | unknown;
   onUpdateSuccess?: (data: UpdateReturnType) => Promise<unknown> | unknown;
   createFn: (body: RecordCreateBody) => Promise<CreateReturnType>;
   updateFn: (id: number, body: RecordUpdateBody) => Promise<UpdateReturnType>;
@@ -37,7 +41,7 @@ export default function useCrud<
 }) {
   const queryClient = useQueryClient();
   const params = useParams();
-  const id = params?.id ? parseInt(params?.id) : undefined;
+  const id = recordId || (params?.id ? parseInt(params?.id) : undefined);
   const listQueryKey = [name, "list"];
   const refetchList = async () => {
     await queryClient.refetchQueries({
@@ -78,6 +82,7 @@ export default function useCrud<
       if (onCreateSuccess) onCreateSuccess(data);
       if (closeModal) closeModal();
     },
+    onError: onCreateError,
   });
   const onFormOk = () => {
     form

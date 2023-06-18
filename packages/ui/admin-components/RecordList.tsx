@@ -9,11 +9,13 @@ function RecordList<T extends { id: number; [key: string]: any }>({
   deleteFn,
   name,
   columns,
+  viewOnly = false,
 }: {
   getFn: () => Promise<Array<(T & { [key: string]: any }) | T>>;
-  deleteFn: (id: number) => Promise<any>;
+  deleteFn?: (id: number) => Promise<any>;
   name: string;
   columns: object[];
+  viewOnly?: boolean;
 }) {
   const queryKey = [name, "list"];
   const query = useQuery({
@@ -29,24 +31,30 @@ function RecordList<T extends { id: number; [key: string]: any }>({
       width: "60px",
     },
     ...columns,
-    {
-      title: "Actions",
-      align: "center" as const,
-      width: "15%",
-      render: (record: T) => (
-        <Space size="middle">
-          <Link to={`/${pluralName}/edit/${record.id}`}>
-            <Button type="link">Edit</Button>
-          </Link>
-          <DeleteRecordButton
-            mutationFn={deleteFn}
-            id={record.id}
-            name={record.name}
-            queryKey={queryKey}
-          />
-        </Space>
-      ),
-    },
+    ...(viewOnly
+      ? []
+      : [
+          {
+            title: "Actions",
+            align: "center" as const,
+            width: "15%",
+            render: (record: T) => (
+              <Space size="middle">
+                <Link to={`/${pluralName}/edit/${record.id}`}>
+                  <Button type="link">Edit</Button>
+                </Link>
+                {deleteFn ? (
+                  <DeleteRecordButton
+                    mutationFn={deleteFn}
+                    id={record.id}
+                    name={record.name}
+                    queryKey={queryKey}
+                  />
+                ) : null}
+              </Space>
+            ),
+          },
+        ]),
   ];
   return (
     <>
@@ -54,9 +62,11 @@ function RecordList<T extends { id: number; [key: string]: any }>({
         <Typography.Title level={2} className="flex-grow mb-0">
           {capitalize(pluralName)}
         </Typography.Title>
-        <Link to={`/${pluralName}/new`}>
-          <Button>Add new</Button>
-        </Link>
+        {!viewOnly && (
+          <Link to={`/${pluralName}/new`}>
+            <Button type="primary">Add new</Button>
+          </Link>
+        )}
       </div>
       {!query.isLoading && (
         <Table

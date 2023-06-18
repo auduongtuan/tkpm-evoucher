@@ -1,39 +1,49 @@
-import { useState } from "react";
-import { Form, Input, Modal, Checkbox } from "antd";
+import { useEffect, useState } from "react";
+import { Form, Input, Modal, Checkbox, message } from "antd";
 import { createEmployee, getEmployee, updateEmployee } from "api-client";
 import useRouteModal from "ui/hooks/useRouteModal";
 import useCrud from "ui/hooks/useCrud";
 import { MerchantSelect } from "ui/admin-components/RecordSelect";
+import useAdminStore from "ui/hooks/useAdminStore";
+import { phoneRegex } from "helpers";
+import { AxiosError } from "axios";
 
 const EmployeeForm = () => {
   const { modalProps, closeModal } = useRouteModal("/employees");
   const [form] = Form.useForm();
-  const [systemAdmin, setSystemAdmin] = useState(false);
+  const merchantId = useAdminStore((state) => state.employee?.merchantId);
+  useEffect(() => {
+    if (merchantId) {
+      form.setFieldsValue({ merchantId });
+    }
+  }, [merchantId]);
   const { id, formModalProps } = useCrud({
     name: "employee",
     getFn: getEmployee,
     onGetSuccess: (data) => {
       form.setFieldsValue({ ...data });
-      setSystemAdmin(data.systemAdmin);
     },
     updateFn: updateEmployee,
     createFn: createEmployee,
+    onCreateError: (error) => {
+      if (error instanceof AxiosError) {
+        const errorData = error.response?.data;
+        if (errorData && errorData.code == "P2002") {
+          message.error("Email or phone already exists!");
+        }
+      }
+    },
     closeModal: closeModal,
     form: form,
   });
-  const onValuesChange = ({ systemAdmin }) => {
-    if (systemAdmin !== undefined) setSystemAdmin(systemAdmin);
-  };
+
   return (
     <>
       <Modal {...modalProps} {...formModalProps}>
-        <Form
-          layout="vertical"
-          autoComplete="off"
-          form={form}
-          onValuesChange={onValuesChange}
-          className="my-4"
-        >
+        <Form layout="vertical" autoComplete="off" form={form} className="my-4">
+          <Form.Item label="Merchant" name={"merchantId"} hidden>
+            <Input></Input>
+          </Form.Item>
           <Form.Item
             label="Full Name"
             name={"fullName"}
@@ -48,6 +58,7 @@ const EmployeeForm = () => {
             name={"phone"}
             rules={[
               { required: true, message: "Please input employee phone!" },
+              { pattern: phoneRegex, message: "Please input valid phone!" },
             ]}
           >
             <Input></Input>
@@ -57,27 +68,12 @@ const EmployeeForm = () => {
             name={"email"}
             rules={[
               { required: true, message: "Please input employee email!" },
+              { type: "email", message: "Please input valid email!" },
             ]}
           >
             <Input></Input>
           </Form.Item>
 
-          <Form.Item name={"systemAdmin"} valuePropName="checked">
-            <Checkbox>
-              This employee is adminstrator for the whole system.
-            </Checkbox>
-          </Form.Item>
-          {!systemAdmin && (
-            <Form.Item
-              label="Merchant"
-              name={"merchantId"}
-              rules={[
-                { required: true, message: "Please select employee merchant!" },
-              ]}
-            >
-              <MerchantSelect />
-            </Form.Item>
-          )}
           <Form.Item
             label={id ? "Change current password" : "Password"}
             name={"password"}
@@ -88,7 +84,7 @@ const EmployeeForm = () => {
               },
             ]}
           >
-            <Input></Input>
+            <Input.Password></Input.Password>
           </Form.Item>
         </Form>
       </Modal>

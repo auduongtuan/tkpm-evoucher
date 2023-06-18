@@ -9,6 +9,7 @@ const Games = () => {
         name="game"
         getFn={getGames}
         deleteFn={deleteGame}
+        viewOnly
         columns={[
           {
             title: "Name",

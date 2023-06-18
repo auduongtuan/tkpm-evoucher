@@ -1,5 +1,10 @@
 import { VouchersParamsType } from "./../../../packages/database/schema/vouchers";
-import { FastifyPluginOptions, FastifyInstance, FastifyRequest } from "fastify";
+import {
+  FastifyPluginOptions,
+  FastifyInstance,
+  FastifyRequest,
+  FastifyReply,
+} from "fastify";
 import { IdParamsSchema, IdParamsType } from "database/schema/id";
 import {
   VoucherCreateSchema,
@@ -42,7 +47,10 @@ async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
   );
   fastify.get<{ Params: IdParamsType }>(
     "/:id",
-    { schema: { params: IdParamsSchema } },
+    {
+      onRequest: [fastify.auth.verifyEmployee],
+      schema: { params: IdParamsSchema },
+    },
     async function (req, reply) {
       const voucher = await fastify.prisma.voucher.findUnique({
         where: {
@@ -53,13 +61,37 @@ async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
           campaign: true,
         },
       });
+      if (!voucher) {
+        reply.statusCode = 404;
+        throw new Error("Voucher not found");
+      }
+      fastify.auth.verifyHasMerchantPermission(
+        req,
+        reply,
+        voucher.campaign.merchantId
+      );
       return voucher ? computeVoucherStatus(voucher) : null;
     }
   );
   fastify.post<{ Body: VoucherCreateBody }>(
     "/",
-    { schema: { body: VoucherCreateSchema } },
+    {
+      onRequest: [fastify.auth.verifyEmployee],
+      schema: { body: VoucherCreateSchema },
+    },
     async function (req, reply) {
+      const { campaignId } = req.body;
+      const campaign = await fastify.prisma.campaign.findUnique({
+        where: {
+          id: campaignId,
+        },
+      });
+      if (!campaign) {
+        reply.statusCode = 404;
+        throw new Error("Campaign not found");
+      }
+      console.log("CAMPAIGN ID", campaign.merchantId, req.employee?.merchantId);
+      fastify.auth.verifyHasMerchantPermission(req, reply, campaign.merchantId);
       return fastify.prisma.voucher.create({
         data: {
           ...req.body,
@@ -67,10 +99,37 @@ async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
       });
     }
   );
+  async function verifyPermissionOnVoucher(
+    req: FastifyRequest,
+    reply: FastifyReply,
+    voucherId: number
+  ) {
+    const voucher = await fastify.prisma.voucher.findUnique({
+      include: {
+        campaign: true,
+      },
+      where: {
+        id: voucherId,
+      },
+    });
+    if (!voucher) {
+      reply.statusCode = 404;
+      throw new Error("Voucher not found");
+    }
+    fastify.auth.verifyHasMerchantPermission(
+      req,
+      reply,
+      voucher.campaign.merchantId
+    );
+  }
   fastify.put<{ Body: VoucherUpdateBody; Params: IdParamsType }>(
     "/:id",
-    { schema: { body: VoucherUpdateSchema, params: IdParamsSchema } },
+    {
+      onRequest: [fastify.auth.verifyEmployee],
+      schema: { body: VoucherUpdateSchema, params: IdParamsSchema },
+    },
     async function (req, reply) {
+      await verifyPermissionOnVoucher(req, reply, req.params.id);
       return await fastify.prisma.voucher.update({
         where: {
           id: req.params.id,
@@ -83,8 +142,12 @@ async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
   );
   fastify.delete<{ Params: IdParamsType }>(
     "/:id",
-    { schema: { params: IdParamsSchema } },
+    {
+      onRequest: [fastify.auth.verifySystemAdmin],
+      schema: { params: IdParamsSchema },
+    },
     async function (req, reply) {
+      await verifyPermissionOnVoucher(req, reply, req.params.id);
       await fastify.prisma.voucher.delete({
         where: {
           id: req.params.id,

@@ -7,6 +7,7 @@ import {
   Category,
   Voucher,
   User,
+  Employee,
 } from "@prisma/client";
 import type { Extended } from "helpers";
 export type CampaignStatus = "upcoming" | "ongoing" | "expired";
@@ -35,10 +36,24 @@ export type CamapignWithMerchantAndStores = Campaign & {
   stores: Store[];
 };
 
+export type VoucherWithCampaignAndUser = VoucherWithStatus & {
+  campaign: Campaign[];
+  user: User;
+};
+
 export type DetailVoucher = VoucherWithStatus & {
   campaign: CamapignWithMerchantAndStores;
 };
 
 export type UserWithDetailVouchers = ExcludePassword<User> & {
   vouchers: DetailVoucher[];
+};
+
+// Merchant
+export type CategoryWithStores = Category & { stores: Store[] };
+
+export type FullMerchant = Merchant & {
+  stores: StoreWithCategories[];
+  employees: Employee[];
+  campaigns: Campaign[];
 };

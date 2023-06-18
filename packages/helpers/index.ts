@@ -1,3 +1,5 @@
+import pluralize from "pluralize-esm";
+
 // This function converts the string to lowercase, then perform the conversion
 export * from "./types";
 export function toLowerCaseNonAccentVietnamese(str: string) {
@@ -94,3 +96,17 @@ export function distance(
     return Math.round(dist * 10) / 10;
   }
 }
+
+export function formatCurrency(number: number, locale: string = "vi-VN") {
+  const formatter = new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: "VND",
+  });
+  return formatter.format(number);
+}
+
+export function quantityPluralize(quantity: number, word: string) {
+  return `${quantity} ${pluralize(word, quantity)}`;
+}
+
+export const phoneRegex = /([\+84|84|0]+(3|5|7|8|9|1[2|6|8|9]))+([0-9]{8})\b/;

@@ -5,6 +5,7 @@ import { Employee } from "database";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { AxiosError, AxiosResponse } from "axios";
+import useAdminStore from "./useAdminStore";
 const TOKEN_NAME = "EMPLOYEE_TOKEN";
 interface EmployeeAuthOptions {
   onLoginError?: (data: { message: string }) => void;
@@ -14,8 +15,14 @@ function useEmployeeAuth(
   options: EmployeeAuthOptions = {}
 ) {
   const { onLoginError } = options;
-  const [authenticated, setAuthenticated] = useState<boolean | null>(null);
-  const [employee, setEmployee] = useState<Employee | null>(null);
+  const {
+    employee,
+    setEmployee,
+    authenticated,
+    setAuthenticated,
+    logout,
+    setLogout,
+  } = useAdminStore();
   const navigate = useNavigate();
   const authenticationQuery = useQuery({
     queryKey: ["authentication"],
@@ -39,6 +46,11 @@ function useEmployeeAuth(
           setAuthenticated(true);
         }
         setEmployee(data);
+        setLogout(() => {
+          localStorage.removeItem(TOKEN_NAME);
+          authenticationQuery.refetch();
+          navigate("/login");
+        });
       } else {
         setAuthenticated(false);
       }
@@ -67,11 +79,7 @@ function useEmployeeAuth(
     refetch: authenticationQuery.refetch,
     loginMutation,
     login: loginMutation.mutate,
-    logout: () => {
-      localStorage.removeItem(TOKEN_NAME);
-      authenticationQuery.refetch();
-      navigate("/login");
-    },
+    logout,
   };
 }
 export default useEmployeeAuth;

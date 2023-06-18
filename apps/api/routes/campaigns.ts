@@ -205,9 +205,14 @@ async function campaignRoutes(
         reply.status(404);
         throw new Error("Campaign not found");
       }
-      if (isCampaignExpired(campaign)) {
+      const campaignWithStatus = computeCampaignStatus(campaign);
+      if (campaignWithStatus.status === "expired") {
         reply.status(403);
         throw new Error("Campaign ended");
+      }
+      if (campaignWithStatus.status === "upcoming") {
+        reply.status(403);
+        throw new Error("Campaign not started");
       }
       const game = await fastify.prisma.game.findUnique({
         where: {

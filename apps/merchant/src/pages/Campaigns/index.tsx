@@ -1,23 +1,20 @@
 import RecordList from "ui/admin-components/RecordList";
-import { getCampaigns, deleteCampaign } from "api-client";
-import { Campaign, Merchant } from "database";
+import { deleteCampaign, getMerchantCampaigns } from "api-client";
+import { Campaign } from "database";
 import { Outlet } from "react-router-dom";
 import { Store } from "antd/es/form/interface";
-import useEmployeeAuth from "ui/hooks/useEmployeeAuth";
+import useAdminStore from "ui/hooks/useAdminStore";
 
 const Campaigns = () => {
-  const { employee } = useEmployeeAuth(false);
+  const merchantId = useAdminStore(
+    (state) => state.employee?.merchantId
+  ) as number;
   return (
     <>
       <Outlet />
       <RecordList<Campaign>
         name="campaign"
-        getFn={async () =>
-          getCampaigns({
-            merchantId:
-              employee && employee.merchantId ? employee.merchantId : undefined,
-          })
-        }
+        getFn={async () => getMerchantCampaigns(merchantId)}
         deleteFn={deleteCampaign}
         columns={[
           {
@@ -25,12 +22,7 @@ const Campaigns = () => {
             dataIndex: "name",
             key: "name",
           },
-          {
-            title: "Merchant",
-            key: "merchant",
-            dataIndex: "merchant",
-            render: (merchant: Merchant) => merchant.name,
-          },
+
           {
             title: "Number of stores applied",
             dataIndex: "stores",

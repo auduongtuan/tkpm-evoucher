@@ -7,15 +7,17 @@ export type MutationFunction<GetReturnType = unknown, TVariables = unknown> = (
 export default function useRecord<GetReturnType = unknown>({
   name,
   getFn,
+  recordId,
   onGetSuccess,
 }: {
   name: string;
+  recordId?: number;
   getFn: (id: number) => Promise<GetReturnType>;
   onGetSuccess?: (data: GetReturnType) => Promise<unknown> | unknown;
 }) {
   // const queryClient = useQueryClient();
   const params = useParams();
-  const id = params?.id ? parseInt(params?.id) : undefined;
+  const id = recordId || (params?.id ? parseInt(params?.id) : undefined);
   // const listQueryKey = [name, "list"];
   // const refetchList = async () => {
   //   await queryClient.refetchQueries({
@@ -23,15 +25,13 @@ export default function useRecord<GetReturnType = unknown>({
   //     type: "active",
   //   });
   // };
-  const recordQuery = id
-    ? useQuery({
-        queryKey: [`${name}_record`, id],
-        queryFn: async () => getFn(id),
-        onSuccess: (data) => {
-          if (onGetSuccess) onGetSuccess(data);
-        },
-      })
-    : undefined;
+  const recordQuery = useQuery({
+    queryKey: [`${name}_record`, id],
+    queryFn: async () => getFn(id),
+    onSuccess: (data) => {
+      if (onGetSuccess) onGetSuccess(data);
+    },
+  });
 
   return {
     id,
