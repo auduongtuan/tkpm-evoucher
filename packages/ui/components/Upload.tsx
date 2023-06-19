@@ -18,7 +18,10 @@ const Upload = ({
   const uploadProps: UploadProps = {
     name: "file",
     multiple: false,
-    action: "http://localhost:8080/upload",
+    action: "http://localhost:8180/upload",
+    headers: {
+      Authentication: "Bearer " + localStorage.getItem("EMPLOYEE_TOKEN"),
+    },
     onChange(info) {
       const { status } = info.file;
       if (status !== "uploading") {

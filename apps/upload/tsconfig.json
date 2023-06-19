@@ -1,0 +1,10 @@
+{
+  "extends": "tsconfig/base.json",
+  "include": ["**/*.ts", "**/*.d.ts"],
+  "exclude": ["dist", "build", "node_modules"],
+  "ts-node": { "files": true },
+  "compilerOptions": {
+    "module": "NodeNext",
+    "target": "es2018"
+  }
+}
