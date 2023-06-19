@@ -3,8 +3,12 @@ import { twMerge } from "tailwind-merge";
 const SystemLogo = ({
   className,
   subName,
+  subClassName,
   ...rest
-}: React.ComponentPropsWithoutRef<"div"> & { subName?: React.ReactNode }) => {
+}: React.ComponentPropsWithoutRef<"div"> & {
+  subName?: React.ReactNode;
+  subClassName?: string;
+}) => {
   return (
     <div
       className={twMerge(
@@ -15,7 +19,11 @@ const SystemLogo = ({
     >
       <span>eVoucher</span>
       {subName && (
-        <span className="text-sm font-medium text-blue-300">{subName}</span>
+        <span
+          className={twMerge("text-sm font-medium text-blue-300", subClassName)}
+        >
+          {subName}
+        </span>
       )}
     </div>
   );

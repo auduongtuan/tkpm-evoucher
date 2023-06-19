@@ -33,11 +33,12 @@ const LoginPage = ({ systemAdmin }: { systemAdmin: boolean }) => {
   return (
     <div className="bg-gray-900 flex flex-col justify-center items-center justify-center p-4 min-h-[100vh]">
       <SystemLogo
-        className="flex-col gap-1"
+        className="flex-col gap-1 text-4xl"
+        subClassName="text-2xl font-bold"
         subName={systemAdmin ? "Admin" : "Merchant"}
       />
       <div className="max-w-md p-8 bg-white border-gray-100 rounded-md shadow-md">
-        <h1 className="text-xl font-semibold">Login</h1>
+        <h1 className="text-sm font-medium text-gray-400 uppercase">Login</h1>
         {errorMessage && (
           <Alert type="error" message={errorMessage} className="mb-4"></Alert>
         )}

@@ -47,6 +47,7 @@ const GeneratedVoucherInfo = ({
         className="w-full mt-4"
         onClick={() => {
           gameState.setVoucherInfo(null);
+          gameState.resetGame();
           gameState.closeModal();
         }}
       >

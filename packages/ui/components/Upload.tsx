@@ -20,7 +20,7 @@ const Upload = ({
     multiple: false,
     action: "http://localhost:8180/upload",
     headers: {
-      Authentication: "Bearer " + localStorage.getItem("EMPLOYEE_TOKEN"),
+      Authorization: "Bearer " + localStorage.getItem("EMPLOYEE_TOKEN"),
     },
     onChange(info) {
       const { status } = info.file;
