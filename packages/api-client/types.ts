@@ -1,2 +1,1 @@
-import { Store, Category } from "database";
-export type StoreWithCategories = Store & { categories: Category[] };
+import { Store, Category, Campaign, Merchant } from "database";

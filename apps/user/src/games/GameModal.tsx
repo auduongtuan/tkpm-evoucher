@@ -1,55 +1,64 @@
 import { Modal } from "antd";
-import Game from "./FlappyBird/Game";
-import useGameStore from "./useGameStore";
-import { Button } from "antd";
-import { useEffect } from "react";
+import FlappyBirdGame from "./FlappyBird/FlappyBirdGame";
+import useGameStore from "../stores/useGameStore";
+import { useReducer } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getGames } from "api-client";
+import { Game } from "database";
+import GamePanel from "./GamePanel";
+import SnakeGame from "./Snake/SnakeGame3";
+
+import GeneratedVoucherInfo from "./GeneratedVoucherInfo";
+const GameComponents = {
+  FLAPPY_BIRD: FlappyBirdGame,
+  SNAKE: SnakeGame,
+};
 const GameModal = () => {
   const gameState = useGameStore();
-  useEffect(() => {
-    gameState.setGameName("FLAPPY_BIRD");
-  }, []);
+  const [lastUpdate, refresh] = useReducer(() => Date.now(), Date.now());
+  const gameQuery = useQuery({
+    queryKey: ["game", "list"],
+    queryFn: async () => {
+      return await getGames();
+    },
+    onSuccess: (data: Game[]) => {
+      gameState.setGames(data);
+    },
+  });
+  const currentGame = gameState.games
+    ? gameState.games.find((game) => game.slug === gameState.gameSlug)
+    : undefined;
+  const { campaign, voucherInfo } = gameState;
+  const GameComponent =
+    currentGame?.slug && currentGame?.slug in GameComponents
+      ? GameComponents[currentGame?.slug]
+      : null;
   return (
     <Modal
-      title={"Flappy Bird"}
+      title={voucherInfo ? "Congratulations!" : currentGame?.name}
       open={gameState.modalOpen}
-      onCancel={gameState.closeModal}
+      onCancel={() => {
+        gameState.closeModal();
+        gameState.resetGame();
+        gameState.setVoucherInfo(null);
+      }}
       footer={null}
     >
-      <div className="relative">
-        {!gameState.gameStarted && (
-          <div className="absolute top-0 flex flex-col items-center justify-center w-full h-full bg-gray-950/30">
-            <div className="flex flex-col items-center p-6 text-white rounded-lg w-80">
-              <div className="text-2xl font-bold">Flappy Bird</div>
-              <div className="text-xl">
-                Best Score:{" "}
-                {gameState.gameName && gameState.bestScores[gameState.gameName]}
-              </div>
-              <div className="flex gap-2 mt-4">
-                <Button onClick={() => gameState.setGameStarted(true)}>
-                  Start
-                </Button>
-              </div>
+      {voucherInfo && campaign && (
+        <GeneratedVoucherInfo voucherInfo={voucherInfo} campaign={campaign} />
+      )}
+      {!voucherInfo && (
+        <>
+          {GameComponent ? (
+            <div className="relative overflow-hidden rounded-md">
+              <GamePanel />
+              <GameComponent key={lastUpdate} />
             </div>
-          </div>
-        )}
-        {gameState.gameOver && (
-          <div className="absolute top-0 flex flex-col items-center justify-center w-full h-full bg-gray-950/30">
-            <div className="flex flex-col items-center p-6 bg-white rounded-lg shadow-xl w-80">
-              <div className="mb-2 text-2xl font-bold">Game Over</div>
-              <div className="text-md">Score:{gameState.score}</div>
-              <div className="text-md">
-                Best Score:{" "}
-                {gameState.gameName && gameState.bestScores[gameState.gameName]}
-              </div>
-              <div className="flex gap-2 mt-4">
-                <Button onClick={() => gameState.resetGame()}>Retry</Button>
-                <Button type="primary">Exchange voucher</Button>
-              </div>
-            </div>
-          </div>
-        )}
-        <Game />
-      </div>
+          ) : (
+            "Game not available yet"
+          )}
+        </>
+      )}
     </Modal>
   );
 };

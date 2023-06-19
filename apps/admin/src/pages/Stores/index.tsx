@@ -1,7 +1,7 @@
-import { deleteStore, getStores } from "../../api-client";
+import { deleteStore, getStores } from "api-client";
 import { Merchant, Store, Category } from "database";
 import { Outlet } from "react-router-dom";
-import RecordList from "@/components/RecordList";
+import RecordList from "ui/admin-components/RecordList";
 const Stores = () => {
   return (
     <>
@@ -28,7 +28,6 @@ const Stores = () => {
             width: "15%",
 
             render: (categories: Category[]) => {
-              console.log(categories);
               return categories.map((category) => category.name).join(", ");
             },
           },

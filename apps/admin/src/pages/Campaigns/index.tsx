@@ -1,4 +1,4 @@
-import RecordList from "@/components/RecordList";
+import RecordList from "ui/admin-components/RecordList";
 import { getCampaigns, deleteCampaign } from "api-client";
 import { Campaign, Merchant } from "database";
 import { Outlet } from "react-router-dom";

@@ -1,7 +1,8 @@
 import { deleteVoucher, getVouchers } from "api-client";
-import RecordList from "@/components/RecordList";
-import { Voucher, User, Campaign } from "database";
+import RecordList from "ui/admin-components/RecordList";
+import { Voucher, User, Campaign, VoucherWithStatus } from "database";
 import { Outlet } from "react-router-dom";
+import { VoucherStatus } from "ui";
 const Vouchers = () => {
   return (
     <>
@@ -23,6 +24,21 @@ const Vouchers = () => {
             title: "Campaign",
             dataIndex: "campaign",
             render: (campaign: Campaign) => campaign.name,
+          },
+          {
+            title: "Discount Type",
+            dataIndex: "discountType",
+          },
+          {
+            title: "Discount Value",
+            dataIndex: "discountValue",
+          },
+          {
+            title: "Status",
+            dataIndex: "status",
+            render: (status: string, voucher: VoucherWithStatus) => (
+              <VoucherStatus voucher={voucher} />
+            ),
           },
           // {
           //   title: "Phone",

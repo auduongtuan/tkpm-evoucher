@@ -1,7 +1,17 @@
-import { MerchantCreateBody, MerchantUpdateBody } from "api/schema/merchants";
-import { Merchant, Store, Employee, Campaign } from "database";
+import {
+  MerchantCreateBody,
+  MerchantUpdateBody,
+} from "database/schema/merchants";
+import {
+  Merchant,
+  Store,
+  Employee,
+  Campaign,
+  StoreWithCategories,
+  CategoryWithStores,
+  FullMerchant,
+} from "database";
 import { createInstance } from "./base";
-import { StoreWithCategories } from "./types";
 const instance = createInstance("merchants");
 export async function getMerchants(): Promise<
   Array<Merchant & { stores: StoreWithCategories[]; employees: Employee[] }>
@@ -10,17 +20,36 @@ export async function getMerchants(): Promise<
 
   return res.data;
 }
-
-export async function getMerchant(
+export async function getMerchantCategories(
   id: string | number
-): Promise<
-  Merchant & {
-    stores: StoreWithCategories[];
-    employees: Employee[];
-    campaigns: Campaign[];
-  }
-> {
+): Promise<CategoryWithStores[]> {
+  const res = await instance.get(`/${id}/categories`);
+  return res.data;
+}
+
+export async function getMerchantEmployees(
+  id: string | number
+): Promise<Employee[]> {
+  const res = await instance.get(`/${id}/employees`);
+  return res.data;
+}
+
+export async function getMerchantCampaigns(
+  id: string | number
+): Promise<Campaign[]> {
+  const res = await instance.get(`/${id}/campaigns`);
+  return res.data;
+}
+
+export async function getMerchant(id: string | number): Promise<Merchant> {
   const res = await instance.get(`/${id}`);
+  return res.data;
+}
+
+export async function getFullMerchant(
+  id: string | number
+): Promise<FullMerchant> {
+  const res = await instance.get(`/${id}/full`);
   return res.data;
 }
 

@@ -1,6 +1,6 @@
 import { FastifyPluginOptions, FastifyInstance, FastifyRequest } from "fastify";
-import { IdParamsSchema, IdParamsType } from "../schema/id";
-import { GameCreateSchema, GameCreateBody } from "../schema/games";
+import { IdParamsSchema, IdParamsType } from "database/schema/id";
+import { GameCreateSchema, GameCreateBody } from "database/schema/games";
 async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
   fastify.get("/", async function (req, reply) {
     return fastify.prisma.game.findMany({

@@ -18,33 +18,28 @@ export default fp(async (fastify, opts) => {
     req: FastifyRequest,
     reply: FastifyReply
   ) => {
-    try {
-      const auth = req.headers.authorization;
-      const token = auth ? auth.split(" ")[1] : undefined;
-      if (!token) return;
-      try {
-        const payload = verifySync(token) as EmployeePayload;
-        if (!payload) {
-          reply.statusCode = 401;
-          throw new Error("Employee not found");
-        }
-        const employee = await fastify.prisma.employee.findUnique({
-          where: {
-            id: payload.employeeId,
-          },
-        });
-        if (!employee) {
-          reply.statusCode = 401;
-          throw new Error("Employee not found");
-        }
-        req.employee = employee;
-      } catch (error) {
-        reply.statusCode = 401;
-        throw new Error("Token invalid");
-      }
-    } catch (error) {
-      throw error;
+    const auth = req.headers.authorization;
+    const token = auth ? auth.split(" ")[1] : undefined;
+    if (!token) {
+      reply.statusCode = 401;
+      throw new Error("Not logged in");
     }
+
+    const payload = verifySync(token) as EmployeePayload;
+    if (!payload) {
+      reply.statusCode = 401;
+      throw new Error("Token invalid");
+    }
+    const employee = await fastify.prisma.employee.findUnique({
+      where: {
+        id: payload.employeeId,
+      },
+    });
+    if (!employee) {
+      reply.statusCode = 401;
+      throw new Error("Employee not found");
+    }
+    req.employee = employee;
   };
   const verifyEmployee = async (
     req: FastifyRequest,
@@ -52,7 +47,7 @@ export default fp(async (fastify, opts) => {
     done: HookHandlerDoneFunction
   ) => {
     await verifyEmployeeBase(req, reply);
-    done();
+    // done();
   };
 
   const verifySystemAdmin = async (
@@ -65,48 +60,96 @@ export default fp(async (fastify, opts) => {
       reply.statusCode = 401;
       throw new Error("Employee not found or not an admin");
     }
+    // done();
+  };
+  const verifyEmployeeOrUser = async (
+    req: FastifyRequest,
+    reply: FastifyReply,
+    done: HookHandlerDoneFunction
+  ) => {
+    const auth = req.headers.authorization;
+    const token = auth ? auth.split(" ")[1] : undefined;
+    if (!token) {
+      reply.statusCode = 401;
+      throw new Error("Not logged in");
+    }
+    const payload = verifySync(token) as UserPayload | EmployeePayload;
+    if (!payload) {
+      reply.statusCode = 401;
+      throw new Error("Invalid Token");
+    }
+    if ("userId" in payload) {
+      const user = await fastify.prisma.user.findUnique({
+        where: {
+          id: payload.userId,
+        },
+      });
+      if (!user) {
+        reply.statusCode = 401;
+        throw new Error("User not found");
+      }
+      req.user = user;
+    }
+    if ("employeeId" in payload) {
+      const employee = await fastify.prisma.employee.findUnique({
+        where: {
+          id: payload.employeeId,
+        },
+      });
+      if (!employee) {
+        reply.statusCode = 401;
+        throw new Error("Employee not found");
+      }
+      req.employee = employee;
+    }
     done();
   };
-
   const verifyUser = async (
     req: FastifyRequest,
     reply: FastifyReply,
     done: HookHandlerDoneFunction
   ) => {
-    try {
-      const auth = req.headers.authorization;
-      const token = auth ? auth.split(" ")[1] : undefined;
-      if (!token) return;
-      try {
-        const payload = verifySync(token) as UserPayload;
-        if (!payload) {
-          reply.statusCode = 401;
-          throw new Error("User not found");
-        }
-        const user = await fastify.prisma.user.findUnique({
-          where: {
-            id: payload.userId,
-          },
-        });
-        if (!user) {
-          reply.statusCode = 401;
-          throw new Error("User not found");
-        }
-        req.user = user;
-      } catch (error) {
-        reply.statusCode = 401;
-        throw new Error("Token invalid");
-      }
-    } catch (error) {
-      throw error;
+    const auth = req.headers.authorization;
+    const token = auth ? auth.split(" ")[1] : undefined;
+    if (!token) {
+      reply.statusCode = 401;
+      throw new Error("Not logged in");
     }
+    const payload = verifySync(token) as UserPayload;
+    if (!payload) {
+      reply.statusCode = 401;
+      throw new Error("Invalid Token");
+    }
+    const user = await fastify.prisma.user.findUnique({
+      where: {
+        id: payload.userId,
+      },
+    });
+    if (!user) {
+      reply.statusCode = 401;
+      throw new Error("User not found");
+    }
+    req.user = user;
     done();
   };
-
+  const verifyHasMerchantPermission = (
+    req: FastifyRequest,
+    reply: FastifyReply,
+    merchantId?: number | null
+  ) => {
+    const isAdmin = req.employee && req.employee.systemAdmin;
+    const hasMerchantPermission =
+      req.employee && merchantId && req.employee.merchantId === merchantId;
+    if (!isAdmin && !hasMerchantPermission) {
+      reply.statusCode = 403;
+      throw new Error("Do not have permission on this merchant");
+    }
+  };
   fastify.decorate("auth", {
     verifyEmployee,
     verifySystemAdmin,
     verifyUser,
+    verifyHasMerchantPermission,
     sign: signSync,
   });
 });

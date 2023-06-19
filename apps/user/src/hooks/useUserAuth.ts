@@ -1,38 +1,30 @@
-import { UserLoginBody } from "./../../../api/schema/users";
+import { UserLoginBody } from "database/schema/users";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { getUserAuth, loginUser } from "api-client";
+import { getAuthUser, loginUser } from "api-client";
 import { User } from "database";
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 import { AxiosError } from "axios";
+import useAppStore from "@/stores/useAppStore";
 interface UserAuthOptions {
   onLoginError?: (data: { message: string }) => void;
+  onLoginSuccess?: (data: User) => void;
+  onLogout?: () => void;
 }
 const TOKEN_NAME = "USER_TOKEN";
-function useUserAuth(
-  systemAdmin: boolean = false,
-  options: UserAuthOptions = {}
-) {
-  const { onLoginError } = options;
-  const [authenticated, setAuthenticated] = useState<boolean | null>(null);
-  const [user, setUser] = useState<User | null>(null);
-  const navigate = useNavigate();
+function useUserAuth(options: UserAuthOptions = {}) {
+  const { onLoginError, onLoginSuccess, onLogout } = options;
+  const { user, setUser, authenticated, setAuthenticated } = useAppStore();
   const authenticationQuery = useQuery({
-    queryKey: ["authentication"],
-    queryFn: getUserAuth,
-    retry: (failureCount, error) => {
-      if (error instanceof AxiosError && error.response?.status === 401) {
-        return false;
-      }
-      return true;
-    },
-    onError: () => {
+    queryKey: ["user", "authentication"],
+    queryFn: getAuthUser,
+    onError: (err) => {
+      console.log(err);
       setAuthenticated(false);
     },
     onSuccess: (data: User) => {
       if (data) {
         setAuthenticated(true);
         setUser(data);
+        onLoginSuccess && onLoginSuccess(data);
       } else {
         setAuthenticated(false);
       }
@@ -43,6 +35,7 @@ function useUserAuth(
       await loginUser(body.email, body.password),
     onSuccess: (data) => {
       const { token } = data;
+      console.log("token", token);
       if (token) {
         localStorage.setItem(TOKEN_NAME, token);
         authenticationQuery.refetch();
@@ -63,9 +56,12 @@ function useUserAuth(
     login: loginMutation.mutate,
     loginMutation,
     logout: () => {
-      localStorage.removeItem("token");
+      localStorage.removeItem(TOKEN_NAME);
+      setUser(null);
+      setAuthenticated(false);
       authenticationQuery.refetch();
-      navigate("/login");
+      onLogout && onLogout();
+      // navigate("/login");
     },
   };
 }

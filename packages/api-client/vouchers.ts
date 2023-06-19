@@ -1,14 +1,24 @@
-import { VoucherCreateBody, VoucherUpdateBody } from "api/schema/vouchers";
-import { Voucher } from "database";
+import {
+  VoucherCreateBody,
+  VoucherUpdateBody,
+  Voucher,
+  VoucherWithStatus,
+  VouchersParamsType,
+  VoucherWithCampaignAndUser,
+} from "database";
 import { createInstance } from "./base";
 const instance = createInstance("vouchers");
-export async function getVouchers(): Promise<Voucher[]> {
-  const res = await instance.get("/");
-
+export async function getVouchers(
+  params?: VouchersParamsType
+): Promise<VoucherWithStatus[]> {
+  const res = await instance.get("/", { params });
+  console.log("Params", params);
   return res.data;
 }
 
-export async function getVoucher(id: string | number): Promise<Voucher> {
+export async function getVoucher(
+  id: string | number
+): Promise<VoucherWithCampaignAndUser> {
   const res = await instance.get(`/${id}`);
   return res.data;
 }

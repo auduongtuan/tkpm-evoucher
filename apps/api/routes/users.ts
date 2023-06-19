@@ -1,42 +1,58 @@
 import { FastifyPluginOptions, FastifyInstance, FastifyRequest } from "fastify";
-import { IdParamsSchema, IdParamsType } from "../schema/id";
+import { IdParamsSchema, IdParamsType } from "database/schema/id";
 import {
   UserCreateSchema,
   UserCreateBody,
   UserUpdateBody,
   UserUpdateSchema,
-} from "../schema/users";
+  UserFindQueryType,
+  UserFindQuerySchema,
+} from "database";
 // import Users from "../models/UserModel";
-import { User, hashPassword } from "database";
-import type { Extended } from "helpers";
-type ExtendedUser = Extended<User>;
-function excludePassword(users: ExtendedUser[] | ExtendedUser | null) {
-  if (!users) return null;
-  if (Array.isArray(users)) {
-    return users.map((user) => {
-      const { password, ...rest } = user;
-      return rest;
-    });
-  } else {
-    const { password, ...rest } = users;
-    return rest;
-  }
-}
+import { User, hashPassword, excludePassword } from "database";
+
 async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
-  fastify.get("/", async function (req, reply) {
-    const users = await fastify.prisma.user.findMany({
-      include: {
-        vouchers: true,
-      },
-      orderBy: {
-        id: "asc",
-      },
-    });
-    return excludePassword(users);
-  });
+  fastify.get(
+    "/",
+    {
+      onRequest: [fastify.auth.verifySystemAdmin],
+    },
+    async function (req, reply) {
+      const users = await fastify.prisma.user.findMany({
+        include: {
+          vouchers: true,
+        },
+        orderBy: {
+          id: "asc",
+        },
+      });
+      return excludePassword(users);
+    }
+  );
+
+  fastify.get<{ Querystring: UserFindQueryType }>(
+    "/find",
+    {
+      onRequest: [fastify.auth.verifyEmployee],
+      schema: UserFindQuerySchema,
+    },
+    async function (req, reply) {
+      const { email, phone } = req.query;
+      const user = await fastify.prisma.user.findFirst({
+        where: {
+          OR: [{ email: email }, { phone: phone }],
+        },
+      });
+      return excludePassword(user);
+    }
+  );
+
   fastify.get<{ Params: IdParamsType }>(
     "/:id",
-    { schema: { params: IdParamsSchema } },
+    {
+      onRequest: [fastify.auth.verifySystemAdmin],
+      schema: { params: IdParamsSchema },
+    },
     async function (req, reply) {
       const user = await fastify.prisma.user.findUnique({
         where: {
@@ -49,6 +65,7 @@ async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
       return excludePassword(user);
     }
   );
+
   fastify.post<{ Body: UserCreateBody }>(
     "/",
     { schema: { body: UserCreateSchema } },

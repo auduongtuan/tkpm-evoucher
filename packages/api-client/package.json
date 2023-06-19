@@ -8,6 +8,7 @@
   "devDependencies": {
     "tsconfig": "workspace:*",
     "api": "workspace:*",
+    "helpers": "workspace:*",
     "database": "workspace:*",
     "typescript": "^4.5.2"
   }

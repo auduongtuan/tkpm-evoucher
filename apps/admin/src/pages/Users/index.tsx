@@ -1,5 +1,5 @@
 import { deleteUser, getUsers } from "api-client";
-import RecordList from "@/components/RecordList";
+import RecordList from "ui/admin-components/RecordList";
 import { User, Voucher } from "database";
 import { Outlet } from "react-router-dom";
 const Users = () => {

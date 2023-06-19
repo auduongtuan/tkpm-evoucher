@@ -4,11 +4,11 @@ import {
   FastifyPluginAsync,
   FastifyPluginOptions,
 } from "fastify";
-import { PrismaClient } from "database";
+import { PrismaClient, createPrismaClient } from "database";
 
 const prismaPlugin: FastifyPluginAsync = fp(
   async (server: FastifyInstance, options: FastifyPluginOptions) => {
-    const prisma = new PrismaClient();
+    const prisma = createPrismaClient();
 
     await prisma.$connect();
 

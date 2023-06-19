@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Form, Input, Modal, Checkbox, Select, DatePicker } from "antd";
 import { createVoucher, getVoucher, updateVoucher } from "api-client";
-import useRouteModal from "@/hooks/useRouteModal";
-import useCrud from "@/hooks/useCrud";
-import { CampaignSelect, UserSelect } from "@/components/RecordSelect";
+import useRouteModal from "ui/hooks/useRouteModal";
+import useCrud from "ui/hooks/useCrud";
+import { CampaignSelect, UserSelect } from "ui/admin-components/RecordSelect";
 import dayjs from "dayjs";
 
 const VoucherForm = () => {
@@ -98,6 +98,9 @@ const VoucherForm = () => {
             ></Input>
           </Form.Item>
           <Form.Item label="Expired at" name={"expiredAt"}>
+            <DatePicker showTime></DatePicker>
+          </Form.Item>
+          <Form.Item label="Used at" name={"usedAt"}>
             <DatePicker showTime></DatePicker>
           </Form.Item>
         </Form>

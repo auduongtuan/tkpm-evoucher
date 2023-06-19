@@ -1,18 +1,52 @@
+import { PaginationQueryType, computeCampaignStatus } from "database";
 import { FastifyInstance, FastifyPluginOptions } from "fastify";
-import { IdParamsSchema, IdParamsType } from "../schema/id";
+import { IdParamsSchema, IdParamsType } from "database";
 import {
   CampaignCreateSchema,
   CampaignCreateBody,
   CampaignUpdateSchema,
   CampaignUpdateBody,
-} from "../schema/campaigns";
+  CampaignsParamsType,
+} from "database/schema/campaigns";
 import { generate } from "voucher-codes-generator";
-import { VoucherGenerateBody, VoucherGenerateSchema } from "../schema/vouchers";
+import {
+  VoucherGenerateBody,
+  VoucherGenerateSchema,
+} from "database/schema/vouchers";
+import { isCampaignExpired } from "database";
 async function campaignRoutes(
   fastify: FastifyInstance,
   options: FastifyPluginOptions
 ) {
-  fastify.get("/", async function (req, reply) {
+  fastify.get<{
+    Querystring: PaginationQueryType & CampaignsParamsType;
+  }>("/", async function (req, reply) {
+    const merchantId = req.query.merchantId
+      ? Number(req.query.merchantId)
+      : undefined;
+    const currentDate = new Date();
+    const statusWhereCondition = {
+      all: {},
+      upcoming: {
+        startedAt: {
+          gte: currentDate,
+        },
+      },
+      ongoing: {
+        startedAt: {
+          lte: currentDate,
+        },
+        endedAt: {
+          gte: currentDate,
+        },
+      },
+      expired: {
+        endedAt: {
+          lte: currentDate,
+        },
+      },
+    };
+
     const campaigns = await fastify.prisma.campaign.findMany({
       include: {
         merchant: true,
@@ -26,14 +60,25 @@ async function campaignRoutes(
             store: true,
           },
         },
+        vouchers: {
+          select: {
+            id: true,
+          },
+        },
       },
       orderBy: {
-        createdAt: "asc",
+        endedAt: "desc",
+      },
+      where: {
+        ...(req.query.status && req.query.status in statusWhereCondition
+          ? statusWhereCondition[req.query.status]
+          : {}),
+        ...(merchantId ? { merchantId } : {}),
       },
     });
     // https://www.prisma.io/docs/guides/other/troubleshooting-orm/help-articles/working-with-many-to-many-relations
     return campaigns.map((campaign) => ({
-      ...campaign,
+      ...computeCampaignStatus(campaign),
       stores: campaign.stores.map((store) => store.store),
       games: campaign.games.map((game) => game.game),
     }));
@@ -62,7 +107,7 @@ async function campaignRoutes(
       });
       return campaign
         ? {
-            ...campaign,
+            ...computeCampaignStatus(campaign),
             stores: campaign.stores.map((store) => store.store),
             games: campaign.games.map((game) => game.game),
           }
@@ -160,18 +205,38 @@ async function campaignRoutes(
         reply.status(404);
         throw new Error("Campaign not found");
       }
+      const campaignWithStatus = computeCampaignStatus(campaign);
+      if (campaignWithStatus.status === "expired") {
+        reply.status(403);
+        throw new Error("Campaign ended");
+      }
+      if (campaignWithStatus.status === "upcoming") {
+        reply.status(403);
+        throw new Error("Campaign not started");
+      }
+      const game = await fastify.prisma.game.findUnique({
+        where: {
+          slug: req.body.gameSlug,
+        },
+      });
+      if (!game) {
+        reply.status(404);
+        throw new Error("Game not found");
+      }
       let voucherValue: number = -1;
-      const GAME_AVG_SCORE = 10;
+      const GAME_AVG_SCORE = game.averageScore || 10;
       const { maxVoucherFixed, maxVoucherPercent, discountType } = campaign;
       if (discountType === "PERCENT" && maxVoucherPercent) {
         voucherValue = Math.min(score / GAME_AVG_SCORE, 1) * maxVoucherPercent;
       } else if (discountType === "FIXED" && maxVoucherFixed) {
         voucherValue = Math.min(score / GAME_AVG_SCORE, 1) * maxVoucherFixed;
       }
+      voucherValue = Math.round(voucherValue);
       const voucherValueInBudget =
         (discountType === "FIXED" ? voucherValue : maxVoucherFixed) || 0;
+      console.log(voucherValueInBudget);
       if (
-        (campaign.totalBudget || 0) + voucherValueInBudget >
+        (campaign.spentBudget || 0) + voucherValueInBudget >
         (campaign.totalBudget || 0)
       ) {
         reply.status(403);
@@ -181,7 +246,7 @@ async function campaignRoutes(
         reply.status(500);
         throw new Error("Invalid voucher value");
       }
-      fastify.prisma.campaign.update({
+      await fastify.prisma.campaign.update({
         where: {
           id: req.params.id,
         },

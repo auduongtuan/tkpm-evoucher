@@ -1,5 +1,5 @@
 import { deleteEmployee, getEmployee, getEmployees } from "api-client";
-import RecordList from "@/components/RecordList";
+import RecordList from "ui/admin-components/RecordList";
 import { Merchant, Employee, Store } from "database";
 import { Outlet } from "react-router-dom";
 import { Tag } from "antd";
