@@ -17,17 +17,17 @@ async function storeRoutes(
   fastify.get<{ Querystring: PaginationQueryType & StoresParamsType }>(
     "/",
     async function (req, reply) {
-      const whereCondition = {
-        categories: req.query.categoryId
-          ? {
-              some: {
-                categoryId: req.query.categoryId
-                  ? Number(req.query.categoryId)
-                  : undefined,
-              },
-            }
-          : undefined,
-      };
+      // const whereCondition = {
+      //   categories: req.query.categoryId
+      //     ? {
+      //         some: {
+      //           categoryId: req.query.categoryId
+      //             ? Number(req.query.categoryId)
+      //             : undefined,
+      //         },
+      //       }
+      //     : undefined,
+      // };
       const take = req.query.take ? Number(req.query.take) : undefined;
       const skip = req.query.skip ? Number(req.query.skip) : undefined;
       const categoryId = req.query.categoryId

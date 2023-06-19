@@ -1,18 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
-import { Col, Typography } from "antd";
+import { Typography } from "antd";
 import { capitalize } from "lodash-es";
 import {
-  getMerchants,
   getStores,
-  getUsers,
-  getCategories,
-  getGames,
-  getCampaigns,
   getVouchers,
   getMerchantCampaigns,
   getMerchantCategories,
 } from "api-client";
 import pluralize from "pluralize-esm";
+import chartColors from "ui/components/chartColors";
 import {
   Chart as ChartJS,
   ArcElement,
@@ -22,11 +18,11 @@ import {
 } from "chart.js";
 import { Doughnut } from "react-chartjs-2";
 import useAdminStore from "ui/hooks/useAdminStore";
+import Support from "ui/components/Support";
 import { formatCurrency } from "helpers";
 import { Campaign } from "database";
 ChartJS.register(Colors);
 ChartJS.register(ArcElement, Tooltip, Legend);
-
 const Home = () => {
   const merchantId = useAdminStore((state) => state.employee?.merchantId);
   if (!merchantId) return null;
@@ -100,7 +96,7 @@ const Home = () => {
               </Typography.Title>
               {!statistics["campaign"].isLoading &&
                 statistics["campaign"].data
-                  ?.sort((a, b) => b?.campaigns?.length - a?.campaigns?.length)
+                  ?.sort((a, b) => b?.totalBudget - a?.totalBudget)
                   .slice(0, 5)
                   .map((campaign: Campaign) => {
                     return (
@@ -141,11 +137,7 @@ const Home = () => {
                       data: joinedCategories.map(
                         (category) => category.stores?.length
                       ),
-                      // backgroundColor: [
-                      //   "rgb(255, 99, 132)",
-                      //   "rgb(54, 162, 235)",
-                      //   "rgb(255, 205, 86)",
-                      // ],
+                      backgroundColor: chartColors,
                       hoverOffset: 4,
                     },
                   ],
@@ -154,7 +146,7 @@ const Home = () => {
             )}
           </section>
           <section>
-            <Typography.Title level={4}>Campaigns by category</Typography.Title>
+            <Typography.Title level={4}>Campaigns by stores</Typography.Title>
             {!statistics["campaign"]?.isLoading &&
               statistics["campaign"]?.data && (
                 <Doughnut
@@ -176,15 +168,11 @@ const Home = () => {
 
                     datasets: [
                       {
-                        label: "Quantity of vouchers",
+                        label: "Quantity of stores",
                         data: statistics["campaign"].data?.map(
-                          (campaign) => campaign.vouchers?.length
+                          (campaign) => campaign.stores?.length
                         ),
-                        // backgroundColor: [
-                        //   "rgb(255, 99, 132)",
-                        //   "rgb(54, 162, 235)",
-                        //   "rgb(255, 205, 86)",
-                        // ],
+                        backgroundColor: chartColors,
                         hoverOffset: 4,
                       },
                     ],
@@ -193,6 +181,7 @@ const Home = () => {
               )}
           </section>
         </div>
+        <Support />
       </div>
     </div>
   );

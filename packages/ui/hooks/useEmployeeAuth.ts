@@ -48,8 +48,9 @@ function useEmployeeAuth(
         setEmployee(data);
         setLogout(() => {
           localStorage.removeItem(TOKEN_NAME);
-          authenticationQuery.refetch();
-          navigate("/login");
+          // authenticationQuery.refetch();
+          setAuthenticated(false);
+          // navigate("/login");
         });
       } else {
         setAuthenticated(false);

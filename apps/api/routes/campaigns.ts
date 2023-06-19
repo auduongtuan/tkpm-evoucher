@@ -116,12 +116,17 @@ async function campaignRoutes(
   );
   fastify.post<{ Body: CampaignCreateBody }>(
     "/",
-    { schema: { body: CampaignCreateSchema } },
+    {
+      onRequest: [fastify.auth.verifyEmployee],
+      schema: { body: CampaignCreateSchema },
+    },
     async function (req, reply) {
-      const { storeIds, gameIds, ...rest } = req.body;
+      const { storeIds, gameIds, merchantId, ...rest } = req.body;
+      fastify.auth.verifyHasMerchantPermission(req, reply, merchantId);
       return fastify.prisma.campaign.create({
         data: {
           ...rest,
+          merchantId,
           stores: storeIds
             ? {
                 create: storeIds.map((storeId) => ({
@@ -151,9 +156,22 @@ async function campaignRoutes(
 
   fastify.put<{ Body: CampaignUpdateBody; Params: IdParamsType }>(
     "/:id",
-    { schema: { body: CampaignUpdateSchema, params: IdParamsSchema } },
+    {
+      onRequest: [fastify.auth.verifyEmployee],
+      schema: { body: CampaignUpdateSchema, params: IdParamsSchema },
+    },
     async function (req, reply) {
       const { storeIds, gameIds, ...rest } = req.body;
+      const campaign = await fastify.prisma.campaign.findUnique({
+        where: {
+          id: req.params.id,
+        },
+      });
+      if (!campaign) {
+        reply.statusCode = 404;
+        throw new Error("Campaign not found");
+      }
+      fastify.auth.verifyHasMerchantPermission(req, reply, campaign.merchantId);
       return await fastify.prisma.campaign.update({
         where: {
           id: req.params.id,
@@ -193,9 +211,16 @@ async function campaignRoutes(
   );
   fastify.post<{ Body: VoucherGenerateBody; Params: IdParamsType }>(
     "/:id/generate-voucher",
-    { schema: { body: VoucherGenerateSchema, params: IdParamsSchema } },
+    {
+      onRequest: [fastify.auth.verifyUser],
+      schema: { body: VoucherGenerateSchema, params: IdParamsSchema },
+    },
     async function (req, reply) {
       const { userId, score } = req.body;
+      if (req.user?.id !== userId) {
+        reply.status(403);
+        throw new Error("You can't generate voucher for other user");
+      }
       const campaign = await fastify.prisma.campaign.findUnique({
         where: {
           id: req.params.id,
@@ -280,8 +305,31 @@ async function campaignRoutes(
   );
   fastify.delete<{ Params: IdParamsType }>(
     "/:id",
-    { schema: { params: IdParamsSchema } },
+    {
+      onRequest: [fastify.auth.verifyEmployee],
+      schema: { params: IdParamsSchema },
+    },
     async function (req, reply) {
+      const campaign = await fastify.prisma.campaign.findUnique({
+        where: {
+          id: req.params.id,
+        },
+      });
+      if (!campaign) {
+        reply.statusCode = 404;
+        throw new Error("Campaign not found");
+      }
+      fastify.auth.verifyHasMerchantPermission(req, reply, campaign.merchantId);
+      await fastify.prisma.campaignsOnStores.deleteMany({
+        where: {
+          campaignId: req.params.id,
+        },
+      });
+      await fastify.prisma.gamesOnCampaigns.deleteMany({
+        where: {
+          campaignId: req.params.id,
+        },
+      });
       await fastify.prisma.campaign.delete({
         where: {
           id: req.params.id,

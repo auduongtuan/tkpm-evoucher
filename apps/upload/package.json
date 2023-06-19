@@ -1,0 +1,38 @@
+{
+  "name": "upload",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node index.js",
+    "dev": "nodemon index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fastify/auth": "^4.2.0",
+    "@fastify/cors": "^8.2.1",
+    "@fastify/error": "^3.2.0",
+    "@fastify/jwt": "^6.7.1",
+    "@fastify/multipart": "^7.6.0",
+    "@fastify/static": "^6.10.2",
+    "@fastify/type-provider-typebox": "^3.2.0",
+    "@hapi/boom": "^10.0.1",
+    "@sinclair/typebox": "^0.28.9",
+    "database": "workspace:*",
+    "fast-jwt": "^2.2.3",
+    "fastify": "^4.18.0",
+    "fastify-plugin": "^4.5.0",
+    "helpers": "workspace:*",
+    "voucher-codes-generator": "^1.2.4"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^7.6.0",
+    "@types/node": "^17.0.33",
+    "ts-node": "^10.9.1",
+    "tsconfig": "workspace:*",
+    "typescript": "^4.6.4"
+  }
+}

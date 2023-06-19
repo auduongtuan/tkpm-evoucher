@@ -4,6 +4,7 @@ import { RiGameFill } from "react-icons/ri";
 import { Breadcrumb, Button, Empty } from "antd";
 import { Description, Link } from "ui";
 import SectionTitle from "@/components/SectionTitle";
+import CategoryLinks from "ui/components/CategoryLinks";
 const StoreDetail = () => {
   const { id, recordQuery } = useRecord({
     name: "store",
@@ -51,21 +52,7 @@ const StoreDetail = () => {
         </Description>
         <Description label={"Categories"} className="mt-4">
           <div className="text-base ">
-            {store.categories.reduce<React.ReactNode[]>((acc, category, i) => {
-              acc.push(
-                <Link
-                  to={`/stores/category/${category.id}`}
-                  className="underline underline-offset-4 decoration-gray-200"
-                  key={"category-tag" + category.id}
-                >
-                  {category.name}
-                </Link>
-              );
-              if (i < store.categories.length - 1) {
-                acc.push(", ");
-              }
-              return acc;
-            }, [])}
+            <CategoryLinks categories={store.categories} />
           </div>
         </Description>
         <Button

@@ -13,6 +13,7 @@ import useCrud from "ui/hooks/useCrud";
 import { MerchantSelect } from "ui/admin-components/RecordSelect";
 import { useQuery } from "@tanstack/react-query";
 import { useWatch } from "antd/es/form/Form";
+import UploadFormItem from "ui/admin-components/UploadFormItem";
 const CampaignForm = () => {
   const { modalProps, closeModal } = useRouteModal("/campaigns");
   const [form] = Form.useForm();
@@ -217,6 +218,7 @@ const CampaignForm = () => {
               className="w-full"
             />
           </Form.Item>
+          <UploadFormItem form={form} />
         </Form>
       </Modal>
     </>

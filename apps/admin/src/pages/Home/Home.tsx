@@ -1,5 +1,5 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Row, Col, Typography } from "antd";
+import { useQuery } from "@tanstack/react-query";
+import { Col, Typography } from "antd";
 import { capitalize } from "lodash-es";
 import {
   getMerchants,
@@ -11,18 +11,37 @@ import {
   getVouchers,
 } from "api-client";
 import pluralize from "pluralize-esm";
+import { ArcElement, Colors } from "chart.js";
 import {
   Chart as ChartJS,
-  ArcElement,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
   Tooltip,
   Legend,
-  Colors,
+  BarElement,
 } from "chart.js";
-import { Doughnut } from "react-chartjs-2";
+
+import { Bar, Doughnut } from "react-chartjs-2";
 import { Campaign } from "database";
+import Support from "ui/components/Support";
 import { formatCurrency, quantityPluralize } from "helpers";
+import dayjs from "dayjs";
+import { groupBy, uniqWith, isEqual } from "lodash-es";
 ChartJS.register(Colors);
 ChartJS.register(ArcElement, Tooltip, Legend);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  BarElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 const Home = () => {
   const queryFns = {
@@ -41,6 +60,19 @@ const Home = () => {
     });
     return acc;
   }, {});
+  const campaignByMonthLabels = statistics["campaign"].data
+    ? uniqWith(
+        statistics["campaign"].data
+          .map((campaign) => dayjs(campaign.startedAt).format("MM/YYYY"))
+          .sort((a, b) => (a == b ? 0 : dayjs(a).isBefore(dayjs(b)) ? 1 : -1)),
+        isEqual
+      )
+    : [];
+  const campaignByMonthData = Object.values(
+    groupBy(statistics["campaign"].data, (campaign) =>
+      dayjs(campaign.startedAt).format("MM/YYYY")
+    )
+  ).map((campaignList) => campaignList?.length);
   return (
     <div className="grid">
       <div className="grid grid-cols-3 gap-10">
@@ -90,7 +122,7 @@ const Home = () => {
               </Typography.Title>
               {!statistics["campaign"].isLoading &&
                 statistics["campaign"].data
-                  ?.sort((a, b) => b?.campaigns?.length - a?.campaigns?.length)
+                  ?.sort((a, b) => b?.totalBudget - a?.totalBudget)
                   .slice(0, 5)
                   .map((campaign: Campaign) => {
                     return (
@@ -164,20 +196,10 @@ const Home = () => {
             )}
           </section>
           <section>
-            <Typography.Title level={4}>Campaigns by category</Typography.Title>
+            <Typography.Title level={4}>Vouchers by campaigns</Typography.Title>
             {!statistics["campaign"].isLoading && (
               <Doughnut
                 className="aspect-video "
-                options={
-                  {
-                    // plugins: {
-                    //   legend: {
-                    //     position: "right",
-                    //   },
-                    // },
-                    // aspectRatio: 2,
-                  }
-                }
                 data={{
                   labels: statistics["campaign"].data.map(
                     (campaign) => campaign.name
@@ -189,11 +211,7 @@ const Home = () => {
                       data: statistics["campaign"].data.map(
                         (campaign) => campaign.vouchers?.length
                       ),
-                      // backgroundColor: [
-                      //   "rgb(255, 99, 132)",
-                      //   "rgb(54, 162, 235)",
-                      //   "rgb(255, 205, 86)",
-                      // ],
+
                       hoverOffset: 4,
                     },
                   ],
@@ -202,8 +220,39 @@ const Home = () => {
             )}
           </section>
         </div>
+        <div>
+          <section className="mb-4">
+            <Typography.Title level={4}>Campaigns by month</Typography.Title>
+
+            {!statistics["campaign"].isLoading && (
+              <Bar
+                key="line-chart"
+                className="aspect-video"
+                options={
+                  {
+                    // plugins: {
+                    //   legend: {
+                    //     position: "right",
+                    //   },
+                    // },
+                    // aspectRatio: 2,
+                  }
+                }
+                data={{
+                  labels: campaignByMonthLabels,
+                  datasets: [
+                    {
+                      label: "Quantity of campaigns",
+                      data: campaignByMonthData,
+                    },
+                  ],
+                }}
+              />
+            )}
+          </section>
+          <Support />
+        </div>
       </div>
-      <Col span={12}></Col>
     </div>
   );
 };

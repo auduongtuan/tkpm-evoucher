@@ -25,6 +25,7 @@
     "@ant-design/icons": "^5.0.1",
     "@tanstack/react-query": "^4.29.5",
     "database": "workspace:*",
-    "api-client": "workspace:*"
+    "api-client": "workspace:*",
+    "helpers": "workspace:*"
   }
 }

@@ -6,6 +6,8 @@ import { RiGameFill, RiStore2Fill } from "react-icons/ri";
 import { Breadcrumb, Empty } from "antd";
 import ThumbnailImage from "ui/components/ThumbnailImage";
 import SectionTitle from "@/components/SectionTitle";
+import CategoryLinks from "ui/components/CategoryLinks";
+import { Category } from "database";
 const MerchantDetail = () => {
   // const { modalProps, closeModal } = useRouteModal("/merchants");
   // const [form] = Form.useForm();
@@ -52,12 +54,14 @@ const MerchantDetail = () => {
           {merchant.stores.length} {pluralize("store", merchant.stores.length)}
         </div>
         <div className="mt-4 text-gray-600 text-md">
-          {[
-            ...merchant.stores.reduce<Set<string>>((acc, curr) => {
-              curr.categories.forEach((category) => acc.add(category.name));
-              return acc;
-            }, new Set<string>()),
-          ].join(", ")}
+          <CategoryLinks
+            categories={[
+              ...merchant.stores.reduce<Set<Category>>((acc, curr) => {
+                curr.categories.forEach((category) => acc.add(category));
+                return acc;
+              }, new Set<Category>()),
+            ]}
+          />
         </div>
         <p className="mt-4 text-sm leading-normal">
           {merchant.description && merchant.description}
