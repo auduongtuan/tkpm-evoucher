@@ -11,13 +11,11 @@ const LoginModal = () => {
     onLoginError: (data) => {
       setErrorMessage(data.message);
     },
-    onLoginSuccess: (data) => {
-      message.success("Login successfully!");
-    },
   });
   useEffect(() => {
-    if (authenticated) {
+    if (loginModal.open && authenticated) {
       loginModal.setOpen(false);
+      message.success("Login successfully!");
     }
   }, [authenticated]);
   const handleLogin = (e) => {

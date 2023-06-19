@@ -1,4 +1,4 @@
-import { Modal } from "antd";
+import { Modal, Empty } from "antd";
 import FlappyBirdGame from "./FlappyBird/FlappyBirdGame";
 import useGameStore from "../stores/useGameStore";
 import { useReducer } from "react";
@@ -55,7 +55,7 @@ const GameModal = () => {
               <GameComponent key={lastUpdate} />
             </div>
           ) : (
-            "Game not available yet"
+            <Empty description="Game not available yet" />
           )}
         </>
       )}

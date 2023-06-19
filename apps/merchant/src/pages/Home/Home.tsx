@@ -100,7 +100,7 @@ const Home = () => {
               </Typography.Title>
               {!statistics["campaign"].isLoading &&
                 statistics["campaign"].data
-                  ?.sort((a, b) => b?.campaigns?.length - a?.campaigns?.length)
+                  ?.sort((a, b) => b?.totalBudget - a?.totalBudget)
                   .slice(0, 5)
                   .map((campaign: Campaign) => {
                     return (

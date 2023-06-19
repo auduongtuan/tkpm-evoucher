@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Alert, Button, Form, Input } from "antd";
 import { useNavigate } from "react-router-dom";
 import useEmployeeAuth from "../hooks/useEmployeeAuth";
+import SystemLogo from "../components/SystemLogo";
 const LoginPage = ({ systemAdmin }: { systemAdmin: boolean }) => {
   // login page with antd components here
   const navigate = useNavigate();
@@ -30,9 +31,13 @@ const LoginPage = ({ systemAdmin }: { systemAdmin: boolean }) => {
       });
   };
   return (
-    <div className="bg-gray-200 flex items-center justify-center p-4 min-h-[100vh]">
+    <div className="bg-gray-900 flex flex-col justify-center items-center justify-center p-4 min-h-[100vh]">
+      <SystemLogo
+        className="flex-col gap-1"
+        subName={systemAdmin ? "Admin" : "Merchant"}
+      />
       <div className="max-w-md p-8 bg-white border-gray-100 rounded-md shadow-md">
-        <h1>Login</h1>
+        <h1 className="text-xl font-semibold">Login</h1>
         {errorMessage && (
           <Alert type="error" message={errorMessage} className="mb-4"></Alert>
         )}
