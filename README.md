@@ -1,10 +1,6 @@
 ## Introduce
 
-This is an school project for Advanced Software Design course in my school. A full-stack web E-voucher system contains 3 apps
-
-- Admin
-- Merchant
-- User
+ This is a university project for the Advanced Software Design course in my university. It is a full-stack web E-voucher system that helps merchants to manage promotion campaigns and vouchers. Users of these merchants can play games to generate vouchers based on game scores with limitations based on merchant setting. The system contains 3 web apps for different roles: Admin, Merchant, and User.
 
 ## Tech used
 
